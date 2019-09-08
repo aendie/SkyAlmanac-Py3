@@ -73,7 +73,7 @@ The results have been crosschecked with USNO data to some extent.
 ### INSTALLATION GUIDELINES on MAC:
 
 &nbsp;&nbsp;&nbsp;&nbsp;Every Mac comes with python preinstalled.  
-&nbsp;&nbsp;&nbsp;&nbsp;(Please choose this version of Pyalmanac if Python 3.* is installed.)  
+&nbsp;&nbsp;&nbsp;&nbsp;(Please choose this version of SkyAlmanac if Python 3.* is installed.)  
 &nbsp;&nbsp;&nbsp;&nbsp;You need to install the Skyfield (and PyEphem) library to use SFalmanac.  
 &nbsp;&nbsp;&nbsp;&nbsp;Type the following commands at the commandline (terminal app):
 
