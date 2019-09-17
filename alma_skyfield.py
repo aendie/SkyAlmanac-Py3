@@ -517,7 +517,7 @@ def fmtdeg(deg,fixedwidth=1):
 
 
 # List of navigational stars with Hipparcos Catalog Number
-db = """\
+db = """
 Alpheratz,677
 Ankaa,2081
 Schedar,3179
