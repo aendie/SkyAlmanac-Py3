@@ -154,10 +154,10 @@ def suntabm(date):
 def NSdeg(deg,modern=False,hr=0,forceNS=False):
     # reformat degrees latitude to Ndd°mm.m or Sdd°mm.m
     if deg[0:1] == '-':
-        hemisph = u"S"
+        hemisph = u'S'
         deg = deg[1:]
     else:
-        hemisph = u"N"
+        hemisph = u'N'
     if modern:
         if forceNS or hr%6 == 0:
             sdeg = u"\\textcolor{blue}{%s}" %hemisph + deg

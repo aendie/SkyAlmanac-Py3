@@ -461,10 +461,10 @@ def sunmoontabm(date):
 def NSdeg(deg,modern=False,hr=0,forceNS=False):
     # reformat degrees latitude to Ndd°mm.m or Sdd°mm.m
     if deg[0:1] == '-':
-        hemisph = u"S"
+        hemisph = u'S'
         deg = deg[1:]
     else:
-        hemisph = u"N"
+        hemisph = u'N'
     if modern:
         if forceNS or hr%6 == 0:
             sdeg = u"\\textcolor{blue}{%s}" %hemisph + deg
@@ -596,7 +596,7 @@ def twilighttab(date):
         moon, moon2 = moonrise_set(date, i)
         if not(double_events_found(moon,moon2)):
             tab = tab + u"\\textbf{%s}" % hs + " " + "%s°" %(abs(i))
-            tab=tab + u" & %s & %s & %s & %s & %s & %s \\\ \n" %(moon[0],moon[1],moon[2],moon[3],moon[4],moon[5])
+            tab = tab + u" & %s & %s & %s & %s & %s & %s \\\ \n" %(moon[0],moon[1],moon[2],moon[3],moon[4],moon[5])
         else:
 # print a row with two moonrise/moonset events on the same day & latitude
             tab = tab + r"""\multirow{2}{*}{\textbf{%s} %s°}""" %(hs,abs(i))
@@ -767,10 +767,10 @@ def almanac(first_day, pagenum):
 
     \begin{document}
 
+    % for the title page only...
+    \newgeometry{ top=21mm, bottom=15mm, left=12mm, right=8mm}
     \begin{titlepage}
 """
-    if config.tbls == "m":
-        alm = alm + r'''\vspace*{0.7cm}'''
 
     alm = alm + r"""
     \begin{center}
@@ -778,9 +778,9 @@ def almanac(first_day, pagenum):
     \textsc{\Large Generated using PyEphem and Skyfield}\\
     \large http://rhodesmill.org/skyfield/\\[0.7cm]
 
-    %\includegraphics[width=0.45\textwidth]{./Sky-large}\\[1cm]
-    \includegraphics[width=0.8\textwidth]{./Bowditch-stars-0-180}\\[0.3cm]
-    \includegraphics[width=0.8\textwidth]{./Bowditch-stars-180-360}\\[1.3cm]
+    % TRIM values: left bottom right top
+    \includegraphics[clip, trim=12mm 20cm 12mm 21mm, width=0.92\textwidth]{./A4chart0-180_P.pdf}\\[0.3cm]
+    \includegraphics[clip, trim=12mm 20cm 12mm 21mm, width=0.92\textwidth]{./A4chart180-360_P.pdf}\\[0.8cm]
 
     \textsc{\huge The Nautical Almanac}\\[0.7cm]
 """
@@ -815,9 +815,7 @@ def almanac(first_day, pagenum):
 """
 
     alm = alm + r"""\end{center}
-     
-    \vfill
-     
+
     {\large \today}
     \HRule \\[0.2cm]
     \end{center}
@@ -832,6 +830,7 @@ def almanac(first_day, pagenum):
     \end{description}
     
     \end{titlepage}
+    \restoregeometry    % so it does not affect the rest of the pages
 """
     alm = alm + pages(first_day,pagenum)
     alm = alm + u'\end{document}'
