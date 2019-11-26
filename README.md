@@ -25,7 +25,9 @@ The results have been crosschecked with USNO data to some extent.
 
 **UPDATE: Nov 2019**
 
-This includes very minor changes and an improved title page for the full almanac with two star charts that indicate the equatorial navigational stars.
+Declination formatting has been changed to the standard used in Nautical Almanacs. In each 6-hour block of declinations, the degrees value is only printed on the first line if it doesn't change. It is printed whenever the degrees value changes. The fourth line has two dots indicating "ditto". This applies to all planet declinations and for the sun's declination, but not to the moon's declination as this is continuously changing.
+
+This also includes some very minor changes and an improved title page for the full almanac with two star charts that indicate the equatorial navigational stars.
 
 ## Requirements
 

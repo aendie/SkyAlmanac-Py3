@@ -46,35 +46,40 @@ def planetstab(date):
         h = 0
 
         if config.decf != '+':	# USNO format for Declination
-            vlastNS = ''
-            mlastNS = ''
-            jlastNS = ''
-            slastNS = ''
             while h < 24:
+                if h > 0:
+                    prevDECv = vDEG[h-1]
+                    prevDECm = mDEG[h-1]
+                    prevDECj = jDEG[h-1]
+                    prevDECs = sDEG[h-1]
+                else:
+                    prevDECv = vDEG[0]		# hour -1 = hour 0
+                    prevDECm = mDEG[0]		# hour -1 = hour 0
+                    prevDECj = jDEG[0]		# hour -1 = hour 0
+                    prevDECs = sDEG[0]		# hour -1 = hour 0
+                if h < 23:
+                    nextDECv = vDEG[h+1]
+                    nextDECm = mDEG[h+1]
+                    nextDECj = jDEG[h+1]
+                    nextDECs = sDEG[h+1]
+                else:
+                    nextDECv = vDEG[23]	    # hour 24 = hour 23
+                    nextDECm = mDEG[23]	    # hour 24 = hour 23
+                    nextDECj = jDEG[23]	    # hour 24 = hour 23
+                    nextDECs = sDEG[23]	    # hour 24 = hour 23
+
                 # format declination checking for hemisphere change
-                vdec, vNS = NSdeg(vDEC[h],False,h)
-                if h < 23:
-                    if vNS != vlastNS or math.copysign(1.0,vDEG[h]) != math.copysign(1.0,vDEG[h+1]):
-                        vdec, vNS = NSdeg(vDEC[h],False,h,True)	# force NS
-                vlastNS = vNS
+                printNS, printDEG = declCompare(prevDECv,vDEG[h],nextDECv,h)
+                vdec = NSdecl(vDEC[h],h,printNS,printDEG,False)
 
-                mdec, mNS = NSdeg(mDEC[h],False,h)
-                if h < 23:
-                    if mNS != mlastNS or math.copysign(1.0,mDEG[h]) != math.copysign(1.0,mDEG[h+1]):
-                        mdec, mNS = NSdeg(mDEC[h],False,h,True)	# force NS
-                mlastNS = mNS
+                printNS, printDEG = declCompare(prevDECm,mDEG[h],nextDECm,h)
+                mdec = NSdecl(mDEC[h],h,printNS,printDEG,False)
 
-                jdec, jNS = NSdeg(jDEC[h],False,h)
-                if h < 23:
-                    if jNS != jlastNS or math.copysign(1.0,jDEG[h]) != math.copysign(1.0,jDEG[h+1]):
-                        jdec, jNS = NSdeg(jDEC[h],False,h,True)	# force NS
-                jlastNS = jNS
+                printNS, printDEG = declCompare(prevDECj,jDEG[h],nextDECj,h)
+                jdec = NSdecl(jDEC[h],h,printNS,printDEG,False)
 
-                sdec, sNS = NSdeg(sDEC[h],False,h)
-                if h < 23:
-                    if sNS != slastNS or math.copysign(1.0,sDEG[h]) != math.copysign(1.0,sDEG[h+1]):
-                        sdec, sNS = NSdeg(sDEC[h],False,h,True)	# force NS
-                slastNS = sNS
+                printNS, printDEG = declCompare(prevDECs,sDEG[h],nextDECs,h)
+                sdec = NSdecl(sDEC[h],h,printNS,printDEG,False)
 
                 line = u"%s & %s & %s & %s & %s & %s & %s & %s & %s & %s" %(h,aGHA[h],vGHA[h],vdec,mGHA[h],mdec,jGHA[h],jdec,sGHA[h],sdec)
                 lineterminator = u"\\\ \n"
@@ -137,37 +142,42 @@ def planetstabm(date):
         h = 0
 
         if config.decf != '+':	# USNO format for Declination
-            vlastNS = ''
-            mlastNS = ''
-            jlastNS = ''
-            slastNS = ''
             while h < 24:
                 band = int(h/6)
                 group = band % 2
+                if h > 0:
+                    prevDECv = vDEG[h-1]
+                    prevDECm = mDEG[h-1]
+                    prevDECj = jDEG[h-1]
+                    prevDECs = sDEG[h-1]
+                else:
+                    prevDECv = vDEG[0]		# hour -1 = hour 0
+                    prevDECm = mDEG[0]		# hour -1 = hour 0
+                    prevDECj = jDEG[0]		# hour -1 = hour 0
+                    prevDECs = sDEG[0]		# hour -1 = hour 0
+                if h < 23:
+                    nextDECv = vDEG[h+1]
+                    nextDECm = mDEG[h+1]
+                    nextDECj = jDEG[h+1]
+                    nextDECs = sDEG[h+1]
+                else:
+                    nextDECv = vDEG[23]	    # hour 24 = hour 23
+                    nextDECm = mDEG[23]	    # hour 24 = hour 23
+                    nextDECj = jDEG[23]	    # hour 24 = hour 23
+                    nextDECs = sDEG[23]	    # hour 24 = hour 23
+
                 # format declination checking for hemisphere change
-                vdec, vNS = NSdeg(vDEC[h],True,h)
-                if h < 23:
-                    if vNS != vlastNS or math.copysign(1.0,vDEG[h]) != math.copysign(1.0,vDEG[h+1]):
-                        vdec, vNS = NSdeg(vDEC[h],True,h,True)	# force NS
-                vlastNS = vNS
+                printNS, printDEG = declCompare(prevDECv,vDEG[h],nextDECv,h)
+                vdec = NSdecl(vDEC[h],h,printNS,printDEG,True)
 
-                mdec, mNS = NSdeg(mDEC[h],True,h)
-                if h < 23:
-                    if mNS != mlastNS or math.copysign(1.0,mDEG[h]) != math.copysign(1.0,mDEG[h+1]):
-                        mdec, mNS = NSdeg(mDEC[h],True,h,True)	# force NS
-                mlastNS = mNS
+                printNS, printDEG = declCompare(prevDECm,mDEG[h],nextDECm,h)
+                mdec = NSdecl(mDEC[h],h,printNS,printDEG,True)
 
-                jdec, jNS = NSdeg(jDEC[h],True,h)
-                if h < 23:
-                    if jNS != jlastNS or math.copysign(1.0,jDEG[h]) != math.copysign(1.0,jDEG[h+1]):
-                        jdec, jNS = NSdeg(jDEC[h],True,h,True)	# force NS
-                jlastNS = jNS
+                printNS, printDEG = declCompare(prevDECj,jDEG[h],nextDECj,h)
+                jdec = NSdecl(jDEC[h],h,printNS,printDEG,True)
 
-                sdec, sNS = NSdeg(sDEC[h],True,h)
-                if h < 23:
-                    if sNS != slastNS or math.copysign(1.0,sDEG[h]) != math.copysign(1.0,sDEG[h+1]):
-                        sdec, sNS = NSdeg(sDEC[h],True,h,True)	# force NS
-                slastNS = sNS
+                printNS, printDEG = declCompare(prevDECs,sDEG[h],nextDECs,h)
+                sdec = NSdecl(sDEC[h],h,printNS,printDEG,True)
 
                 line = r'''\color{blue} {%s} & 
 ''' %(h)
@@ -322,15 +332,20 @@ def sunmoontab(date):
 
         h = 0
         if config.decf != '+':	# USNO format for Declination
-            slastNS = ''
             mlastNS = ''
             while h < 24:
-                # format declination checking for hemisphere change
-                sdec, sNS = NSdeg(decs[h],False,h)
+                if h > 0:
+                    prevDEC = degs[h-1]
+                else:
+                    prevDEC = degs[0]		# hour -1 = hour 0
                 if h < 23:
-                    if sNS != slastNS or math.copysign(1.0,degs[h]) != math.copysign(1.0,degs[h+1]):
-                        sdec, sNS = NSdeg(decs[h],False,h,True)	# force N/S
-                slastNS = sNS
+                    nextDEC = degs[h+1]
+                else:
+                    nextDEC = degs[23]	# hour 24 = hour 23
+                
+                # format declination checking for hemisphere change
+                printNS, printDEG = declCompare(prevDEC,degs[h],nextDEC,h)
+                sdec = NSdecl(decs[h],h,printNS,printDEG,False)
 
                 mdec, mNS = NSdeg(decm[h],False,h)
                 if h < 23:
@@ -398,17 +413,22 @@ def sunmoontabm(date):
 
         h = 0
         if config.decf != '+':	# USNO format for Declination
-            slastNS = ''
             mlastNS = ''
             while h < 24:
                 band = int(h/6)
                 group = band % 2
-                # format declination checking for hemisphere change
-                sdec, sNS = NSdeg(decs[h],True,h)
+                if h > 0:
+                    prevDEC = degs[h-1]
+                else:
+                    prevDEC = degs[0]		# hour -1 = hour 0
                 if h < 23:
-                    if sNS != slastNS or math.copysign(1.0,degs[h]) != math.copysign(1.0,degs[h+1]):
-                        sdec, sNS = NSdeg(decs[h],True,h,True)	# force NS
-                slastNS = sNS
+                    nextDEC = degs[h+1]
+                else:
+                    nextDEC = degs[23]	# hour 24 = hour 23
+                
+                # format declination checking for hemisphere change
+                printNS, printDEG = declCompare(prevDEC,degs[h],nextDEC,h)
+                sdec = NSdecl(decs[h],h,printNS,printDEG,True)
 
                 mdec, mNS = NSdeg(decm[h],True,h)
                 if h < 23:
@@ -456,6 +476,81 @@ def sunmoontabm(date):
     \end{tabular}
     \quad\quad"""
     return tab
+
+##NEW##
+def declCompare(prev_deg, curr_deg, next_deg, hr):
+    # for Declinations only...
+    # decide if to print N/S; decide if to print degrees
+    # note: the first three arguments are declinations in degrees (float)
+    prNS = False
+    prDEG = False
+    psign = math.copysign(1.0,prev_deg)
+    csign = math.copysign(1.0,curr_deg)
+    nsign = math.copysign(1.0,next_deg)
+    pdeg = abs(prev_deg)
+    cdeg = abs(curr_deg)
+    ndeg = abs(next_deg)
+    pdegi = int(pdeg)
+    cdegi = int(cdeg)
+    ndegi = int(ndeg)
+    pmin = round((pdeg-pdegi)*60, 1)	# minutes (float), rounded to 1 decimal place
+    cmin = round((cdeg-cdegi)*60, 1)	# minutes (float), rounded to 1 decimal place
+    nmin = round((ndeg-ndegi)*60, 1)	# minutes (float), rounded to 1 decimal place
+    pmini = int(pmin)
+    cmini = int(cmin)
+    nmini = int(nmin)
+    if pmini == 60:
+        pmin -= 60
+        pdegi += 1
+    if cmini == 60:
+        cmin -= 60
+        cdegi += 1
+    if nmini == 60:
+        nmin -= 60
+        ndegi += 1
+    # now we have the values in degrees+minutes as printed
+
+    if hr%6 == 0:
+        prNS = True			# print N/S for hour = 0, 6, 12, 18
+    else:
+        if psign != csign:
+            prNS = True		# print N/S if previous sign different
+    if hr < 23:
+        if csign != nsign:
+            prNS = True		# print N/S if next sign different
+    if prNS == False:
+        if pdegi != cdegi:
+            prDEG = True	# print degrees if changed since previous value
+        if cdegi != ndegi:
+            prDEG = True	# print degrees if next value is changed
+    else:
+        prDEG= True			# print degrees is N/S to be printed
+    return prNS, prDEG
+
+##NEW##
+def NSdecl(deg, hr, printNS, printDEG, modernFMT):
+    # reformat degrees latitude to Ndd°mm.m or Sdd°mm.m
+    if deg[0:1] == '-':
+        hemisph = u'S'
+        deg = deg[1:]
+    else:
+        hemisph = u'N'
+    if not(printDEG):
+        deg = deg[4:]	# skip the degrees (always dd°mm.m) - note: the degree symbol '°' is two bytes long
+        if (hr+3)%6 == 0:
+            deg = r'''\raisebox{0.24ex}{\boldmath$\cdot$~\boldmath$\cdot$~~}''' + deg
+    if modernFMT:
+        if printNS or hr%6 == 0:
+            sdeg = u"\\textcolor{blue}{%s}" %hemisph + deg
+        else:
+            sdeg = deg
+    else:
+        if printNS or hr%6 == 0:
+            sdeg = u"\\textbf{%s}" %hemisph + deg
+        else:
+            sdeg = deg
+    #print("sdeg: ", sdeg)
+    return sdeg
 
 
 def NSdeg(deg,modern=False,hr=0,forceNS=False):
