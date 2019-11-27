@@ -219,7 +219,7 @@ def NSdecl(deg, hr, printNS, printDEG, modernFMT):
     else:
         hemisph = u'N'
     if not(printDEG):
-        deg = deg[4:]	# skip the degrees (always dd°mm.m) - note: the degree symbol '°' is two bytes long
+        deg = deg[3:]	# skip the degrees (always dd°mm.m)
         if (hr+3)%6 == 0:
             deg = r'''\raisebox{0.24ex}{\boldmath$\cdot$~\boldmath$\cdot$~~}''' + deg
     if modernFMT:
