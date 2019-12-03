@@ -57,7 +57,8 @@ This also includes some very minor changes and an improved title page for the fu
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install --upgrade pyephem**
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install skyfield**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install pandas**  
-&nbsp;&nbsp;&nbsp;&nbsp;Put the SkyAlmanac files in a new folder, go there and start with:  
+
+&nbsp;&nbsp;&nbsp;&nbsp;Put the SkyAlmanac files in a new folder, run Command Prompt and start with:  
 &nbsp;&nbsp;&nbsp;&nbsp;**py -3 skyalmanac.py**
 
 

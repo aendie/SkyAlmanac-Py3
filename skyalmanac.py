@@ -53,7 +53,7 @@ s = input("""What do you want to create?:\n
 if s in set(['1', '2', '3', '4']):
     if int(s) < 3:
         print("Please enter the year you want to create the nautical almanac")
-        years =  raw_input("  for as yyyy ... or the FIRST and LAST year as yyyy-yyyy\n")
+        years = raw_input("  for as yyyy ... or the FIRST and LAST year as yyyy-yyyy\n")
         if len(years)== 4:
             yearfr = years
             yearto = years
@@ -102,7 +102,6 @@ if s in set(['1', '2', '3', '4']):
         config.decf = ''		# USNO format for Declination
     else:
         DecFmt = '[old]'
-
 
     if s == '1':
         print("Take a break - this computer needs some time for cosmic meditation.")

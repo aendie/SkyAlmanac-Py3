@@ -134,7 +134,7 @@ def twilight(date, lat):
     
     return out
 
-def moonrise_set(date,lat):
+def moonrise_set(date, lat):
     # returns moonrise and moonset for the given date and latitude plus next 2 days:
     #    rise day 1, rise day 2, rise day 3, set day 1, set day 2, set day 3
 
