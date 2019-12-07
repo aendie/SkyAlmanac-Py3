@@ -121,7 +121,7 @@ if s in set(['1', '2', '3', '4']):
             msg = "execution time = %0.2f seconds" %(stop-start)
             print(msg)
 ##            config.writeLOG("\n\n" + msg + "\n")
-            print
+            print()
             command = 'pdflatex %s' %filename
             os.system(command)
             print("finished creating nautical almanac for %s" %year)
@@ -159,7 +159,7 @@ if s in set(['1', '2', '3', '4']):
         print(msg)
 ##        config.writeLOG('\n\n' + msg)
 ##        config.closeLOG()
-        print
+        print()
         command = 'pdflatex %s' %filename
         os.system(command)
         print("finished")
