@@ -53,7 +53,7 @@ s = input("""What do you want to create?:\n
 if s in set(['1', '2', '3', '4']):
     if int(s) < 3:
         print("Please enter the year you want to create the nautical almanac")
-        years = raw_input("  for as yyyy ... or the FIRST and LAST year as yyyy-yyyy\n")
+        years = input("  for as yyyy ... or the FIRST and LAST year as yyyy-yyyy\n")
         if len(years)== 4:
             yearfr = years
             yearto = years
@@ -120,8 +120,8 @@ if s in set(['1', '2', '3', '4']):
             stop = time.time()
             msg = "execution time = %0.2f seconds" %(stop-start)
             print(msg)
-            print
 ##            config.writeLOG("\n\n" + msg + "\n")
+            print
             command = 'pdflatex %s' %filename
             os.system(command)
             print("finished creating nautical almanac for %s" %year)
@@ -157,9 +157,9 @@ if s in set(['1', '2', '3', '4']):
         stop = time.time()
         msg = "execution time = %0.2f seconds" %(stop-start)
         print(msg)
-        print
 ##        config.writeLOG('\n\n' + msg)
 ##        config.closeLOG()
+        print
         command = 'pdflatex %s' %filename
         os.system(command)
         print("finished")
