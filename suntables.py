@@ -159,7 +159,7 @@ def suntabm(date):
     \end{tabular}"""
     return tab
 
-##NEW##
+
 def declCompare(prev_deg, curr_deg, next_deg, hr):
     # for Declinations only...
     # decide if to print N/S; decide if to print degrees
@@ -209,7 +209,7 @@ def declCompare(prev_deg, curr_deg, next_deg, hr):
         prDEG= True			# print degrees is N/S to be printed
     return prNS, prDEG
 
-##NEW##
+
 def NSdecl(deg, hr, printNS, printDEG, modernFMT):
     # reformat degrees latitude to Ndd°mm.m or Sdd°mm.m
     if deg[0:1] == '-':
@@ -415,5 +415,5 @@ def almanac(first_day, pagenum):
     \newpage
 """
     alm = alm + pages(first_day,pagenum)
-    alm = alm + u'\end{document}'
+    alm = alm + u"\end{document}"
     return alm
