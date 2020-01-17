@@ -32,6 +32,7 @@ This also includes some very minor changes and an improved title page for the fu
 **UPDATE: Jan 2020**
 
 The Nautical Almanac tables now indicate if the sun never sets or never rises; similarly if the moon never sets or never rises. For better performance, the *SunNeverSets* or *SunNeverRises* state is determined only by the month of year and hemisphere. (This is reliable for the set of latitudes printed in the Nautical Almanac tables.) The code also has cosmetic improvements.
+P.S. Don't be irritated by the *Overfull \hbox in paragraph...* messages. There is a tiny bug in pdfTeX (included in MiKTeX) that needs to be fixed.
 
 ## Requirements
 
