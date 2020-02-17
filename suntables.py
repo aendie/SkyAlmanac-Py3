@@ -24,13 +24,13 @@ from alma_skyfield import *
 def suntab(date):
     # generates LaTeX table for sun only (traditional)
     tab = r'''\noindent
-    \begin{tabular*}{0.2\textwidth}[t]{@{\extracolsep{\fill}}|c|rr|}
+\begin{tabular*}{0.2\textwidth}[t]{@{\extracolsep{\fill}}|c|rr|}
 '''
     n = 0
     while n < 3:
-        tab = tab + r'''\hline 
-        \multicolumn{1}{|c|}{\rule{0pt}{2.6ex}\textbf{%s}} &\multicolumn{1}{c}{\textbf{GHA}} &\multicolumn{1}{c|}{\textbf{Dec}}\\ 
-        \hline\rule{0pt}{2.6ex}\noindent
+        tab = tab + r'''\hline
+\multicolumn{1}{|c|}{\rule{0pt}{2.6ex}\textbf{%s}} & \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c|}{\textbf{Dec}}\\
+\hline\rule{0pt}{2.6ex}\noindent
 ''' %(date.strftime("%d"))
 
         ghas, decs, degs = sunGHA(date)
@@ -51,49 +51,56 @@ def suntab(date):
                 printNS, printDEG = declCompare(prevDEC,degs[h],nextDEC,h)
                 sdec = NSdecl(decs[h],h,printNS,printDEG,False)
 
-                line = u"%s & %s & %s" %(h,ghas[h],sdec)
-                lineterminator = u"\\\ \n"
+                line = "%s & %s & %s" %(h,ghas[h],sdec)
+                lineterminator = r'''\\
+'''
                 if h < 23 and (h+1)%6 == 0:
-                    lineterminator = u"\\\[2Pt] \n"
+                    lineterminator = r'''\\[2Pt]
+'''
                 tab = tab + line + lineterminator
                 h += 1
 
         else:			# Positive/Negative Declinations
             while h < 24:
-                line = u"%s & %s & %s" %(h,ghas[h],decs[h])
-                lineterminator = u"\\\ \n"
+                line = "%s & %s & %s" %(h,ghas[h],decs[h])
+                lineterminator = r'''\\
+'''
                 if h < 23 and (h+1)%6 == 0:
-                    lineterminator = u"\\\[2Pt] \n"
+                    lineterminator = r'''\\[2Pt]
+'''
                 tab = tab + line + lineterminator
                 h += 1
 
         sds, dsm = sunSD(date)
-        tab = tab + r"""\hline
-        \rule{0pt}{2.4ex} & \multicolumn{1}{c}{SD.=%s} & \multicolumn{1}{c|}{d=%s} \\
-        \hline
-""" %(sds,dsm)
+        tab = tab + r'''\hline
+\rule{0pt}{2.4ex} & \multicolumn{1}{c}{SD.=%s} & \multicolumn{1}{c|}{d=%s}\\
+\hline
+''' %(sds,dsm)
         if n < 2:
             # add space between tables...
-            tab = tab + r"""\multicolumn{1}{c}{}\\[-0.5ex]"""
+            tab = tab + r'''\multicolumn{1}{c}{}\\[-0.5ex]'''
         n += 1
         date += datetime.timedelta(days=1)
-    tab = tab + r"""\end{tabular*}"""
+    tab = tab + r'''\end{tabular*}'''
     return tab
 
 def suntabm(date):
     # generates LaTeX table for sun only (modern)
+    if config.decf != '+':	# USNO format for Declination
+        tabsep = "4pt"
+    else:
+        tabsep = "3.8pt"
+    
     tab = r'''\noindent
-    \renewcommand{\arraystretch}{1.1}
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}[t]{@{}crr}
-'''
+\renewcommand{\arraystretch}{1.1}
+\setlength{\tabcolsep}{%s}
+\begin{tabular}[t]{@{}crr}''' %(tabsep)
+
     n = 0
     while n < 3:
         tab = tab + r'''
-    \multicolumn{1}{c}{\footnotesize{\textbf{%s}}} & 
-    \multicolumn{1}{c}{\footnotesize{\textbf{GHA}}} &  
-    \multicolumn{1}{c}{\footnotesize{\textbf{Dec}}}\\ 
-    \cmidrule{1-3}
+\multicolumn{1}{c}{\footnotesize{\textbf{%s}}} & \multicolumn{1}{c}{\footnotesize{\textbf{GHA}}} & \multicolumn{1}{c}{\footnotesize{\textbf{Dec}}}\\
+\cmidrule{1-3}
 ''' %(date.strftime("%d"))
 
         ghas, decs, degs = sunGHA(date)
@@ -116,15 +123,15 @@ def suntabm(date):
                 printNS, printDEG = declCompare(prevDEC,degs[h],nextDEC,h)
                 sdec = NSdecl(decs[h],h,printNS,printDEG,True)
 
-                line = r'''\color{blue} {%s} & 
-''' %(h)
-                line = line + u"%s & %s" %(ghas[h],sdec)
+                line = r'''\color{blue} {%s} & ''' %(h)
+                line = line + "%s & %s" %(ghas[h],sdec)
                 if group == 1:
-                    tab = tab + r'''\rowcolor{LightCyan}
+                    tab = tab + r'''\rowcolor{LightCyan}'''
+                lineterminator = r'''\\
 '''
-                lineterminator = u"\\\ \n"
                 if h < 23 and (h+1)%6 == 0:
-                    lineterminator = u"\\\[2Pt] \n"
+                    lineterminator = r'''\\[2Pt]
+'''
                 tab = tab + line + lineterminator
                 h += 1
 
@@ -132,31 +139,30 @@ def suntabm(date):
             while h < 24:
                 band = int(h/6)
                 group = band % 2
-                line = r'''\color{blue} {%s} & 
-''' %(h)
-                line = line + u"%s & %s" %(ghas[h],decs[h])
+                line = r'''\color{blue} {%s} & ''' %(h)
+                line = line + "%s & %s" %(ghas[h],decs[h])
                 if group == 1:
-                    tab = tab + r'''\rowcolor{LightCyan}
+                    tab = tab + r'''\rowcolor{LightCyan}'''
+                lineterminator = r'''\\
 '''
-                lineterminator = u"\\\ \n"
                 if h < 23 and (h+1)%6 == 0:
-                    lineterminator = u"\\\[2Pt] \n"
+                    lineterminator = r'''\\[2Pt]
+'''
                 tab = tab + line + lineterminator
                 h += 1
 
         sds, dsm = sunSD(date)
-        tab = tab + r"""\cmidrule{2-3}
-        & \multicolumn{1}{c}{\footnotesize{SD.=%s}} & \multicolumn{1}{c}{\footnotesize{d=%s}} \\
-        \cmidrule{2-3}
-""" %(sds,dsm)
+        tab = tab + r'''\cmidrule{2-3}
+& \multicolumn{1}{c}{\footnotesize{SD.=%s}} & \multicolumn{1}{c}{\footnotesize{d=%s}}\\
+\cmidrule{2-3}''' %(sds,dsm)
         if n < 2:
             # add space between tables...
-            tab = tab + r"""\multicolumn{3}{c}{}\\[-1.5ex]
-"""
+            tab = tab + r'''
+\multicolumn{3}{c}{}\\[-1.5ex]'''
         n += 1
         date += datetime.timedelta(days=1)
-    tab = tab + r"""
-    \end{tabular}"""
+    tab = tab + r'''
+\end{tabular}'''
     return tab
 
 
@@ -213,38 +219,40 @@ def declCompare(prev_deg, curr_deg, next_deg, hr):
 def NSdecl(deg, hr, printNS, printDEG, modernFMT):
     # reformat degrees latitude to Ndd°mm.m or Sdd°mm.m
     if deg[0:1] == '-':
-        hemisph = u'S'
+        hemisph = 'S'
         deg = deg[1:]
     else:
-        hemisph = u'N'
+        hemisph = 'N'
     if not(printDEG):
         deg = deg[3:]	# skip the degrees (always dd°mm.m)
         if (hr+3)%6 == 0:
             deg = r'''\raisebox{0.24ex}{\boldmath$\cdot$~\boldmath$\cdot$~~}''' + deg
     if modernFMT:
         if printNS or hr%6 == 0:
-            sdeg = u"\\textcolor{blue}{%s}" %hemisph + deg
+            sdeg = "\\textcolor{blue}{%s}" %hemisph + deg
         else:
             sdeg = deg
     else:
         if printNS or hr%6 == 0:
-            sdeg = u"\\textbf{%s}" %hemisph + deg
+            sdeg = "\\textbf{%s}" %hemisph + deg
         else:
             sdeg = deg
     #print("sdeg: ", sdeg)
     return sdeg
 
+
 def page(date):
     # creates a page(15 days) of the Sun almanac
-    page = r"""
-    \sffamily
-    \noindent
-    \begin{flushright}
-    \textbf{%s to %s}
-    \end{flushright}
-    
-    \begin{scriptsize}
-    """ %(date.strftime("%Y %B %d"), (date + datetime.timedelta(days=14)).strftime("%b. %d"))
+    page = r'''
+%% ------------------ N E W   P A G E ------------------
+\newpage
+\sffamily
+\noindent
+\begin{flushright}
+\textbf{%s to %s}\par
+\end{flushright}
+\begin{scriptsize}
+''' %(date.strftime("%Y %B %d"), (date + datetime.timedelta(days=14)).strftime("%b. %d"))
     if config.tbls == "m":
         page = page + suntabm(date)
         page = page + r'''\quad
@@ -265,9 +273,10 @@ def page(date):
         page = page + suntab(date + datetime.timedelta(days=6))
         page = page + suntab(date + datetime.timedelta(days=9))
         page = page + suntab(date + datetime.timedelta(days=12))
-    page = page + r"""\end{scriptsize}
-    \newpage
-"""
+    page = page + r'''
+
+\end{scriptsize}'''
+    # to avoid "Overfull \hbox" messages, always leave a paragraph end before the end of a size change. (See line above)
     return page
 
 
@@ -286,134 +295,123 @@ def almanac(first_day, pagenum):
     mth = first_day.month
     day = first_day.day
 
-    alm = r"""\documentclass[10pt, twoside, a4paper]{report}
-    \usepackage[utf8x]{inputenc}
-    \usepackage[english]{babel}
-    \usepackage{fontenc}"""
+    alm = r'''\documentclass[10pt, twoside, a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{fontenc}'''
 
     if config.tbls == "m" and config.decf != '+':	# USNO format for Declination
-        alm = alm + r"""
-    \usepackage[ top=8mm, bottom=18mm, left=13mm, right=8mm ]{geometry}"""
+        alm = alm + r'''
+\usepackage[ top=8mm, bottom=18mm, left=13mm, right=8mm ]{geometry}'''
 
     if config.tbls == "m" and config.decf == '+':	# Positive/Negative Declinations
-        alm = alm + r"""
-    \usepackage[ top=8mm, bottom=18mm, left=17mm, right=11mm ]{geometry}"""
+        alm = alm + r'''
+\usepackage[ top=8mm, bottom=18mm, left=17mm, right=11mm ]{geometry}'''
 
     if config.tbls == "m":
-        alm = alm + r"""
-    \usepackage[table]{xcolor}
-    \definecolor{LightCyan}{rgb}{0.88,1,1}
-    \usepackage{booktabs}"""
+        alm = alm + r'''
+\usepackage[table]{xcolor}
+\definecolor{LightCyan}{rgb}{0.88,1,1}
+\usepackage{booktabs}'''
     else:
-        alm = alm + r"""
-    \usepackage[ top=21mm, bottom=21mm, left=16mm, right=10mm]{geometry}"""
+        alm = alm + r'''
+\usepackage[ top=21mm, bottom=21mm, left=16mm, right=10mm]{geometry}'''
     
-    alm = alm + r"""
-    \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
-    \usepackage[pdftex]{graphicx}
+    alm = alm + r'''
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\usepackage[pdftex]{graphicx}
+%\showboxbreadth=50  % use for logging
+%\showboxdepth=50    % use for logging
+\DeclareUnicodeCharacter{00B0}{\ensuremath{{}^\circ}}
+\begin{document}
+\begin{titlepage}'''
 
-    \begin{document}
-
-    \begin{titlepage}"""
     if config.tbls == "m":
         alm = alm + r'''\vspace*{2cm}'''
 
-    alm = alm + r"""
+    alm = alm + r'''
     \begin{center}
-     
     \textsc{\Large Generated using Skyfield}\\
     \large http://rhodesmill.org/skyfield/\\[1.5cm]
-
     \includegraphics[width=0.4\textwidth]{./Ra}\\[1cm]
-
-    \textsc{\huge The Nautical Almanac for the Sun}\\[0.7cm]
-"""
+    \textsc{\huge The Nautical Almanac for the Sun}\\[0.7cm]'''
 
     if pagenum == 25:
-        alm = alm + r"""
-        \HRule \\[0.6cm]
-        { \Huge \bfseries %s}\\[0.4cm]
-        \HRule \\[1.5cm]
-""" %(year)
+        alm = alm + r'''
+    \HRule \\[0.6cm]
+    { \Huge \bfseries %s}\\[0.4cm]
+    \HRule \\[1.5cm]''' %(year)
     else:
-        alm = alm + r"""
-        \HRule \\[0.6cm]
-        { \Huge \bfseries from %s.%s.%s}\\[0.4cm]
-        \HRule \\[1.5cm]
-""" %(day,mth,year)
+        alm = alm + r'''
+    \HRule \\[0.6cm]
+    { \Huge \bfseries from %s.%s.%s}\\[0.4cm]
+    \HRule \\[1.5cm]''' %(day,mth,year)
 
     if config.tbls == "m":
-        alm = alm + r"""
-        \begin{center} \large
-        \emph{Author:}\\
-        Enno \textsc{Rodegerdts}\\[6Pt]
-        \emph{Skyfield interface \& Table Design:}\\
-        Andrew \textsc{Bauer}
-"""
+        alm = alm + r'''
+    \begin{center} \large
+    \emph{Author:}\\
+    Enno \textsc{Rodegerdts}\\[6Pt]
+    \emph{Skyfield interface \& Table Design:}\\
+    Andrew \textsc{Bauer}'''
     else:
-        alm = alm + r"""
-        \begin{center} \large
-        \emph{Author:}\\
-        Enno \textsc{Rodegerdts}\\
-        \emph{Skyfield interface:}\\
-        Andrew \textsc{Bauer}
-"""
+        alm = alm + r'''
+    \begin{center} \large
+    \emph{Author:}\\
+    Enno \textsc{Rodegerdts}\\
+    \emph{Skyfield interface:}\\
+    Andrew \textsc{Bauer}'''
 
-    alm = alm + r"""\end{center}
-
+    alm = alm + r'''
+    \end{center}
     \vfill
-
     {\large \today}
     \HRule \\[0.6cm]
     \end{center}
-    
     \begin{description}\footnotesize
-    
     \item[Disclaimer:] These are computer generated tables. Use on your own risk. 
     The accuracy has been checked as good as possible but can not be guaranteed. 
     This means, if you get lost on the oceans because of errors in this publication I can not be held liable. 
     For security relevant applications you should buy an official version of the nautical almanac.
-    
     \end{description}
-     
-    \end{titlepage}
-"""
+\end{titlepage}
+'''
+
     if config.tbls == "m":
-        alm = alm + r"""\vspace*{3cm}
-"""
+        alm = alm + r'''\vspace*{3cm}'''
     else:
-        alm = alm + r"""\vspace*{1.5cm}
-"""
-    alm = alm + r"""
+        alm = alm + r'''\vspace*{1.5cm}'''
+
+    alm = alm + r'''
+    \noindent
     DIP corrects for height of eye over the surface. This value has to be subtracted from the sextant altitude ($H_s$). The  correction in degrees for height of eye in meters is given by the following formula: 
     \[d=0.0293\sqrt{m}\]
-    This is the first correction (apart from index error) that has to be applied to the measured altitude.
-    
-    The next correction is for refraction in the Earth's atmosphere. As usual this table is correct for 10°C and a pressure of 1010hPa. This correction has to be applied to apparent altitude ($H_a$). The exact values can be calculated by the following formula.
+    This is the first correction (apart from index error) that has to be applied to the measured altitude.\\[12pt]
+    \noindent
+    The next correction is for refraction in the Earth's atmosphere. As usual this table is correct for 10°C and a pressure of 1010 hPa. This correction has to be applied to apparent altitude ($H_a$). The exact values can be calculated by the following formula.
     \[R_0=\cot \left( H_a + \frac{7.31}{H_a+4.4}\right)\]
-    For other than standard conditions, calculate a correction factor for $R_0$ by: \[f=\frac{0.28P}{T+273}\] where $P$ is the pressure in hectopascal and $T$ is the temperature in °C.
-    
-     Semidiameter has to be added for lower limb sights and subtracted for upper limb sights. The value for semidiameter is tabulated in the daily pages.
-    
+    For other than standard conditions, calculate a correction factor for $R_0$ by: \[f=\frac{0.28P}{T+273}\] where $P$ is the pressure in hectopascal and $T$ is the temperature in °C.\\[12pt]
+    \noindent
+    Semidiameter has to be added for lower limb sights and subtracted for upper limb sights. The value for semidiameter is tabulated in the daily pages.\\[12pt]
+    \noindent
     To correct your sextant altitude $H_s$ do the following:
     Calculate $H_a$ by
      \[H_a= H_s+I-dip\] 
-    Where $I$ is the sextants index error. Than calculate the observed altitude $H_o$ by
+    where $I$ is the sextant's index error. Then calculate the observed altitude $H_o$ by
     \[H_o= H_a-R+P\pm SD\]
-    where $R$ is refraction, $P$ is parallax and $SD$ is the semidiameter.
-    
-    Sight reduction tables can be downloaded for the US governments internet pages. Search for HO-229 or HO-249.  These values can also be calculated with to, relatively simple, formulas
+    where $R$ is refraction, $P$ is parallax and $SD$ is the semidiameter.\\[12pt]
+    \noindent
+    Sight reduction tables can be downloaded for the US governments internet pages. Search for HO-229 or HO-249.  These values can also be calculated with two, relatively simple, formulas:
     \[ \sin H_c= \sin L \sin d + \cos L \cos d \cos LHA\]
     and
     \[\cos A = \frac{\sin d - \sin L \sin H_c}{\cos L \cos H_c}\]
     where $A$ is the azimuth angle, $L$ is the latitude, $d$ is the declination and $LHA$ is the local hour angle. The azimuth ($Z_n$) is given by the following rule:
     \begin{itemize}
-          \item if the $LHA$ is greater than 180°, $Z_n=A$
-          \item if the $LHA$ is less than 180°, $Z_n = 360^\circ - A$
-    \end{itemize}
+    \item if the $LHA$ is greater than 180°, $Z_n=A$
+    \item if the $LHA$ is less than 180°, $Z_n = 360^\circ - A$
+    \end{itemize}'''
 
-    \newpage
-"""
     alm = alm + pages(first_day,pagenum)
-    alm = alm + u"\end{document}"
+    alm = alm + '''
+\end{document}'''
     return alm

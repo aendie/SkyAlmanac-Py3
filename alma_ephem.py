@@ -34,7 +34,7 @@ degree_sign= u'\N{DEGREE SIGN}'
 #   internal methods
 #----------------------
 
-def hhmm(date): 
+def hhmm(date):
     # turn an ephem.date (float) into a time string formatted hh:mm
     tup = date.tuple()
     hr = tup[-3]

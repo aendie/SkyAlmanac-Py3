@@ -34,13 +34,17 @@ This also includes some very minor changes and an improved title page for the fu
 The Nautical Almanac tables now indicate if the sun never sets or never rises; similarly if the moon never sets or never rises. For better performance, the *SunNeverSets* or *SunNeverRises* state is determined only by the month of year and hemisphere. (This is reliable for the set of latitudes printed in the Nautical Almanac tables.) The code also has cosmetic improvements.  
 P.S. The *Overfull \hbox in paragraph...* messages can be ignored - the PDF is correctly generated.
 
+**UPDATE: Feb 2020**
+
+The main focus was on cleaning up the TeX code and eliminating the *Overfull/Underfull hbox/vbox* messages. Other minor improvements were included.
+
 ## Requirements
 
 &nbsp;&nbsp;&nbsp;&nbsp;Computation is done by the free PyEphem and Skyfield libraries.  
 &nbsp;&nbsp;&nbsp;&nbsp;Typesetting is done by LaTeX or MiKTeX so you first need to install:
 
 * Python v3.4 or higher (the latest version is recommended)
-* Skyfield 1.16 (latest tested version)
+* Skyfield 1.17 (latest tested version)
 * Pandas (to load the Hipparcos catalog; tested: 0.24.2, 0.25.3)
 * PyEphem 3.7.6 or 3.7.7
 * TeX/LaTeX&nbsp;&nbsp;or&nbsp;&nbsp;MiKTeX
