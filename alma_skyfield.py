@@ -116,7 +116,7 @@ def rise_set(t, y, lats):
     sett = '--:--'
     ris2 = '--:--'
     set2 = '--:--'
-    if len(y) == 2:		# this happens most often
+    if len(t) == 2:		# this happens most often
         t0 = ts.utc((t[0].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
         t1 = ts.utc((t[1].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
         if y[0] and not(y[1]):
@@ -130,14 +130,14 @@ def rise_set(t, y, lats):
                 # this should never get here!
                 rise_set_error(y,lats,ts.utc(t[0].utc_datetime()))
     else:
-        if len(y) == 1:		# this happens ocassionally
+        if len(t) == 1:		# this happens ocassionally
             t0 = ts.utc((t[0].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
             if y[0]:
                 rise = t0.utc_iso()[11:16]
             else:
                 sett = t0.utc_iso()[11:16]
         else:
-            if len(y) == 3:		# this happens rarely (in high latitudes in summer)
+            if len(t) == 3:		# this happens rarely (in high latitudes in summer)
                 t0 = ts.utc((t[0].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
                 t1 = ts.utc((t[1].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
                 t2 = ts.utc((t[2].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
@@ -154,7 +154,7 @@ def rise_set(t, y, lats):
                         # this should never get here!
                         rise_set_error(y,lats,ts.utc(t[0].utc_datetime()))
             else:
-                if len(y) > 3:
+                if len(t) > 3:
                     # this should never get here!
                     rise_set_error(y,lats,ts.utc(t[0].utc_datetime()))
 
@@ -871,7 +871,7 @@ def find_new_moon(d):       # used in doublepage
     t0 = ts.utc(d0.year, d0.month, d0.day, 12, 0, 0)
     t1 = ts.utc(d.year, d.month, d.day, 12, 0, 0)
     t, y = almanac.find_discrete(t0, t1, almanac.moon_phases(eph))
-    for i in range(len(y)):
+    for i in range(len(t)):
         if y[i] == 0:       # 0=New Moon, 1=First Quarter, 2=Full Moon, 3=Last Quarter
             PreviousNewMoon = t[i].utc_datetime()
 
@@ -880,7 +880,7 @@ def find_new_moon(d):       # used in doublepage
         t2 = ts.utc(PreviousNewMoon + datetime.timedelta(days=28))
         t3 = ts.utc(PreviousNewMoon + datetime.timedelta(days=30))
         t, y = almanac.find_discrete(t2, t3, almanac.moon_phases(eph))
-        for i in range(len(y)):
+        for i in range(len(t)):
             if y[i] == 0:       # 0 = New Moon
                 NextNewMoon = t[i].utc_datetime()
     return
