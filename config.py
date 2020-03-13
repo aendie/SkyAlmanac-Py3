@@ -21,6 +21,7 @@
 
 tbls = ''		# table style (global variable)
 decf = ''		# Declination format (global variable)
+pgsz = 'A4'     # page size 'A4' or 'Letter' (global variable)
 logfileopen = False
 
 # list of latitudes to include for Sunrise/Sunset/Twilight/Moonrise/Moonset...

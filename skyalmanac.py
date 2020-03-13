@@ -37,11 +37,15 @@ first_day = datetime.date(d.year, d.month, d.day)
 #first_day = datetime.date(2023, 6, 24)	# for testing a specific date
 #d = first_day							# for testing a specific date
 
-sday = "%02d" % d.day
-smth = "%02d" % d.month
-syr  = "%s" % d.year
+sday = "{:02d}".format(d.day)       # sday = "%02d" % d.day
+smth = "{:02d}".format(d.month)     # smth = "%02d" % d.month
+syr  = "{}".format(d.year)          # syr  = "%s" % d.year
 symd = syr + smth + sday
 sdmy = sday + "." + smth + "." + syr
+
+if config.pgsz not in set(['A4', 'Letter']):
+    print("Please choose a valid paper size in config.py")
+    sys.exit(0)
 
 s = input("""What do you want to create?:\n
     1   Full nautical almanac   (for a year)
@@ -108,79 +112,79 @@ if s in set(['1', '2', '3', '4']):
 ##        config.init()		# initialize log file
         for yearint in range(int(yearfr),int(yearto)+1):
             start = time.time()
-            year = "%4d" %yearint
-            msg = "\nCreating the nautical almanac for the year %s" %(year)
+            year = "{:4d}".format(yearint)  # year = "%4d" %yearint
+            msg = "\nCreating the nautical almanac for the year {}".format(year)
             print(msg)
 ##            config.writeLOG(msg)
             first_day = datetime.date(yearint, 1, 1)
-            filename = "almanac%s%s.tex" %(ff,year+DecFmt)
+            filename = "almanac{}{}.tex".format(ff,year+DecFmt)
             outfile = open(filename, mode="w", encoding="utf8")
             outfile.write(tables.almanac(first_day,122))
             outfile.close()
             stop = time.time()
-            msg = "execution time = %0.2f seconds" %(stop-start)
+            msg = "execution time = {:0.2f} seconds".format(stop-start) # msg = "execution time = %0.2f seconds" %(stop-start)
             print(msg)
 ##            config.writeLOG("\n\n" + msg + "\n")
             print()
-            command = 'pdflatex %s' %filename
+            command = 'pdflatex {}'.format(filename)
             os.system(command)
-            print("finished creating nautical almanac for %s" %year)
+            print("finished creating nautical almanac for {}".format(year))
             os.remove(filename)
-            os.remove("almanac%s%s.log" %(ff,year+DecFmt))
-            os.remove("almanac%s%s.aux" %(ff,year+DecFmt))
+            os.remove("almanac{}{}.log".format(ff,year+DecFmt))
+            os.remove("almanac{}{}.aux".format(ff,year+DecFmt))
 ##        config.closeLOG()
 
     elif s == '2':
         for yearint in range(int(yearfr),int(yearto)+1):
-            year = "%4d" %yearint
-            msg = "\nCreating the sun tables only for the year %s" %(year)
+            year = "{:4d}".format(yearint)  # year = "%4d" %yearint
+            msg = "\nCreating the sun tables only for the year {}".format(year)
             print(msg)
             first_day = datetime.date(yearint, 1, 1)
-            filename = "sunalmanac%s%s.tex" %(ff,year+DecFmt)
+            filename = "sunalmanac{}{}.tex".format(ff,year+DecFmt)
             outfile = open(filename, mode="w", encoding="utf8")
             outfile.write(suntables.almanac(first_day,25))
             outfile.close()
-            command = 'pdflatex %s' %filename
+            command = 'pdflatex {}'.format(filename)
             os.system(command)
-            print("finished creating sun tables for %s" %year)
+            print("finished creating sun tables for {}".format(year))
             os.remove(filename)
-            os.remove("sunalmanac%s%s.log" %(ff,year+DecFmt))
-            os.remove("sunalmanac%s%s.aux" %(ff,year+DecFmt))
+            os.remove("sunalmanac{}{}.log".format(ff,year+DecFmt))
+            os.remove("sunalmanac{}{}.aux".format(ff,year+DecFmt))
 
     elif s == '3':
 ##        config.init()		# initialize log file
         start = time.time()
-        msg = "\nCreating nautical almanac tables - from %s" %(sdmy)
+        msg = "\nCreating nautical almanac tables - from {}".format(sdmy)
         print(msg)
-        filename = "almanac%s%s.tex" %(ff,symd+DecFmt)
+        filename = "almanac{}{}.tex".format(ff,symd+DecFmt)
         outfile = open(filename, mode="w", encoding="utf8")
         outfile.write(tables.almanac(first_day,2))
         outfile.close()
         stop = time.time()
-        msg = "execution time = %0.2f seconds" %(stop-start)
+        msg = "execution time = {:0.2f} seconds".format(stop-start) # msg = "execution time = %0.2f seconds" %(stop-start)
         print(msg)
 ##        config.writeLOG('\n\n' + msg)
 ##        config.closeLOG()
         print()
-        command = 'pdflatex %s' %filename
+        command = 'pdflatex {}'.format(filename)
         os.system(command)
         print("finished")
         os.remove(filename)
-        os.remove("almanac%s%s.log" %(ff,symd+DecFmt))
-        os.remove("almanac%s%s.aux" %(ff,symd+DecFmt))
+        os.remove("almanac{}{}.log".format(ff,symd+DecFmt))
+        os.remove("almanac{}{}.aux".format(ff,symd+DecFmt))
 
     elif s == '4':
-        msg = "\nCreating the sun tables only - from %s" %(sdmy)
+        msg = "\nCreating the sun tables only - from {}".format(sdmy)
         print(msg)
-        filename = "sunalmanac%s%s.tex" %(ff,symd+DecFmt)
+        filename = "sunalmanac{}{}.tex".format(ff,symd+DecFmt)
         outfile = open(filename, mode="w", encoding="utf8")
         outfile.write(suntables.almanac(first_day,2))
         outfile.close()
-        command = 'pdflatex %s' %filename
+        command = 'pdflatex {}'.format(filename)
         os.system(command)
         print("finished")
         os.remove(filename)
-        os.remove("sunalmanac%s%s.log" %(ff,symd+DecFmt))
-        os.remove("sunalmanac%s%s.aux" %(ff,symd+DecFmt))
+        os.remove("sunalmanac{}{}.log".format(ff,symd+DecFmt))
+        os.remove("sunalmanac{}{}.aux".format(ff,symd+DecFmt))
 else:
     print("Error! Choose 1, 2, 3 or 4")

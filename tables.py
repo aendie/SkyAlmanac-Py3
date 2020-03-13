@@ -17,6 +17,11 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# NOTE: the new format statement requires a literal '{' to be entered as '{{',
+#       and a literal '}' to be entered as '}}'. The old '%' format specifier
+#       will be removed from Python at some later time. See:
+# https://docs.python.org/3/whatsnew/3.0.html#pep-3101-a-new-approach-to-string-formatting
+
 import config
 import datetime		# required for .timedelta()
 import sys			# required for .stdout.write()
@@ -36,9 +41,9 @@ def planetstab(date):
     n = 0
     while n < 3:
         tab = tab + r'''\hline
-\rule{0pt}{2.4ex}\textbf{%s} & \multicolumn{1}{c|}{\textbf{GHA}} & \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c|}{\textbf{Dec}} & \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c|}{\textbf{Dec}} & \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c|}{\textbf{Dec}} & \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c|}{\textbf{Dec}}\\
-\hline\rule{0pt}{2.6ex}\noindent
-''' %(date.strftime("%a"))
+\rule{{0pt}}{{2.4ex}}\textbf{{{}}} & \multicolumn{{1}}{{c|}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c|}}{{\textbf{{Dec}}}} & \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c|}}{{\textbf{{Dec}}}} & \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c|}}{{\textbf{{Dec}}}} & \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c|}}{{\textbf{{Dec}}}}\\
+\hline\rule{{0pt}}{{2.6ex}}\noindent
+'''.format(date.strftime("%a"))
         aGHA             = ariesGHA(date)
         vGHA, vDEC, vDEG = venusGHA(date)
         mGHA, mDEC, mDEG = marsGHA(date)
@@ -82,7 +87,7 @@ def planetstab(date):
                 printNS, printDEG = declCompare(prevDECs,sDEG[h],nextDECs,h)
                 sdec = NSdecl(sDEC[h],h,printNS,printDEG,False)
 
-                line = "%s & %s & %s & %s & %s & %s & %s & %s & %s & %s" %(h,aGHA[h],vGHA[h],vdec,mGHA[h],mdec,jGHA[h],jdec,sGHA[h],sdec)
+                line = "{} & {} & {} & {} & {} & {} & {} & {} & {} & {}".format(h,aGHA[h],vGHA[h],vdec,mGHA[h],mdec,jGHA[h],jdec,sGHA[h],sdec)
                 lineterminator = r'''\\
 '''
                 if h < 23 and (h+1)%6 == 0:
@@ -93,7 +98,7 @@ def planetstab(date):
 
         else:			# Positive/Negative Declinations
             while h < 24:
-                line = r'''%s & %s & %s & %s & %s & %s & %s & %s & %s & %s''' %(h,aGHA[h],vGHA[h],vDEC[h],mGHA[h],mDEC[h],jGHA[h],jDEC[h],sGHA[h],sDEC[h])
+                line = r'''{} & {} & {} & {} & {} & {} & {} & {} & {} & {}'''.format(h,aGHA[h],vGHA[h],vDEC[h],mGHA[h],mDEC[h],jGHA[h],jDEC[h],sGHA[h],sDEC[h])
                 lineterminator = r'''\\
 '''
                 if h < 23 and (h+1)%6 == 0:
@@ -108,10 +113,10 @@ def planetstab(date):
         RAc_s, Dc_s = vdm_Saturn(date)
         mag_v, mag_m, mag_j, mag_s = magnitudes(date)
         tab = tab + r'''\hline
-\multicolumn{2}{|c|}{\rule{0pt}{2.4ex}Mer.pass.:%s} & \multicolumn{2}{c|}{v%s d%s m%s} & \multicolumn{2}{c|}{v%s d%s m%s} & \multicolumn{2}{c|}{v%s d%s m%s} & \multicolumn{2}{c|}{v%s d%s m%s}\\
+\multicolumn{{2}}{{|c|}}{{\rule{{0pt}}{{2.4ex}}Mer.pass.:{}}} & \multicolumn{{2}}{{c|}}{{v{} d{} m{}}} & \multicolumn{{2}}{{c|}}{{v{} d{} m{}}} & \multicolumn{{2}}{{c|}}{{v{} d{} m{}}} & \multicolumn{{2}}{{c|}}{{v{} d{} m{}}}\\
 \hline
-\multicolumn{10}{c}{}\\
-''' %(ariestransit(date+datetime.timedelta(days=1)),RAc_v,Dc_v,mag_v,RAc_m,Dc_m,mag_m,RAc_j,Dc_j,mag_j,RAc_s,Dc_s,mag_s)
+\multicolumn{{10}}{{c}}{{}}\\
+'''.format(ariestransit(date+datetime.timedelta(days=1)),RAc_v,Dc_v,mag_v,RAc_m,Dc_m,mag_m,RAc_j,Dc_j,mag_j,RAc_s,Dc_s,mag_s)
         n += 1
         date += datetime.timedelta(days=1)
     tab = tab + r'''\end{tabular*}
@@ -124,7 +129,7 @@ def planetstabm(date):
     tab = r'''\vspace{6Pt}\noindent
 \renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}[t]{@{}crcrrcrrcrrcrr@{}}
+\begin{tabular}[t]{crcrrcrrcrrcrr}
 \multicolumn{1}{c}{\normalsize{h}} & 
 \multicolumn{1}{c}{\normalsize{Aries}} & & 
 \multicolumn{2}{c}{\normalsize{Venus}}& & 
@@ -135,9 +140,9 @@ def planetstabm(date):
     n = 0
     while n < 3:
         tab = tab + r'''
-\multicolumn{1}{c}{\textbf{%s}} & \multicolumn{1}{c}{\textbf{GHA}} && 
-\multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c}{\textbf{Dec}} &&  \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c}{\textbf{Dec}} &&  \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c}{\textbf{Dec}} &&  \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c}{\textbf{Dec}}\\
-''' %(date.strftime("%a"))
+\multicolumn{{1}}{{c}}{{\textbf{{{}}}}} & \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} && 
+\multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c}}{{\textbf{{Dec}}}} &&  \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c}}{{\textbf{{Dec}}}} &&  \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c}}{{\textbf{{Dec}}}} &&  \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c}}{{\textbf{{Dec}}}}\\
+'''.format(date.strftime("%a"))
         aGHA             = ariesGHA(date)
         vGHA, vDEC, vDEG = venusGHA(date)
         mGHA, mDEC, mDEG = marsGHA(date)
@@ -184,10 +189,9 @@ def planetstabm(date):
                 printNS, printDEG = declCompare(prevDECs,sDEG[h],nextDECs,h)
                 sdec = NSdecl(sDEC[h],h,printNS,printDEG,True)
 
-                line = r'''\color{blue} {%s} & 
-''' %(h)
-                line = line + r'''%s && %s & %s && %s & %s && %s & %s && %s & %s \\
-''' %(aGHA[h],vGHA[h],vdec,mGHA[h],mdec,jGHA[h],jdec,sGHA[h],sdec)
+                line = r'''\color{{blue}}{{{}}} & '''.format(h)
+                line = line + r'''{} && {} & {} && {} & {} && {} & {} && {} & {} \\
+'''.format(aGHA[h],vGHA[h],vdec,mGHA[h],mdec,jGHA[h],jdec,sGHA[h],sdec)
                 if group == 1:
                     tab = tab + r'''\rowcolor{LightCyan}
 '''
@@ -198,10 +202,9 @@ def planetstabm(date):
             while h < 24:
                 band = int(h/6)
                 group = band % 2
-                line = r'''\color{blue} {%s} & 
-''' %(h)
-                line = line + r'''%s && %s & %s && %s & %s && %s & %s && %s & %s \\
-''' %(aGHA[h],vGHA[h],vDEC[h],mGHA[h],mDEC[h],jGHA[h],jDEC[h],sGHA[h],sDEC[h])
+                line = r'''\color{{blue}}{{{}}} & '''.format(h)
+                line = line + r'''{} && {} & {} && {} & {} && {} & {} && {} & {} \\
+'''.format(aGHA[h],vGHA[h],vDEC[h],mGHA[h],mDEC[h],jGHA[h],jDEC[h],sGHA[h],sDEC[h])
                 if group == 1:
                     tab = tab + r'''\rowcolor{LightCyan}
 '''
@@ -213,17 +216,20 @@ def planetstabm(date):
         RAc_j, Dc_j = vdm_Jupiter(date)
         RAc_s, Dc_s = vdm_Saturn(date)
         mag_v, mag_m, mag_j, mag_s = magnitudes(date)
-        tab = tab + r'''\cmidrule{1-2} \cmidrule{4-5} \cmidrule{7-8} \cmidrule{10-11} \cmidrule{13-14}
-\multicolumn{2}{c}{\footnotesize{Mer.pass.:%s}} && 
-\multicolumn{2}{c}{\footnotesize{v%s d%s m%s}} && 
-\multicolumn{2}{c}{\footnotesize{v%s d%s m%s}} && 
-\multicolumn{2}{c}{\footnotesize{v%s d%s m%s}} && 
-\multicolumn{2}{c}{\footnotesize{v%s d%s m%s}}\\
-\cmidrule{1-2} \cmidrule{4-5} \cmidrule{7-8} \cmidrule{10-11} \cmidrule{13-14}
-''' %(ariestransit(date+datetime.timedelta(days=1)),RAc_v,Dc_v,mag_v,RAc_m,Dc_m,mag_m,RAc_j,Dc_j,mag_j,RAc_s,Dc_s,mag_s)
+        tab = tab + r'''\cmidrule{{1-2}} \cmidrule{{4-5}} \cmidrule{{7-8}} \cmidrule{{10-11}} \cmidrule{{13-14}}
+\multicolumn{{2}}{{c}}{{\footnotesize{{Mer.pass.:{}}}}} && 
+\multicolumn{{2}}{{c}}{{\footnotesize{{v{} d{} m{}}}}} && 
+\multicolumn{{2}}{{c}}{{\footnotesize{{v{} d{} m{}}}}} && 
+\multicolumn{{2}}{{c}}{{\footnotesize{{v{} d{} m{}}}}} && 
+\multicolumn{{2}}{{c}}{{\footnotesize{{v{} d{} m{}}}}}\\
+\cmidrule{{1-2}} \cmidrule{{4-5}} \cmidrule{{7-8}} \cmidrule{{10-11}} \cmidrule{{13-14}}
+'''.format(ariestransit(date+datetime.timedelta(days=1)),RAc_v,Dc_v,mag_v,RAc_m,Dc_m,mag_m,RAc_j,Dc_j,mag_j,RAc_s,Dc_s,mag_s)
         if n < 2:
+            vsep = ""
+            if config.pgsz == "Letter":
+                vsep = "[-2.0ex]"
             # add space between tables...
-            tab = tab + r'''\multicolumn{10}{c}{}\\'''
+            tab = tab + r'''\multicolumn{{10}}{{c}}{{}}\\{}'''.format(vsep)
         n += 1
         date += datetime.timedelta(days=1)
 
@@ -250,34 +256,36 @@ def starstab(date):
 '''
     stars = stellar_info(date+datetime.timedelta(days=1))
     for i in range(len(stars)):
-        out = out + r'''%s & %s & %s \\''' %(stars[i][0],stars[i][1],stars[i][2])
-        out = out + '\n'
+        out = out + r'''{} & {} & {} \\
+'''.format(stars[i][0],stars[i][1],stars[i][2])
     m = r'''\hline
 '''
 
     # returns 3 tables with SHA & Mer.pass for Venus, Mars, Jupiter and Saturn
     for i in range(3):
-        datestr = r'''\rule{0pt}{2.6ex}%s %s %s''' %(date.strftime("%b"), (date+datetime.timedelta(days=i)).strftime("%d"), (date+datetime.timedelta(days=i)).strftime("%a"))
+        datestr = r'''{} {} {}'''.format(date.strftime("%b"), (date+datetime.timedelta(days=i)).strftime("%d"), (date+datetime.timedelta(days=i)).strftime("%a"))
         m = m + '''\hline
 '''
         if config.tbls == "m":
-            m = m + '''\multicolumn{1}{|r}{\multirow{2}{*}{\\textbf{%s}}} 
-& \multicolumn{1}{c}{\multirow{2}{*}{\\textbf{SHA}}} 
-& \multicolumn{1}{r|}{\multirow{2}{*}{\\textbf{Mer.pass}}}\\\\
-& & \multicolumn{1}{r|}{} \\\ \n''' %datestr
+            m = m + r'''& & \multicolumn{{1}}{{r|}}{{}}\\[-2.0ex]
+\multicolumn{{1}}{{|r}}{{\textbf{{{}}}}} 
+& \multicolumn{{1}}{{c}}{{\textbf{{SHA}}}} 
+& \multicolumn{{1}}{{r|}}{{\textbf{{Mer.pass}}}}\\
+'''.format(datestr)
         else:
-            m = m + (r'''\textbf{%s} & \textbf{SHA} & \textbf{Mer.pass} \\
-''' %datestr)
+            m = m + r'''& & \multicolumn{{1}}{{r|}}{{}}\\[-2.0ex]
+\textbf{{{}}} & \textbf{{SHA}} & \textbf{{Mer.pass}}\\
+'''.format(datestr)
         datex = date + datetime.timedelta(days=i)
         p = planetstransit(datex)
-        m = m + r'''Venus & %s & %s \\
-''' %(p[0],p[1])
-        m = m + r'''Mars & %s & %s \\
-''' %(p[2],p[3])
-        m = m + r'''Jupiter & %s & %s \\
-''' %(p[4],p[5])
-        m = m + r'''Saturn & %s & %s \\
-''' %(p[6],p[7])
+        m = m + r'''Venus & {} & {} \\
+'''.format(p[0],p[1])
+        m = m + r'''Mars & {} & {} \\
+'''.format(p[2],p[3])
+        m = m + r'''Jupiter & {} & {} \\
+'''.format(p[4],p[5])
+        m = m + r'''Saturn & {} & {} \\
+'''.format(p[6],p[7])
         m = m + r'''\hline
 '''
     out = out + m
@@ -285,12 +293,13 @@ def starstab(date):
     # returns a table with Horizontal parallax for Venus and Mars
     hp = r'''\hline
 '''
-    hp = hp + r'''\multicolumn{2}{|r}{\rule{0pt}{2.6ex}\textbf{Horizontal parallax}} & \multicolumn{1}{c|}{}\\
+    hp = hp + r'''& & \multicolumn{1}{r|}{}\\[-2.5ex]
+\multicolumn{2}{|r}{\rule{0pt}{2.6ex}\textbf{Horizontal parallax}} & \multicolumn{1}{c|}{}\\
 '''
-    hp = hp + r'''\multicolumn{2}{|r}{Venus:} & \multicolumn{1}{c|}{%s} \\
-''' %(p[9])
-    hp = hp + r'''\multicolumn{2}{|r}{Mars:} & \multicolumn{1}{c|}{%s} \\
-''' %(p[8])
+    hp = hp + r'''\multicolumn{{2}}{{|r}}{{Venus:}} & \multicolumn{{1}}{{c|}}{{{}}} \\
+'''.format(p[9])
+    hp = hp + r'''\multicolumn{{2}}{{|r}}{{Mars:}} & \multicolumn{{1}}{{c|}}{{{}}} \\
+'''.format(p[8])
     hp = hp + r'''\hline
 '''
     out = out + hp
@@ -339,9 +348,9 @@ def sunmoontab(date):
     n = 0
     while n < 3:
         tab = tab + r'''\hline
-\multicolumn{1}{|c|}{\rule{0pt}{2.6ex}\textbf{%s}} &\multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c|}{\textbf{Dec}}  & \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c}{\textbf{\(\nu\)}} & \multicolumn{1}{c}{\textbf{Dec}} & \multicolumn{1}{c}{\textbf{d}} & \multicolumn{1}{c|}{\textbf{HP}}\\
-\hline\rule{0pt}{2.6ex}\noindent
-''' %(date.strftime("%a"))
+\multicolumn{{1}}{{|c|}}{{\rule{{0pt}}{{2.6ex}}\textbf{{{}}}}} &\multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c|}}{{\textbf{{Dec}}}}  & \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c}}{{\textbf{{\(\nu\)}}}} & \multicolumn{{1}}{{c}}{{\textbf{{Dec}}}} & \multicolumn{{1}}{{c}}{{\textbf{{d}}}} & \multicolumn{{1}}{{c|}}{{\textbf{{HP}}}}\\
+\hline\rule{{0pt}}{{2.6ex}}\noindent
+'''.format(date.strftime("%a"))
 
         date0 = date - datetime.timedelta(days=1)
         ghas, decs, degs = sunGHA(date)
@@ -374,7 +383,7 @@ def sunmoontab(date):
                         mdec, mNS = NSdeg(decm[h],False,h,True)	# force N/S
                 mlastNS = mNS
 
-                line = r'''%s & %s & %s & %s & %s & %s & %s & %s''' %(h,ghas[h],sdec,gham[h],vmin[h],mdec,dmin[h],HPm[h])
+                line = r'''{} & {} & {} & {} & {} & {} & {} & {}'''.format(h,ghas[h],sdec,gham[h],vmin[h],mdec,dmin[h],HPm[h])
                 lineterminator = r'''\\
 '''
                 if h < 23 and (h+1)%6 == 0:
@@ -385,7 +394,7 @@ def sunmoontab(date):
 
         else:			# Positive/Negative Declinations
             while h < 24:
-                line = r'''%s & %s & %s & %s & %s & %s & %s & %s''' %(h,ghas[h],decs[h],gham[h],vmin[h],decm[h],dmin[h],HPm[h])
+                line = r'''{} & {} & {} & {} & {} & {} & {} & {}'''.format(h,ghas[h],decs[h],gham[h],vmin[h],decm[h],dmin[h],HPm[h])
                 lineterminator = r'''\\
 '''
                 if h < 23 and (h+1)%6 == 0:
@@ -397,9 +406,9 @@ def sunmoontab(date):
         sds, dsm = sunSD(date)
         sdmm = moonSD(date)
         tab = tab + r'''\hline
-\rule{0pt}{2.4ex} & \multicolumn{1}{c}{SD.=%s} & \multicolumn{1}{c|}{d=%s} & \multicolumn{5}{c|}{S.D.=%s}\\
+\rule{{0pt}}{{2.4ex}} & \multicolumn{{1}}{{c}}{{SD.={}}} & \multicolumn{{1}}{{c|}}{{d={}}} & \multicolumn{{5}}{{c|}}{{S.D.={}}}\\
 \hline
-''' %(sds,dsm,sdmm)
+'''.format(sds,dsm,sdmm)
         if n < 2:
             # add space between tables...
             tab = tab + r'''\multicolumn{7}{c}{}\\[-1.5ex]'''
@@ -415,7 +424,7 @@ def sunmoontabm(date):
 \renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{4pt}
 \quad\quad
-\begin{tabular}[t]{@{}crrcrrrrr@{}}
+\begin{tabular}[t]{crrcrrrrr}
 \multicolumn{1}{c}{\normalsize{h}} & 
 \multicolumn{2}{c}{\normalsize{Sun}} & &
 \multicolumn{5}{c}{\normalsize{Moon}}\\
@@ -424,8 +433,8 @@ def sunmoontabm(date):
     n = 0
     while n < 3:
         tab = tab + r'''
-\multicolumn{1}{c}{\textbf{%s}} & \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c}{\textbf{Dec}} & & \multicolumn{1}{c}{\textbf{GHA}} & \multicolumn{1}{c}{\textbf{\(\nu\)}} & \multicolumn{1}{c}{\textbf{Dec}} & \multicolumn{1}{c}{\textbf{d}} & \multicolumn{1}{c}{\textbf{HP}}\\
-''' %(date.strftime("%a"))
+\multicolumn{{1}}{{c}}{{\textbf{{{}}}}} & \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c}}{{\textbf{{Dec}}}} & & \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c}}{{\textbf{{\(\nu\)}}}} & \multicolumn{{1}}{{c}}{{\textbf{{Dec}}}} & \multicolumn{{1}}{{c}}{{\textbf{{d}}}} & \multicolumn{{1}}{{c}}{{\textbf{{HP}}}}\\
+'''.format(date.strftime("%a"))
 
         date0 = date - datetime.timedelta(days=1)
         ghas, decs, degs = sunGHA(date)
@@ -460,10 +469,9 @@ def sunmoontabm(date):
                         mdec, mNS = NSdeg(decm[h],True,h,True)	# force NS
                 mlastNS = mNS
 
-                line = r'''\color{blue} {%s} & 
-''' %(h)
-                line = line + r'''%s & %s && %s & %s & %s & %s & %s \\
-''' %(ghas[h],sdec,gham[h],vmin[h],mdec,dmin[h],HPm[h])
+                line = r'''\color{{blue}}{{{}}} & '''.format(h)
+                line = line + r'''{} & {} && {} & {} & {} & {} & {} \\
+'''.format(ghas[h],sdec,gham[h],vmin[h],mdec,dmin[h],HPm[h])
 
                 if group == 1:
                     tab = tab + r'''\rowcolor{LightCyan}
@@ -475,9 +483,9 @@ def sunmoontabm(date):
             while h < 24:
                 band = int(h/6)
                 group = band % 2
-                line = r'''\color{blue} {%s} & ''' %(h)
-                line = line + r'''%s & %s && %s & %s & %s & %s & %s \\
-''' %(ghas[h],decs[h],gham[h],vmin[h],decm[h],dmin[h],HPm[h])
+                line = r'''\color{{blue}}{{{}}} & '''.format(h)
+                line = line + r'''{} & {} && {} & {} & {} & {} & {} \\
+'''.format(ghas[h],decs[h],gham[h],vmin[h],decm[h],dmin[h],HPm[h])
                 if group == 1:
                     tab = tab + r'''\rowcolor{LightCyan}
 '''
@@ -486,14 +494,17 @@ def sunmoontabm(date):
 
         sds, dsm = sunSD(date)
         sdmm = moonSD(date)
-        tab = tab + r'''\cmidrule{2-3} \cmidrule{5-9}
-\multicolumn{1}{c}{} & \multicolumn{1}{c}{\footnotesize{SD.=%s}} & 
-\multicolumn{1}{c}{\footnotesize{d=%s}} && \multicolumn{5}{c}{\footnotesize{S.D.=%s}}\\
-\cmidrule{2-3} \cmidrule{5-9}
-''' %(sds,dsm,sdmm)
+        tab = tab + r'''\cmidrule{{2-3}} \cmidrule{{5-9}}
+\multicolumn{{1}}{{c}}{{}} & \multicolumn{{1}}{{c}}{{\footnotesize{{SD.={}}}}} & 
+\multicolumn{{1}}{{c}}{{\footnotesize{{d={}}}}} && \multicolumn{{5}}{{c}}{{\footnotesize{{S.D.={}}}}}\\
+\cmidrule{{2-3}} \cmidrule{{5-9}}
+'''.format(sds,dsm,sdmm)
         if n < 2:
+            vsep = "[-1.5ex]"
+            if config.pgsz == "Letter":
+                vsep = "[-2.0ex]"
             # add space between tables...
-            tab = tab + r'''\multicolumn{7}{c}{}\\[-1.5ex]'''
+            tab = tab + r'''\multicolumn{{7}}{{c}}{{}}\\{}'''.format(vsep)
         n += 1
         date += datetime.timedelta(days=1)
     tab = tab + r'''\end{tabular}
@@ -559,17 +570,17 @@ def NSdecl(deg, hr, printNS, printDEG, modernFMT):
     else:
         hemisph = 'N'
     if not(printDEG):
-        deg = deg[4:]	# skip the degrees (always dd°mm.m) - note: the degree symbol '°' is two bytes long
+        deg = deg[10:]	# skip the degrees (always dd°mm.m) - note: the degree symbol '$^\circ$' is eight bytes long
         if (hr+3)%6 == 0:
             deg = r'''\raisebox{0.24ex}{\boldmath$\cdot$~\boldmath$\cdot$~~}''' + deg
     if modernFMT:
         if printNS or hr%6 == 0:
-            sdeg = "\\textcolor{blue}{%s}" %hemisph + deg
+            sdeg = r'''\textcolor{{blue}}{{{}}}'''.format(hemisph) + deg
         else:
             sdeg = deg
     else:
         if printNS or hr%6 == 0:
-            sdeg = "\\textbf{%s}" %hemisph + deg
+            sdeg = r'''\textbf{{{}}}'''.format(hemisph) + deg
         else:
             sdeg = deg
     #print("sdeg: ", sdeg)
@@ -585,12 +596,12 @@ def NSdeg(deg, modern=False, hr=0, forceNS=False):
         hemisph = 'N'
     if modern:
         if forceNS or hr%6 == 0:
-            sdeg = "\\textcolor{blue}{%s}" %hemisph + deg
+            sdeg = r'''\textcolor{{blue}}{{{}}}'''.format(hemisph) + deg
         else:
             sdeg = deg
     else:
         if forceNS or hr%6 == 0:
-            sdeg = "\\textbf{%s}" %hemisph + deg
+            sdeg = r'''\textbf{{{}}}'''.format(hemisph) + deg
         else:
             sdeg = deg
     return sdeg, hemisph
@@ -659,9 +670,9 @@ def twilighttab(date):
         lasthemisph = hemisph
         # day+1 to calculate for the second day (three days are printed on one page)
         twi = twilight(date+datetime.timedelta(days=1), i, hemisph)
-        line = r'''\textbf{%s}''' % hs + " " + "%s°" %(abs(i))
-        line = line + r''' & %s & %s & %s & %s & %s & %s \\
-''' %(twi[0],twi[1],twi[2],twi[3],twi[4],twi[5])
+        line = r'''\textbf{{{}}}'''.format(hs) + " " + r'''{}$^\circ$'''.format(abs(i))
+        line = line + r''' & {} & {} & {} & {} & {} & {} \\
+'''.format(twi[0],twi[1],twi[2],twi[3],twi[4],twi[5])
         tab = tab + line
         j += 1
     # add space between tables...
@@ -684,15 +695,15 @@ def twilighttab(date):
 '''
 
     weekday = [date.strftime("%a"),(date+datetime.timedelta(days=1)).strftime("%a"),(date+datetime.timedelta(days=2)).strftime("%a")]
-    tab = tab + r'''\multicolumn{1}{|c|}{} & 
-\multicolumn{1}{c}{%s} & 
-\multicolumn{1}{c}{%s} & 
-\multicolumn{1}{c|}{%s} & 
-\multicolumn{1}{c}{%s} & 
-\multicolumn{1}{c}{%s} & 
-\multicolumn{1}{c|}{%s} \\
-\hline\rule{0pt}{2.6ex}\noindent
-''' %(weekday[0],weekday[1],weekday[2],weekday[0],weekday[1],weekday[2])
+    tab = tab + r'''\multicolumn{{1}}{{|c|}}{{}} & 
+\multicolumn{{1}}{{c}}{{{}}} & 
+\multicolumn{{1}}{{c}}{{{}}} & 
+\multicolumn{{1}}{{c|}}{{{}}} & 
+\multicolumn{{1}}{{c}}{{{}}} & 
+\multicolumn{{1}}{{c}}{{{}}} & 
+\multicolumn{{1}}{{c|}}{{{}}} \\
+\hline\rule{{0pt}}{{2.6ex}}\noindent
+'''.format(weekday[0],weekday[1],weekday[2],weekday[0],weekday[1],weekday[2])
 
     moon = [0,0,0,0,0,0]
     moon2 = [0,0,0,0,0,0]
@@ -713,23 +724,23 @@ def twilighttab(date):
         lasthemisph = hemisph
         moon, moon2 = moonrise_set(date,i)
         if not(double_events_found(moon,moon2)):
-            tab = tab + "\\textbf{%s}" % hs + " " + "%s°" %(abs(i))
-            tab = tab + r''' & %s & %s & %s & %s & %s & %s \\
-''' %(moon[0],moon[1],moon[2],moon[3],moon[4],moon[5])
+            tab = tab + r'''\textbf{{{}}}'''.format(hs) + " " + r'''{}$^\circ$'''.format(abs(i))
+            tab = tab + r''' & {} & {} & {} & {} & {} & {} \\
+'''.format(moon[0],moon[1],moon[2],moon[3],moon[4],moon[5])
         else:
 # print a row with two moonrise/moonset events on the same day & latitude
-            tab = tab + r'''\multirow{2}{*}{\textbf{%s} %s°}''' %(hs,abs(i))
+            tab = tab + r'''\multirow{{2}}{{*}}{{\textbf{{{}}} {}$^\circ$}}'''.format(hs,abs(i))
 # top row...
             for k in range(len(moon)):
                 if moon2[k] != '--:--':
-                    tab = tab + r''' & %s''' %(moon[k])
+                    tab = tab + r''' & {}'''.format(moon[k])
                 else:
-                    tab = tab + r''' & \multirow{2}{*}{%s}''' %(moon[k])
+                    tab = tab + r''' & \multirow{{2}}{{*}}{{{}}}'''.format(moon[k])
             tab = tab + r'''\\'''	# terminate top row
 # bottom row...
             for k in range(len(moon)):
                 if moon2[k] != '--:--':
-                    tab = tab + r''' & %s''' %(moon2[k])
+                    tab = tab + r''' & {}'''.format(moon2[k])
                 else:
                     tab = tab + r'''&'''
             tab = tab + r'''\\'''	# terminate bottom row
@@ -744,7 +755,7 @@ def twilighttab(date):
 \multicolumn{1}{|c|}{} & & & \multicolumn{1}{c|}{} & & & \multicolumn{1}{c|}{}\\[-2.0ex]
 \multicolumn{1}{|c|}{\multirow{4}{*}{\footnotesize{\textbf{Day}}}} & 
 \multicolumn{3}{c|}{\footnotesize{\textbf{Sun}}} & 
-\multicolumn{3}{c|}{\footnotesize{\textbf{Moon}}}\\[0.6ex] 
+\multicolumn{3}{c|}{\footnotesize{\textbf{Moon}}}\\[0.6ex]
 \multicolumn{1}{|c|}{} & 
 \multicolumn{2}{c}{Eqn.of Time} & 
 \multicolumn{1}{|c|}{Mer.} & 
@@ -757,7 +768,7 @@ def twilighttab(date):
     else:
         tab = tab + r'''\hline
 \multicolumn{1}{|c|}{\rule{0pt}{2.4ex}\multirow{4}{*}{\textbf{Day}}} & 
-\multicolumn{3}{c|}{\textbf{Sun}} & \multicolumn{3}{c|}{\textbf{Moon}} \\
+\multicolumn{3}{c|}{\textbf{Sun}} & \multicolumn{3}{c|}{\textbf{Moon}}\\
 \multicolumn{1}{|c|}{} & \multicolumn{2}{c}{Eqn.of Time} & \multicolumn{1}{|c|}{Mer.} & \multicolumn{2}{c}{Mer.Pass.} & \multicolumn{1}{|c|}{}\\
 \multicolumn{1}{|c|}{} & \multicolumn{1}{c}{00\textsuperscript{h}} & \multicolumn{1}{c}{12\textsuperscript{h}} & \multicolumn{1}{|c|}{Pass} & \multicolumn{1}{c}{Upper} & \multicolumn{1}{c}{Lower} &\multicolumn{1}{|c|}{Age}\\
 \multicolumn{1}{|c|}{} & \multicolumn{1}{c}{mm:ss} & \multicolumn{1}{c}{mm:ss} & \multicolumn{1}{|c|}{hh:mm} & \multicolumn{1}{c}{hh:mm} & \multicolumn{1}{c}{hh:mm} &\multicolumn{1}{|c|}{}\\
@@ -768,11 +779,11 @@ def twilighttab(date):
     for k in range(3):
         eq = equation_of_time(d,d + datetime.timedelta(days=1),UpperLists[k],LowerLists[k])
         if k == 2:
-            tab = tab + r'''%s & %s & %s & %s & %s & %s & %s(%s\%%) \\[0.3ex]
-''' %(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4],eq[5],eq[6])
+            tab = tab + r'''{} & {} & {} & {} & {} & {} & {}({}\%) \\[0.3ex]
+'''.format(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4],eq[5],eq[6])
         else:
-            tab = tab + r'''%s & %s & %s & %s & %s & %s & %s(%s\%%) \\
-''' %(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4],eq[5],eq[6])
+            tab = tab + r'''{} & {} & {} & {} & {} & {} & {}({}\%) \\
+'''.format(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4],eq[5],eq[6])
         d += datetime.timedelta(days=1)
     tab = tab + r'''\hline
 \end{tabular*}'''
@@ -802,10 +813,16 @@ def doublepage(date, page1):
 % ------------------ N E W   P A G E ------------------
 \newpage'''
 
+    leftindent = ""
+    rightindent = ""
+    if config.tbls == "m":
+        leftindent = "\quad"
+        rightindent = "\hphantom{\quad}"
+
     page = page + r'''
 \sffamily
 \noindent
-\textbf{%s, %s, %s   (%s.,  %s.,  %s.)}''' %(date.strftime("%B %d"),(date+datetime.timedelta(days=1)).strftime("%d"),(date+datetime.timedelta(days=2)).strftime("%d"),date.strftime("%a"),(date+datetime.timedelta(days=1)).strftime("%a"),(date+datetime.timedelta(days=2)).strftime("%a"))
+{}\textbf{{{}, {}, {}   ({}.,  {}.,  {}.)}}'''.format(leftindent,date.strftime("%B %d"),(date+datetime.timedelta(days=1)).strftime("%d"),(date+datetime.timedelta(days=2)).strftime("%d"),date.strftime("%a"),(date+datetime.timedelta(days=1)).strftime("%a"),(date+datetime.timedelta(days=2)).strftime("%a"))
 
     if config.tbls == "m":
         page = page + r'\par'
@@ -823,15 +840,14 @@ def doublepage(date, page1):
     page = page + starstab(date)
     str1 = r'''
 
-\end{scriptsize}
+\end{{scriptsize}}
 %% ------------------ N E W   P A G E ------------------
 \newpage
-\begin{flushright}
-\textbf{%s to %s}\par
-\end{flushright}
-    
-\begin{scriptsize}
-''' %(date.strftime("%Y %B %d"),(date+datetime.timedelta(days=2)).strftime("%b. %d"))
+\begin{{flushright}}
+\textbf{{{} to {}}}{}%%
+\end{{flushright}}\par
+\begin{{scriptsize}}
+'''.format(date.strftime("%Y %B %d"),(date+datetime.timedelta(days=2)).strftime("%b. %d"),rightindent)
     page = page + str1
     if config.tbls == "m":
         page = page + sunmoontabm(date)
@@ -876,72 +892,106 @@ def almanac(first_day, pagenum):
     mth = first_day.month
     day = first_day.day
 
-    alm = r'''\documentclass[10pt, twoside, a4paper]{report}
-\usepackage[utf8]{inputenc}
+    # page size specific parameters
+    if config.pgsz == "A4":
+        paper = "a4paper"
+        vsep1 = "1.5cm"
+        vsep2 = "1.0cm"
+        tm1 = "21mm"    # title page...
+        bm1 = "15mm"
+        lm1 = "10mm"
+        rm1 = "10mm"
+        tm = "21mm"     # data pages...
+        bm = "18mm"
+        lm = "12mm"
+        rm = "8mm"
+        if config.tbls == "m":
+            tm = "10mm"
+            bm = "15mm"
+            lm = "11mm"
+            rm = "10mm"
+    else:
+        paper = "letterpaper"
+        vsep1 = "0.8cm"
+        vsep2 = "0.7cm"
+        tm1 = "12mm"    # title page...
+        bm1 = "15mm"
+        lm1 = "12mm"
+        rm1 = "12mm"
+        tm = "12.2mm"   # data pages...
+        bm = "13mm"
+        lm = "15mm"
+        rm = "11mm"
+        if config.tbls == "m":
+            tm = "4mm"
+            bm = "10mm"
+            lm = "13mm"
+            rm = "13mm"
+
+    alm = r'''\documentclass[10pt, twoside, {}]{{report}}
+'''.format(paper)
+
+    alm = alm + r'''
+%\usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{fontenc}'''
 
+    # to troubleshoot add "showframe, verbose," below:
+    alm = alm + r'''
+\usepackage[nomarginpar, top={}, bottom={}, left={}, right={}]{{geometry}}'''.format(tm,bm,lm,rm)
+
     if config.tbls == "m":
         alm = alm + r'''
-\usepackage[ top=10mm, bottom=18mm, left=12mm, right=10mm ]{geometry}
 \usepackage[table]{xcolor}
 \definecolor{LightCyan}{rgb}{0.88,1,1}
-\usepackage{booktabs}
-\usepackage{multirow}'''
-    else:
-        alm = alm + r'''
-\usepackage[ top=21mm, bottom=21mm, left=12mm, right=8mm]{geometry}
-\usepackage{multirow}'''
+\usepackage{booktabs}'''
 
+    # Note: \DeclareUnicodeCharacter is not compatible with some versions of pdflatex
     alm = alm + r'''
+\usepackage{multirow}
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\setlength{\footskip}{15pt}
 \usepackage[pdftex]{graphicx}	% for \includegraphics
 \usepackage{tikz}				% for \draw  (load after 'graphicx')
 %\showboxbreadth=50  % use for logging
 %\showboxdepth=50    % use for logging
-\DeclareUnicodeCharacter{00B0}{\ensuremath{{}^\circ}}
-\begin{document}
-% for the title page only...
-\newgeometry{ top=21mm, bottom=15mm, left=12mm, right=8mm}
-\begin{titlepage}'''
+%\DeclareUnicodeCharacter{00B0}{\ensuremath{{}^\circ}}
+\begin{document}'''
 
     alm = alm + r'''
+%% for the title page only...
+\newgeometry{{nomarginpar, top={}, bottom={}, left={}, right={}}}'''.format(tm1,bm1,lm1,rm1)
+
+    alm = alm + r'''
+    \begin{titlepage}
     \begin{center}
     \textsc{\Large Generated using PyEphem and Skyfield}\\
     \large http://rhodesmill.org/skyfield/\\[0.7cm]
     % TRIM values: left bottom right top
     \includegraphics[clip, trim=12mm 20cm 12mm 21mm, width=0.92\textwidth]{./A4chart0-180_P.pdf}\\[0.3cm]
-    \includegraphics[clip, trim=12mm 20cm 12mm 21mm, width=0.92\textwidth]{./A4chart180-360_P.pdf}\\[0.8cm]
-    \textsc{\huge The Nautical Almanac}\\[0.7cm]'''
+    \includegraphics[clip, trim=12mm 20cm 12mm 21mm, width=0.92\textwidth]{./A4chart180-360_P.pdf}\\'''
+    
+    alm = alm + r'''[{}]
+    \textsc{{\huge The Nautical Almanac}}\\[{}]'''.format(vsep1,vsep2)
 
     if pagenum == 122:
         alm = alm + r'''
     \HRule \\[0.5cm]
-    { \Huge \bfseries %s}\\[0.2cm]
-    \HRule \\''' %(year)
+    {{ \Huge \bfseries {}}}\\[0.2cm]
+    \HRule \\'''.format(year)
     else:
         alm = alm + r'''
     \HRule \\[0.5cm]
-    { \Huge \bfseries from %s.%s.%s}\\[0.2cm]
-    \HRule \\''' %(day,mth,year)
-
-    if config.tbls == "m":
-        alm = alm + r'''
-    \begin{center} \large
-    \emph{Author:}\\
-    Enno \textsc{Rodegerdts}\\[6Pt]
-    \emph{Skyfield interface:}\\
-    Andrew \textsc{Bauer}'''
-    else:
-        alm = alm + r'''
-    \begin{center} \large
-    \emph{Author:}\\
-    Enno \textsc{Rodegerdts}\\
-    \emph{Skyfield interface:}\\
-    Andrew \textsc{Bauer}'''
+    {{ \Huge \bfseries from {}.{}.{}}}\\[0.2cm]
+    \HRule \\'''.format(day,mth,year)
 
     alm = alm + r'''
-    \end{center}
+    \begin{center}\begin{tabular}[t]{rl}
+    \large\emph{Author:} & \large Andrew \textsc{Bauer}\\
+    \large\emph{Original concept from:} & \large Enno \textsc{Rodegerdts}\\
+    \end{tabular}\end{center}'''
+
+    alm = alm + r'''
     {\large \today}
     \HRule \\[0.2cm]
     \end{center}
@@ -953,6 +1003,7 @@ def almanac(first_day, pagenum):
     \end{description}
 \end{titlepage}
 \restoregeometry    % so it does not affect the rest of the pages'''
+
     alm = alm + pages(first_day,pagenum)
     alm = alm + '''
 \end{document}'''
