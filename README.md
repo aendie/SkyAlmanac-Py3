@@ -77,7 +77,7 @@ the [old](https://docs.python.org/2/library/stdtypes.html#string-formatting) sty
 
 ### INSTALLATION GUIDELINES on Ubuntu 19.10:
 
-&nbsp;&nbsp;&nbsp;&nbsp;Ubuntu 19 and higher come with Python 3 preinstalled,  
+&nbsp;&nbsp;&nbsp;&nbsp;Ubuntu 18.04 and higher come with Python 3 preinstalled,  
 &nbsp;&nbsp;&nbsp;&nbsp;however pip may need to be installed:  
 &nbsp;&nbsp;&nbsp;&nbsp;**sudo apt install python3-pip**
 
