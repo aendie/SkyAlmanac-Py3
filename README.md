@@ -49,8 +49,8 @@ the [old](https://docs.python.org/2/library/stdtypes.html#string-formatting) sty
 &nbsp;&nbsp;&nbsp;&nbsp;Typesetting is done by LaTeX or MiKTeX so you first need to install:
 
 * Python v3.4 or higher (the latest version is recommended)
-* Skyfield 1.17 (latest tested version)
-* Pandas (to load the Hipparcos catalog; tested: 0.24.2, 0.25.3)
+* Skyfield 1.20 (latest tested version - older versions work too)
+* Pandas (to load the Hipparcos catalog; tested: 0.24.2, 0.25.3, 1.0.3)
 * PyEphem 3.7.6 or 3.7.7
 * TeX/LaTeX&nbsp;&nbsp;or&nbsp;&nbsp;MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
 
@@ -75,7 +75,7 @@ the [old](https://docs.python.org/2/library/stdtypes.html#string-formatting) sty
 &nbsp;&nbsp;&nbsp;&nbsp;**py -3 skyalmanac.py**
 
 
-### INSTALLATION GUIDELINES on Ubuntu 19.10:
+### INSTALLATION GUIDELINES on Ubuntu 19.10 or 20.04:
 
 &nbsp;&nbsp;&nbsp;&nbsp;Ubuntu 18.04 and higher come with Python 3 preinstalled,  
 &nbsp;&nbsp;&nbsp;&nbsp;however pip may need to be installed:  
