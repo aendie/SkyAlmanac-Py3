@@ -67,7 +67,7 @@ the [old](https://docs.python.org/2/library/stdtypes.html#string-formatting) sty
 &nbsp;&nbsp;&nbsp;&nbsp;... for a first install:  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install pyephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;... if already installed, check for upgrade explicitly:  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install --upgrade pyephem**
+&nbsp;&nbsp;&nbsp;&nbsp;**pip install --upgrade pyephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install skyfield**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install pandas**  
 
