@@ -46,11 +46,11 @@ the [old](https://docs.python.org/2/library/stdtypes.html#string-formatting) sty
 ## Requirements
 
 &nbsp;&nbsp;&nbsp;&nbsp;Computation is done by the free PyEphem and Skyfield libraries.  
-&nbsp;&nbsp;&nbsp;&nbsp;Typesetting is done by LaTeX or MiKTeX so you first need to install:
+&nbsp;&nbsp;&nbsp;&nbsp;Typesetting is done by MiKTeX or TeX Live so you first need to install:
 
 * Python v3.4 or higher (the latest version is recommended)
 * Skyfield 1.20 (latest tested version - older versions work too)
-* Pandas (to load the Hipparcos catalog; tested: 0.24.2, 0.25.3, 1.0.3)
+* Pandas (to load the Hipparcos catalog; tested: 1.0.3)
 * PyEphem 3.7.6 or 3.7.7
 * TeX/LaTeX&nbsp;&nbsp;or&nbsp;&nbsp;MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
 
