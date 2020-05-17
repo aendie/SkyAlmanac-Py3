@@ -841,10 +841,10 @@ def doublepage(date, page1):
     str1 = r'''
 
 \end{{scriptsize}}
-%% ------------------ N E W   P A G E ------------------
+% ------------------ N E W   P A G E ------------------
 \newpage
 \begin{{flushright}}
-\textbf{{{} to {}}}{}%%
+\textbf{{{} to {}}}{}%
 \end{{flushright}}\par
 \begin{{scriptsize}}
 '''.format(date.strftime("%Y %B %d"),(date+datetime.timedelta(days=2)).strftime("%b. %d"),rightindent)
@@ -959,7 +959,7 @@ def almanac(first_day, pagenum):
 \begin{document}'''
 
     alm = alm + r'''
-%% for the title page only...
+% for the title page only...
 \newgeometry{{nomarginpar, top={}, bottom={}, left={}, right={}}}'''.format(tm1,bm1,lm1,rm1)
 
     alm = alm + r'''
