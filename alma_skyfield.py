@@ -31,15 +31,16 @@ from skyfield.data import hipparcos
 #load    = Loader('~/Documents/fishing/SkyData')  # avoids multiple copies of large files
 
 ts = load.timescale()	# timescale object
-hipparcos_epoch = ts.tt(1991.25)
-eph = load('de421.bsp')	# ephemeris, valid between 1900 and 2050
-earth   = eph['earth']
-moon    = eph['moon']
-sun     = eph['sun']
-venus   = eph['venus']
-mars    = eph['mars']
-jupiter = eph['jupiter barycenter']
-saturn  = eph['saturn barycenter']
+#hipparcos_epoch = ts.tt(1991.25)
+if config.ephndx in set([0, 1, 2]):
+    eph = load(config.ephemeris[config.ephndx][0])	# load chosen ephemeris
+    earth   = eph['earth']
+    moon    = eph['moon']
+    sun     = eph['sun']
+    venus   = eph['venus']
+    mars    = eph['mars']
+    jupiter = eph['jupiter barycenter']
+    saturn  = eph['saturn barycenter']
 degree_sign= u'\N{DEGREE SIGN}'
 hour_of_day = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
 
@@ -72,7 +73,6 @@ def GHAcolong(gha):
 
 def fmtgha(gst, ra):
     # formats angle (hours) to that used in the nautical almanac. (ddd°mm.m)
-    theminus = ""
     sha = (gst - ra) * 15
     if sha < 0:
         sha = sha + 360
@@ -779,6 +779,8 @@ def equation_of_time(d, d1, UpperList, LowerList):  # used in twilighttab (secti
     ra = position.apparent().radec(epoch='date')[0]
     gha00 = gha2deg(t00.gast, ra.hours)
     eqt00 = gha2eqt(gha00)
+    if gha00 <= 180:
+        eqt00 = r"\colorbox{{lightgray!80}}{{{}}}".format(eqt00)
 
     # percent illumination is calculated at noon
     t12 = ts.utc(d.year, d.month, d.day, 12, 0, 0)
@@ -787,6 +789,8 @@ def equation_of_time(d, d1, UpperList, LowerList):  # used in twilighttab (secti
     gha12 = gha2deg(t12.gast, ra.hours)
     eqt12 = gha2eqt(gha12)
     mpa12 = gha2mpa(gha12)
+    if gha12 > 270:
+        eqt12 = r"\colorbox{{lightgray!80}}{{{}}}".format(eqt12)
 
     phase_angle = almanac.phase_angle(eph, 'moon', t12)
     pctrad = 50 * (1.0 + math.cos(phase_angle.radians))
@@ -826,8 +830,10 @@ def gha2mpa(gha):
     hhmm = '--:--'
     if gha > 270:
         gha = 360 - gha
-    
-    mpa = 12 + (gha * 4.0)/60.0
+        mpa = 12 + (gha * 4.0)/60.0
+    else:
+        mpa = 12 - (gha * 4.0)/60.0
+
     hr  = int(mpa)
     min = int(round((mpa - hr) * 60.0))
     if min == 60:
@@ -853,7 +859,7 @@ def gha2eqt(gha):
     if sec == 60:
         sec = 0
         min += 1
-    if min < 59:
+    if min <= 59:
         mmss = '{:02d}:{:02d}'.format(min,sec)
     else:
         mmss = '??:??'		# indicate error

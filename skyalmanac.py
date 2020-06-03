@@ -30,6 +30,10 @@ from alma_skyfield import init
 if sys.version_info[0] < 3:
     raise Exception("Must be using Python 3")
 
+if config.ephndx not in set([0, 1, 2]):
+    print("Error - Please choose a valid ephemeris in config.py")
+    sys.exit(0)
+
 ts = init()     # in alma_skyfield
 d = datetime.datetime.utcnow().date()
 first_day = datetime.date(d.year, d.month, d.day)
@@ -42,6 +46,8 @@ smth = "{:02d}".format(d.month)     # smth = "%02d" % d.month
 syr  = "{}".format(d.year)          # syr  = "%s" % d.year
 symd = syr + smth + sday
 sdmy = sday + "." + smth + "." + syr
+yrmin = config.ephemeris[config.ephndx][1]
+yrmax = config.ephemeris[config.ephndx][2]
 
 if config.pgsz not in set(['A4', 'Letter']):
     print("Please choose a valid paper size in config.py")
@@ -69,20 +75,20 @@ if s in set(['1', '2', '3', '4']):
             sys.exit(0)
         
         if str(yearfr).isnumeric():
-            if 1900 <= int(yearfr) <= 2050:
+            if yrmin <= int(yearfr) <= yrmax:
                 first_day = datetime.date(int(yearfr), 1, 1)
             else:
-                print("!! Please pick a year between 1900 and 2050 !!")
+                print("!! Please pick a year between {} and {} !!".format(yrmin,yrmax))
                 sys.exit(0)
         else:
             print("Error! First year is not numeric")
             sys.exit(0)
 
         if str(yearto).isnumeric():
-            if 1900 <= int(yearto) <= 2050:
+            if yrmin <= int(yearto) <= yrmax:
                 first_day_to = datetime.date(int(yearto), 1, 1)
             else:
-                print("!! Please pick a year between 1900 and 2050 !!")
+                print("!! Please pick a year between {} and {} !!".format(yrmin,yrmax))
                 sys.exit(0)
             if int(yearto) < int(yearfr):
                 print("Error! The LAST year must be later than the FIRST year")
