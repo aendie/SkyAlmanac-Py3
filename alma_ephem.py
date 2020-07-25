@@ -165,7 +165,6 @@ def twilight(date, lat, hemisph):   # used in twilighttab (section 1)
 
     return out
 
-##NEW##
 def midnightsun(dt, hemisph):
     # simple way to fudge whether the sun is up or down when there's no
     # sunrise or sunset on date 'dt' depending on the hemisphere only.
@@ -187,7 +186,6 @@ def midnightsun(dt, hemisph):
 #   MOONRISE/-SET table
 #-------------------------
 
-##NEW##
 # create a list of 'moon above/below horizon' states per Latitude...
 #    None = unknown; True = above horizon (visible); False = below horizon (not visible)
 moonvisible = [None] * 31       # moonvisible[0] up to moonvisible[30]
@@ -409,7 +407,6 @@ def moonrise_set(date, lat):    # used in twilighttab (section 2)
 
     return out, out2
 
-##NEW##
 def moonstate(ndx):
     # return the current moonstate (if known)
     out = '--:--'
@@ -425,7 +422,6 @@ def moonstate(ndx):
         out = r'''\rule{12Pt}{4Pt}'''
     return out
 
-##NEW##
 def getmoonstate(d, lat):
     # populate the moon state (visible or not) for the specified date & latitude
     # note: the first parameter 'd' is already an ephem date 30 seconds before midnight

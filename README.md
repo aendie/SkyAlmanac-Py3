@@ -49,6 +49,10 @@ The Equation Of Time is shaded whenever EoT is negative indicating that apparent
 It is possible to extend the maximum year beyond 2050 by choosing a different ephemeris in config.py.
 Bugfix applied to correct the Meridian Passage times.
 
+**UPDATE: Jul 2020**
+
+A new option has been added into config.py: *moonimg = True* will display a graphic image of the moon phase (making the resulting PDF slightly larger). Use *moonimg = False* to revert to the previous format without the graphic moon image.
+
 ## Requirements
 
 &nbsp;&nbsp;&nbsp;&nbsp;Computation is done by the free PyEphem and Skyfield libraries.  

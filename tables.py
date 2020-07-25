@@ -240,9 +240,11 @@ def planetstabm(date):
 
 def starstab(date):
     # returns a table with ephemerieds for the navigational stars
-    out = r'''\begin{tabular*}{0.25\textwidth}[t]{@{\extracolsep{\fill}}|rrr|}
+    out = r'''\begin{tabular*}{0.251\textwidth}[t]{@{\extracolsep{\fill}}|rrr|}
 \multicolumn{3}{c}{\normalsize{Stars}}\\
 '''
+    # note: 0.251 instead of 0.25 (above) prevents an "Overfull \hbox (0.14297pt too wide)" message on about 5 specific pages in the full year (moonimg=True)
+
     if config.tbls == "m":
         out = out + r'''\hline
 & \multicolumn{1}{c}{\multirow{2}{*}{\textbf{SHA}}} 
@@ -750,8 +752,71 @@ def twilighttab(date):
 '''
 
 # Equation of Time section ...........................................
-    if config.tbls == "m":
+    #------------------  if moon image displayed... ------------------
+    if config.moonimg:
+        d = date
+        d1 = d + datetime.timedelta(days=1)
+        d2 = d + datetime.timedelta(days=2)
+        d3 = d + datetime.timedelta(days=3)
+        age0, pct0 = moonage(d, d1)
+        phase = moonphase(d1)       # moon phase (0:new to π:full to 2π:new)
+        age2, pct2 = moonage(d2, d3)
+        ages = '{}-{}'.format(age0,age2)
+        pcts = '{}-{}\%'.format(pct0,pct2)
+
+        if config.tbls == "m":
+            tab = tab + r'''\hline
+\multicolumn{1}{|c|}{} & & & \multicolumn{1}{c|}{} & & & \multicolumn{1}{c|}{}\\[-2.0ex]
+\multicolumn{1}{|c|}{\multirow{4}{*}{\footnotesize{\textbf{Day}}}} & 
+\multicolumn{3}{c|}{\footnotesize{\textbf{Sun}}} & 
+\multicolumn{3}{c|}{\footnotesize{\textbf{Moon}}}\\[0.6ex]
+\multicolumn{1}{|c|}{} & \multicolumn{2}{c}{Eqn.of Time} & \multicolumn{1}{|c|}{Mer.} & \multicolumn{2}{c}{Mer.Pass.} & \multicolumn{1}{|c|}{Age}\\
+'''
+
+            tab = tab + r'''\multicolumn{1}{|c|}{} &\multicolumn{1}{c}{00\textsuperscript{h}} & 
+\multicolumn{1}{c}{12\textsuperscript{h}} & \multicolumn{1}{|c|}{Pass} & \multicolumn{1}{c}{Upper} & \multicolumn{1}{c}{Lower} & '''
+            tab = tab + r'''\multicolumn{{1}}{{|c|}}{{{}}}\\
+'''.format(ages)
+            
+            tab = tab + r'''\multicolumn{1}{|c|}{} &\multicolumn{1}{c}{mm:ss} & 
+\multicolumn{1}{c}{mm:ss} & \multicolumn{1}{|c|}{hh:mm} & \multicolumn{1}{c}{hh:mm} & \multicolumn{1}{c}{hh:mm} & '''
+            tab = tab + r'''\multicolumn{{1}}{{|c|}}{{{}}}\\
+\hline\rule{{0pt}}{{3.0ex}}\noindent
+'''.format(pcts)
+
+        else:
+            tab = tab + r'''\hline
+\multicolumn{1}{|c|}{\rule{0pt}{2.4ex}\multirow{4}{*}{\textbf{Day}}} & 
+\multicolumn{3}{c|}{\textbf{Sun}} & \multicolumn{3}{c|}{\textbf{Moon}}\\
+\multicolumn{1}{|c|}{} & \multicolumn{2}{c}{Eqn.of Time} & \multicolumn{1}{|c|}{Mer.} & \multicolumn{2}{c}{Mer.Pass.} & \multicolumn{1}{|c|}{Age}\\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{c}{00\textsuperscript{h}} & \multicolumn{1}{c}{12\textsuperscript{h}} & \multicolumn{1}{|c|}{Pass} & \multicolumn{1}{c}{Upper} & \multicolumn{1}{c}{Lower} & '''
+            tab = tab + r'''\multicolumn{{1}}{{|c|}}{{{}}}\\
+'''.format(ages)
+            tab = tab + r'''\multicolumn{1}{|c|}{} & \multicolumn{1}{c}{mm:ss} & \multicolumn{1}{c}{mm:ss} & 
+\multicolumn{1}{|c|}{hh:mm} & \multicolumn{1}{c}{hh:mm} & \multicolumn{1}{c}{hh:mm} & '''
+            tab = tab + r'''\multicolumn{{1}}{{|c|}}{{{}}}\\
+\hline\rule{{0pt}}{{3.0ex}}\noindent
+'''.format(pcts)
+
+        d = date
+        for k in range(3):
+            eq = equation_of_time(d,d + datetime.timedelta(days=1),UpperLists[k],LowerLists[k], False)
+            if k == 0:
+                tab = tab + r'''%s & %s & %s & %s & %s & %s & ''' %(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4])
+                tab = tab + lunatikz(phase)
+            elif k == 1:
+                tab = tab + r'''{} & {} & {} & {} & {} & {} & \multicolumn{{1}}{{|c|}}{{}}\\
+'''.format(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4])
+            else:
+                tab = tab + r'''{} & {} & {} & {} & {} & {} & \multicolumn{{1}}{{|c|}}{{}}\\[0.3ex]
+'''.format(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4])
+            d += datetime.timedelta(days=1)
         tab = tab + r'''\hline
+\end{tabular*}'''
+    #-----------------  if no moon image displayed... -----------------
+    else:
+        if config.tbls == "m":
+            tab = tab + r'''\hline
 \multicolumn{1}{|c|}{} & & & \multicolumn{1}{c|}{} & & & \multicolumn{1}{c|}{}\\[-2.0ex]
 \multicolumn{1}{|c|}{\multirow{4}{*}{\footnotesize{\textbf{Day}}}} & 
 \multicolumn{3}{c|}{\footnotesize{\textbf{Sun}}} & 
@@ -765,8 +830,8 @@ def twilighttab(date):
 \multicolumn{1}{|c|}{} &\multicolumn{1}{c}{mm:ss} & \multicolumn{1}{c}{mm:ss} & \multicolumn{1}{|c|}{hh:mm} & \multicolumn{1}{c}{hh:mm} & \multicolumn{1}{c}{hh:mm} &\multicolumn{1}{|c|}{}\\
 \hline\rule{0pt}{3.0ex}\noindent
 '''
-    else:
-        tab = tab + r'''\hline
+        else:
+            tab = tab + r'''\hline
 \multicolumn{1}{|c|}{\rule{0pt}{2.4ex}\multirow{4}{*}{\textbf{Day}}} & 
 \multicolumn{3}{c|}{\textbf{Sun}} & \multicolumn{3}{c|}{\textbf{Moon}}\\
 \multicolumn{1}{|c|}{} & \multicolumn{2}{c}{Eqn.of Time} & \multicolumn{1}{|c|}{Mer.} & \multicolumn{2}{c}{Mer.Pass.} & \multicolumn{1}{|c|}{}\\
@@ -775,19 +840,65 @@ def twilighttab(date):
 \hline\rule{0pt}{3.0ex}\noindent
 '''
 
-    d = date
-    for k in range(3):
-        eq = equation_of_time(d,d + datetime.timedelta(days=1),UpperLists[k],LowerLists[k])
-        if k == 2:
-            tab = tab + r'''{} & {} & {} & {} & {} & {} & {}({}\%) \\[0.3ex]
+        d = date
+        for k in range(3):
+            eq = equation_of_time(d,d + datetime.timedelta(days=1),UpperLists[k],LowerLists[k], True)
+            if k == 2:
+                tab = tab + r'''{} & {} & {} & {} & {} & {} & {}({}\%) \\[0.3ex]
 '''.format(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4],eq[5],eq[6])
-        else:
-            tab = tab + r'''{} & {} & {} & {} & {} & {} & {}({}\%) \\
+            else:
+                tab = tab + r'''{} & {} & {} & {} & {} & {} & {}({}\%) \\
 '''.format(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4],eq[5],eq[6])
-        d += datetime.timedelta(days=1)
-    tab = tab + r'''\hline
+            d += datetime.timedelta(days=1)
+        tab = tab + r'''\hline
 \end{tabular*}'''
     return tab
+
+
+##NEW##
+def lunatikz(phase):
+    # argument: moon phase (0:new to π:full to 2π:new)
+    # returns the code for a moon image overlaid with a shadow (pardon the function name)
+    radius = 0.375  # moon image radius (cm)
+    diam   = 0.75   # moon image diameter (cm)
+    top    = diam   # top of moon (cm)
+    bottom = 0.0    # bottom of moon (cm)
+    if phase < ephem.pi*0.5:    # new moon to 1st quarter
+        ystart = top
+        fr_angle = 90           # trace a semicircle anticlockwise from top to bottom
+        to_angle = 270
+        ret_angle = -90         # trace an ellipse anticlockwise from bottom to top
+        end_angle = 90
+        xradius = math.cos(phase) * radius
+    elif phase < ephem.pi:      # 1st quarter to full moon
+        ystart = top
+        fr_angle = 90           # trace a semicircle anticlockwise from top to bottom
+        to_angle = 270
+        ret_angle = 270         # trace an ellipse clockwise from bottom to top
+        end_angle = 90
+        xradius = abs(math.cos(phase)) * radius
+    elif phase < ephem.pi*1.5:  # full moon to 3rd quarter
+        ystart = bottom
+        fr_angle = -90          # trace a semicircle anticlockwise from bottom to top
+        to_angle = 90
+        ret_angle = 90          # trace an ellipse clockwise from top to bottom
+        end_angle = -90
+        xradius = abs(math.cos(phase)) * radius
+    else:                       # 3rd quarter to new moon
+        ystart = bottom
+        fr_angle = -90          # trace a semicircle anticlockwise from bottom to top
+        to_angle = 90
+        ret_angle = 90          # trace an ellipse anticlockwise from top to bottom
+        end_angle = 270
+        xradius = math.cos(phase) * radius
+
+    tikz = r'''\multicolumn{{1}}{{|c|}}{{\multirow{{3}}{{*}}
+{{\begin{{tikzpicture}}
+\node[anchor=south west,inner sep=0] at (0,0) {{\includegraphics[width=0.75cm]{{croppedmoon.png}}}};
+\path [fill=darknight, opacity=0.75] (0.375,{:5.3f}) arc [x radius=0.375, y radius=0.375, start angle={:d}, end angle={:d}]  arc [x radius={:f}, y radius=0.375, start angle={:d}, end angle={:d}];
+\end{{tikzpicture}}}}}}\\
+'''.format(ystart, fr_angle, to_angle, xradius, ret_angle, end_angle)
+    return tikz
 
 
 def double_events_found(m1, m2):
@@ -804,8 +915,10 @@ def doublepage(date, page1):
 
     find_new_moon(date)
     #import alma_skyfield
-    #print("previous  new moon: %s" %alma_skyfield.PreviousNewMoon)
-    #print("next      new moon: %s" %alma_skyfield.NextNewMoon)
+    #print("previous  new moon: {}".fotmat(alma_skyfield.PreviousNewMoon))
+    #print("previous full moon: {}".fotmat(alma_skyfield.PreviousFullMoon))
+    #print("next      new moon: {}".fotmat(alma_skyfield.NextNewMoon))
+    #print("next     full moon: {}".fotmat(alma_skyfield.NextFullMoon))
 
     page = ''
     if not(page1):
@@ -945,6 +1058,11 @@ def almanac(first_day, pagenum):
 \usepackage[table]{xcolor}
 \definecolor{LightCyan}{rgb}{0.88,1,1}
 \usepackage{booktabs}'''
+
+    if config.moonimg:
+            alm = alm + r'''
+\usepackage[table]{xcolor}
+\definecolor{darknight}{rgb}{0.18, 0.27, 0.33}'''
 
     # Note: \DeclareUnicodeCharacter is not compatible with some versions of pdflatex
     alm = alm + r'''
