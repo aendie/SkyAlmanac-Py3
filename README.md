@@ -64,6 +64,13 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 * PyEphem 3.7.6 or 3.7.7
 * TeX/LaTeX&nbsp;&nbsp;or&nbsp;&nbsp;MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
 
+## Files required in the execution folder:
+
+* &ast;.py
+* Ra.jpg
+* croppedmoon.png
+* A4chart0-180_P.pdf
+* A4chart180-360_P.pdf
 
 ### INSTALLATION GUIDELINES on Windows 10:
 
