@@ -64,9 +64,6 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 * PyEphem 3.7.6 or 3.7.7
 * TeX/LaTeX&nbsp;&nbsp;or&nbsp;&nbsp;MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
 
-&nbsp;&nbsp;&nbsp;&nbsp;If upgrading from an older version of Skyfield to 1.31 or higher, these files may be deleted:  
-&nbsp;&nbsp;&nbsp;&nbsp;**deltat.data** and **deltat.preds**
-
 ## Files required in the execution folder:
 
 * &ast;.py
@@ -74,6 +71,9 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 * croppedmoon.png
 * A4chart0-180_P.pdf
 * A4chart180-360_P.pdf
+
+&nbsp;&nbsp;&nbsp;&nbsp;If upgrading from an older version of Skyfield to 1.31 or higher, these files may be deleted:  
+&nbsp;&nbsp;&nbsp;&nbsp;**deltat.data** and **deltat.preds**
 
 ### INSTALLATION GUIDELINES on Windows 10:
 
