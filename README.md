@@ -59,10 +59,13 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 &nbsp;&nbsp;&nbsp;&nbsp;Typesetting is done by MiKTeX or TeX Live so you first need to install:
 
 * Python v3.4 or higher (the latest version is recommended)
-* Skyfield 1.20 (latest tested version - older versions work too)
-* Pandas (to load the Hipparcos catalog; tested: 1.0.3)
+* Skyfield 1.31 (latest tested version - older versions work too)
+* Pandas (to load the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
 * PyEphem 3.7.6 or 3.7.7
 * TeX/LaTeX&nbsp;&nbsp;or&nbsp;&nbsp;MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
+
+&nbsp;&nbsp;&nbsp;&nbsp;If upgrading from an older version of Skyfield to 1.31 or higher, these files may be deleted:  
+&nbsp;&nbsp;&nbsp;&nbsp;**deltat.data** and **deltat.preds**
 
 ## Files required in the execution folder:
 
@@ -74,21 +77,31 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 
 ### INSTALLATION GUIDELINES on Windows 10:
 
-&nbsp;&nbsp;&nbsp;&nbsp;Install Python 3.8 (add python.exe to path)  
-&nbsp;&nbsp;&nbsp;&nbsp;Install MiKTeX 2.9 from https://miktex.org/  
+&nbsp;&nbsp;&nbsp;&nbsp;Tested on Windows 10 Pro, Version 20H2 with an AMD Ryzen 7 3700X 8-Core Processor  
+
+&nbsp;&nbsp;&nbsp;&nbsp;Install Python 3.9 (should be in the system environment variable PATH, e.g. )  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**C:\\Python39\Scripts;C:\\Python39;** .....  
+&nbsp;&nbsp;&nbsp;&nbsp;Install MiKTeX 20.11 from https://miktex.org/  
 &nbsp;&nbsp;&nbsp;&nbsp;When MiKTeX first runs it will require installation of additional packages.  
 &nbsp;&nbsp;&nbsp;&nbsp;Run Command Prompt as Administrator, go to your Python folder and execute, e.g.:
 
-&nbsp;&nbsp;&nbsp;&nbsp;**cd C:\\Python38-32**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install --upgrade pip**  
-&nbsp;&nbsp;&nbsp;&nbsp;... for a first install:  
+&nbsp;&nbsp;&nbsp;&nbsp;**cd C:\\Python39**  
+&nbsp;&nbsp;&nbsp;&nbsp;**python.exe -m pip install --upgrade pip**  
+&nbsp;&nbsp;&nbsp;&nbsp;... for a first install (it's preferable to install *wheel* first):  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip install wheel**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install pyephem**  
-&nbsp;&nbsp;&nbsp;&nbsp;... if already installed, check for upgrade explicitly:  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install --upgrade pyephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install skyfield**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install pandas**  
+&nbsp;&nbsp;&nbsp;&nbsp;... if already installed, check for upgrades explicitly:  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip install --upgrade pyephem skyfield pandas**  
 
-&nbsp;&nbsp;&nbsp;&nbsp;Put the SkyAlmanac files in a new folder, run Command Prompt and start with:  
+&nbsp;&nbsp;&nbsp;&nbsp;On Windows 10 Version 2004 and 20H2 there is currently a bug that may cause the following error:  
+&nbsp;&nbsp;&nbsp;&nbsp;**RuntimeError: The current Numpy installation fails to pass a sanity check due to a bug in the windows runtime.**  
+&nbsp;&nbsp;&nbsp;&nbsp;The final resolution is expected end of January 2021, however the following workaround will bypass the problem:  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip uninstall numpy**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip install numpy==1.19.3**  
+
+&nbsp;&nbsp;&nbsp;&nbsp;Put the required files for SkyAlmanac in a new folder, run Command Prompt in that folder and start with:  
 &nbsp;&nbsp;&nbsp;&nbsp;**py -3 skyalmanac.py**
 
 
@@ -102,6 +115,7 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 &nbsp;&nbsp;&nbsp;&nbsp;**sudo apt install texlive-latex-extra**
 
 &nbsp;&nbsp;&nbsp;&nbsp;Install the required astronomical libraries etc.:  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install wheel**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install pyephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install skyfield**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install pandas**  
@@ -118,6 +132,7 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 &nbsp;&nbsp;&nbsp;&nbsp;Type the following commands at the commandline (terminal app):
 
 &nbsp;&nbsp;&nbsp;&nbsp;**sudo easy_install pip**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip install wheel**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install pyephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install skyfield**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install pandas**  
