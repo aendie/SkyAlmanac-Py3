@@ -59,7 +59,7 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 &nbsp;&nbsp;&nbsp;&nbsp;Typesetting is done by MiKTeX or TeX Live so you first need to install:
 
 * Python v3.4 or higher (the latest version is recommended)
-* Skyfield 1.31 (latest tested version - older versions work too)
+* Skyfield 1.31 (for best accuracy use 1.31 or higher - see the Skyfield Changelog)
 * Pandas (to load the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
 * PyEphem 3.7.6 or 3.7.7
 * TeX/LaTeX&nbsp;&nbsp;or&nbsp;&nbsp;MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
