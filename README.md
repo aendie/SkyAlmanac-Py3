@@ -61,7 +61,7 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 * Python v3.4 or higher (the latest version is recommended)
 * Skyfield 1.31 (for best accuracy use 1.31 or higher - see the Skyfield Changelog)
 * Pandas (to load the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
-* PyEphem 3.7.6 or 3.7.7
+* Ephem 3.7.6 or 3.7.7
 * TeX/LaTeX&nbsp;&nbsp;or&nbsp;&nbsp;MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
 
 ## Files required in the execution folder:
@@ -88,12 +88,13 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 &nbsp;&nbsp;&nbsp;&nbsp;**cd C:\\Python39**  
 &nbsp;&nbsp;&nbsp;&nbsp;**python.exe -m pip install --upgrade pip**  
 &nbsp;&nbsp;&nbsp;&nbsp;... for a first install (it's preferable to install *wheel* first):  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install wheel**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install pyephem**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install skyfield**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install pandas**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install wheel**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 uninstall pyephem**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install ephem**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install skyfield**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install pandas**  
 &nbsp;&nbsp;&nbsp;&nbsp;... if already installed, check for upgrades explicitly:  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install --upgrade pyephem skyfield pandas**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install --upgrade ephem skyfield pandas**  
 
 &nbsp;&nbsp;&nbsp;&nbsp;On Windows 10 Version 2004 and 20H2 there is currently a bug that may cause the following error:  
 &nbsp;&nbsp;&nbsp;&nbsp;**RuntimeError: The current Numpy installation fails to pass a sanity check due to a bug in the windows runtime.**  
@@ -116,7 +117,8 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 
 &nbsp;&nbsp;&nbsp;&nbsp;Install the required astronomical libraries etc.:  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install wheel**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install pyephem**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 uninstall pyephem**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install ephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install skyfield**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install pandas**  
 
@@ -133,7 +135,8 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 
 &nbsp;&nbsp;&nbsp;&nbsp;**sudo easy_install pip**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install wheel**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install pyephem**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip uninstall pyephem**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip install ephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install skyfield**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install pandas**  
 
