@@ -59,7 +59,7 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 &nbsp;&nbsp;&nbsp;&nbsp;Typesetting is done by MiKTeX or TeX Live so you first need to install:
 
 * Python v3.4 or higher (the latest version is recommended)
-* Skyfield 1.31 (for best accuracy use 1.31 or higher - see the Skyfield Changelog)
+* Skyfield 1.35 (see the Skyfield Changelog)
 * Pandas (to load the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
 * Ephem 3.7.6 or 3.7.7
 * TeX/LaTeX&nbsp;&nbsp;or&nbsp;&nbsp;MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
@@ -79,9 +79,9 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 
 &nbsp;&nbsp;&nbsp;&nbsp;Tested on Windows 10 Pro, Version 20H2 with an AMD Ryzen 7 3700X 8-Core Processor  
 
-&nbsp;&nbsp;&nbsp;&nbsp;Install Python 3.9 (should be in the system environment variable PATH, e.g. )  
+&nbsp;&nbsp;&nbsp;&nbsp;Install Python 3.9.1 (should be in the system environment variable PATH, e.g. )  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**C:\\Python39\Scripts;C:\\Python39;** .....  
-&nbsp;&nbsp;&nbsp;&nbsp;Install MiKTeX 20.11 from https://miktex.org/  
+&nbsp;&nbsp;&nbsp;&nbsp;Install MiKTeX 21.1 from https://miktex.org/  
 &nbsp;&nbsp;&nbsp;&nbsp;When MiKTeX first runs it will require installation of additional packages.  
 &nbsp;&nbsp;&nbsp;&nbsp;Run Command Prompt as Administrator, go to your Python folder and execute, e.g.:
 
@@ -96,14 +96,17 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 &nbsp;&nbsp;&nbsp;&nbsp;... if already installed, check for upgrades explicitly:  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install --upgrade ephem skyfield pandas**  
 
-&nbsp;&nbsp;&nbsp;&nbsp;On Windows 10 Version 2004 and 20H2 there is currently a bug that may cause the following error:  
-&nbsp;&nbsp;&nbsp;&nbsp;**RuntimeError: The current Numpy installation fails to pass a sanity check due to a bug in the windows runtime.**  
-&nbsp;&nbsp;&nbsp;&nbsp;The final resolution is expected end of January 2021, however the following workaround will bypass the problem:  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip uninstall numpy**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install numpy==1.19.3**  
-
 &nbsp;&nbsp;&nbsp;&nbsp;Put the required files for SkyAlmanac in a new folder, run Command Prompt in that folder and start with:  
 &nbsp;&nbsp;&nbsp;&nbsp;**py -3 skyalmanac.py**
+
+&nbsp;&nbsp;&nbsp;&nbsp;If using MiKTeX 21 or higher, running **py -3 increments.py** will probably fail with  
+&nbsp;&nbsp;&nbsp;&nbsp;**! TeX capacity exceeded, sorry [main memory size=3000000].**  
+&nbsp;&nbsp;&nbsp;&nbsp;To resolve this problem (assuming MiKTeX has been installed for all users),  
+&nbsp;&nbsp;&nbsp;&nbsp;open a Command Prompt as Administrator and enter:  
+&nbsp;&nbsp;&nbsp;&nbsp;**initexmf --admin --edit-config-file=pdflatex**  
+&nbsp;&nbsp;&nbsp;&nbsp;This opens **pdflatex.ini** in Notepad. Add the following line:  
+&nbsp;&nbsp;&nbsp;&nbsp;**extra_mem_top = 1000000**  
+&nbsp;&nbsp;&nbsp;&nbsp;and save the file. Problem solved. For more details go [here](https://tex.stackexchange.com/questions/438902/how-to-increase-memory-size-for-xelatex-in-miktex/438911#438911)
 
 
 ### INSTALLATION GUIDELINES on Ubuntu 19.10 or 20.04:
