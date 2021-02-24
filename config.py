@@ -35,7 +35,7 @@ moonimg = True  # 'True' to include a moon image; otherwise 'False'
 lat = [72,70,68,66,64,62,60,58,56,54,52,50,45,40,35,30,20,10,0,-10,-20,-30,-35,-40,-45,-50,-52,-54,-56,-58,-60]
 
 # open/write/close a log file
-def init():
+def initLOG():
     global errors
     errors = 0
     global logfile

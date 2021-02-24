@@ -4,19 +4,20 @@ SkyAlmanac-Py3 is a Python 3 script that creates the daily pages of the Nautical
 
 SkyAlmanac-Py3 was developed with the intention of having identical output format as SFalmanac-Py3. It is a hybrid version based on two astronomical libraries:  
 
-* the older PyEphem library:  https://rhodesmill.org/pyephem/
+* the older Ephem library:  https://rhodesmill.org/pyephem/
 * the newer Skyfield library: https://rhodesmill.org/skyfield/
 
-It uses the star database in Skyfield, which is based on data from the Hipparcos Catalogue. PyEphem is used for calculating twilight (actual, civil and nautical sunrise/sunset) and moonrise/moonset. As a consequence, it is **four times faster** than SFalmanac (which uses Skyfield for almost everything).
+It uses the star database in Skyfield, which is based on data from the Hipparcos Catalogue. Ephem is used for calculating twilight (actual, civil and nautical sunrise/sunset) and moonrise/moonset. As a consequence, it is **four times faster** than SFalmanac (which uses Skyfield for almost everything).
 
-NOTE: two scripts are included (both can be run): 'skyalmanac.py' and 'increments.py'  
+**NOTE: the Python Package Index (PyPI) edition is here:** https://pypi.org/project/skyalmanac/  
+**Users are encouraged to install the PyPI edition instead.**  
 NOTE: a Python 2.7 script with identical functionality can be found at:  https://github.com/aendie/SkyAlmanac-Py2  
-NOTE: a 100% [PyEphem](https://rhodesmill.org/pyephem/) version of SkyAlmanac is available here: https://github.com/aendie/Pyalmanac-Py3
+NOTE: a 100% [Ephem](https://rhodesmill.org/pyephem/) version of SkyAlmanac is available here: https://github.com/aendie/Pyalmanac-Py3
 
 An aim of this development was to maintain:
 
 * **identical PDF output formatting with a similar control program**  
-	 It is then possible to display both generated tables (from PyEphem, Skyfield and SkyAlmanac) and compare what has changed by flipping between the two tabs in Adobe Acrobat Reader DC.
+	 It is then possible to display both generated tables (from Ephem, Skyfield and SkyAlmanac) and compare what has changed by flipping between the two tabs in Adobe Acrobat Reader DC.
 	 Anything that has changed flashes, thereby drawing your attention to
 	 it. This crude and simple method is quite effective in highlihgting data that might need further attention.
 
@@ -53,16 +54,21 @@ Bugfix applied to correct the Meridian Passage times.
 
 A new option has been added into config.py: *moonimg = True* will display a graphic image of the moon phase (making the resulting PDF slightly larger). Use *moonimg = False* to revert to the previous format without the graphic moon image.
 
+**UPDATE: Feb 2021**
+
+Minor changes are included here to this original (non-PyPI) edition to reflect some of the adaptation that was required (e.g. integrate *increments.py* into *skyalmanac.py* as Option 5) to create a PyPI (Python Package Index) edition making this original (non-PyPI) and the PyPI editions similar. Both editions create identical almanacs and the [PyPI edition](https://pypi.org/project/skyalmanac/) is the preferred choice for users.
+
 ## Requirements
 
-&nbsp;&nbsp;&nbsp;&nbsp;Computation is done by the free PyEphem and Skyfield libraries.  
-&nbsp;&nbsp;&nbsp;&nbsp;Typesetting is done by MiKTeX or TeX Live so you first need to install:
+&nbsp;&nbsp;&nbsp;&nbsp;Computation is done by the free Ephem and Skyfield libraries.  
+&nbsp;&nbsp;&nbsp;&nbsp;Typesetting is typically done by MiKTeX or TeX Live.  
+&nbsp;&nbsp;&nbsp;&nbsp;These need to be installed:
 
 * Python v3.4 or higher (the latest version is recommended)
 * Skyfield 1.35 (see the Skyfield Changelog)
 * Pandas (to load the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
-* Ephem 3.7.6 or 3.7.7
-* TeX/LaTeX&nbsp;&nbsp;or&nbsp;&nbsp;MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
+* Ephem >=3.7.6
+* MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
 
 ## Files required in the execution folder:
 
@@ -89,7 +95,7 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 &nbsp;&nbsp;&nbsp;&nbsp;**python.exe -m pip install --upgrade pip**  
 &nbsp;&nbsp;&nbsp;&nbsp;... for a first install (it's preferable to install *wheel* first):  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install wheel**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 uninstall pyephem**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 uninstall pyephem ephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install ephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install skyfield**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install pandas**  
@@ -99,7 +105,7 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 &nbsp;&nbsp;&nbsp;&nbsp;Put the required files for SkyAlmanac in a new folder, run Command Prompt in that folder and start with:  
 &nbsp;&nbsp;&nbsp;&nbsp;**py -3 skyalmanac.py**
 
-&nbsp;&nbsp;&nbsp;&nbsp;If using MiKTeX 21 or higher, running **py -3 increments.py** will probably fail with  
+&nbsp;&nbsp;&nbsp;&nbsp;If using MiKTeX 21 or higher, executing 'option 5' (Increments and Corrections) will probably fail with  
 &nbsp;&nbsp;&nbsp;&nbsp;**! TeX capacity exceeded, sorry [main memory size=3000000].**  
 &nbsp;&nbsp;&nbsp;&nbsp;To resolve this problem (assuming MiKTeX has been installed for all users),  
 &nbsp;&nbsp;&nbsp;&nbsp;open a Command Prompt as Administrator and enter:  
@@ -120,7 +126,7 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 
 &nbsp;&nbsp;&nbsp;&nbsp;Install the required astronomical libraries etc.:  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install wheel**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 uninstall pyephem**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip3 uninstall pyephem ephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install ephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install skyfield**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip3 install pandas**  
@@ -133,12 +139,12 @@ A new option has been added into config.py: *moonimg = True* will display a grap
 
 &nbsp;&nbsp;&nbsp;&nbsp;Every Mac comes with python preinstalled.  
 &nbsp;&nbsp;&nbsp;&nbsp;(Please choose this version of SkyAlmanac if Python 3.* is installed.)  
-&nbsp;&nbsp;&nbsp;&nbsp;You need to install the Skyfield (and PyEphem) library to use SFalmanac.  
+&nbsp;&nbsp;&nbsp;&nbsp;You need to install the Skyfield (and Ephem) library to use SFalmanac.  
 &nbsp;&nbsp;&nbsp;&nbsp;Type the following commands at the commandline (terminal app):
 
 &nbsp;&nbsp;&nbsp;&nbsp;**sudo easy_install pip**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install wheel**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip uninstall pyephem**  
+&nbsp;&nbsp;&nbsp;&nbsp;**pip uninstall pyephem ephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install ephem**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install skyfield**  
 &nbsp;&nbsp;&nbsp;&nbsp;**pip install pandas**  

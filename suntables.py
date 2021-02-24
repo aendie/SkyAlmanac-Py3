@@ -22,9 +22,12 @@
 #       will be removed from Python at some later time. See:
 # https://docs.python.org/3/whatsnew/3.0.html#pep-3101-a-new-approach-to-string-formatting
 
-import config
+# Standard library imports
 import datetime		# required for .timedelta()
+import math
+# Local application imports
 from alma_skyfield import *
+import config
 
 def suntab(date):
     # generates LaTeX table for sun only (traditional)

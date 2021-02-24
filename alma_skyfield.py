@@ -18,15 +18,18 @@
 
 # This contains most functions that calculate values for the nautical almanac
 
-import config
-import math
+# Standard library imports
 import datetime
+import math
+# Third party imports
 from skyfield.api import Topos, Star, load
 from skyfield import almanac
 from skyfield.nutationlib import iau2000b
 from skyfield.data import hipparcos
-#from skyfield.units import Distance
-#from skyfield.units import Angle
+##from skyfield.units import Distance
+##from skyfield.units import Angle
+# Local application imports
+import config
 
 #load    = Loader('~/Documents/fishing/SkyData')  # avoids multiple copies of large files
 
@@ -48,7 +51,7 @@ hour_of_day = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
 with load.open(hipparcos.URL) as f:
     df = hipparcos.load_dataframe(f)
 
-def init():
+def init_sf():
     return ts
 
 #----------------------

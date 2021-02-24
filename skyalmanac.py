@@ -17,14 +17,17 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import tables
-import suntables 
+# Standard library imports
 import os
 import sys
 import time
 import datetime
+# Local application imports
+import tables
+import suntables 
 import config
-from alma_skyfield import init
+import increments
+from alma_skyfield import init_sf
 
 ##Main##
 if sys.version_info[0] < 3:
@@ -34,7 +37,7 @@ if config.ephndx not in set([0, 1, 2]):
     print("Error - Please choose a valid ephemeris in config.py")
     sys.exit(0)
 
-ts = init()     # in alma_skyfield
+ts = init_sf()     # in alma_skyfield
 d = datetime.datetime.utcnow().date()
 first_day = datetime.date(d.year, d.month, d.day)
 
@@ -58,9 +61,10 @@ s = input("""What do you want to create?:\n
     2   Just tables for the sun (for a year)
     3   Nautical almanac   - 6 days from today
     4   Tables for the sun - 30 days from today
+    5   "Increments and Corrections" tables (static data)
 """)
 
-if s in set(['1', '2', '3', '4']):
+if s in set(['1', '2', '3', '4', '5']):
     if int(s) < 3:
         print("Please enter the year you want to create the nautical almanac")
         years = input("  for as yyyy ... or the FIRST and LAST year as yyyy-yyyy\n")
@@ -97,25 +101,26 @@ if s in set(['1', '2', '3', '4']):
             print("Error! Last year is not numeric")
             sys.exit(0)
 
-    tsin = input("""What table style is required?:\n
-    t   Traditional
-    m   Modern
+    if s != '5':
+        tsin = input("""What table style is required?:\n
+        t   Traditional
+        m   Modern
 """)
-    ff = '_'
-    DecFmt = ''
-    config.tbls = tsin[0:1]	# table style
-    config.decf = tsin[1:2]	# Declination format
-    if config.tbls != 'm':
-        config.tbls = ''		# anything other than 'm' is traditional
-        ff = ''
-    if config.decf != '+':		# Positive/Negative Declinations
-        config.decf = ''		# USNO format for Declination
-    else:
-        DecFmt = '[old]'
+        ff = '_'
+        DecFmt = ''
+        config.tbls = tsin[0:1]	# table style
+        config.decf = tsin[1:2]	# Declination format
+        if config.tbls != 'm':
+            config.tbls = ''		# anything other than 'm' is traditional
+            ff = ''
+        if config.decf != '+':		# Positive/Negative Declinations
+            config.decf = ''		# USNO format for Declination
+        else:
+            DecFmt = '[old]'
 
     if s == '1':
         print("Be patient - this may take a while.")
-##        config.init()		# initialize log file
+##        config.initLOG()		# initialize log file
         for yearint in range(int(yearfr),int(yearto)+1):
             start = time.time()
             year = "{:4d}".format(yearint)  # year = "%4d" %yearint
@@ -162,7 +167,7 @@ if s in set(['1', '2', '3', '4']):
                 os.remove("sunalmanac{}{}.aux".format(ff,year+DecFmt))
 
     elif s == '3':
-##        config.init()		# initialize log file
+##        config.initLOG()		# initialize log file
         start = time.time()
         msg = "\nCreating nautical almanac tables - from {}".format(sdmy)
         print(msg)
@@ -200,5 +205,21 @@ if s in set(['1', '2', '3', '4']):
             os.remove("sunalmanac{}{}.log".format(ff,symd+DecFmt))
         if os.path.isfile("sunalmanac{}{}.aux".format(ff,symd+DecFmt)):
             os.remove("sunalmanac{}{}.aux".format(ff,symd+DecFmt))
+
+    elif s == '5':
+        msg = "\nCreating the Increments and Corrections tables"
+        print(msg)
+        fn = "inc"
+        filename = fn + ".tex"
+        outfile = open(filename, mode="w", encoding="utf8")
+        outfile.write(increments.makelatex())
+        outfile.close()
+        command = 'pdflatex {}'.format(filename)
+        os.system(command)
+        print("finished")
+        os.remove(fn + ".tex")
+        os.remove(fn + ".log")
+        os.remove(fn + ".aux")
+
 else:
-    print("Error! Choose 1, 2, 3 or 4")
+    print("Error! Choose 1, 2, 3, 4 or 5")

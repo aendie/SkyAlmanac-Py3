@@ -22,11 +22,16 @@
 #       will be removed from Python at some later time. See:
 # https://docs.python.org/3/whatsnew/3.0.html#pep-3101-a-new-approach-to-string-formatting
 
-import config
+# Standard library imports
 import datetime		# required for .timedelta()
 import sys			# required for .stdout.write()
-from alma_ephem import *
+import math
+# Third party imports
+import ephem
+# Local application imports
 from alma_skyfield import *
+from alma_ephem import *
+import config
 
 UpperLists = [[], [], []]    # moon GHA per hour for 3 days
 LowerLists = [[], [], []]    # moon colong GHA per hour for 3 days
@@ -1084,7 +1089,7 @@ def almanac(first_day, pagenum):
     alm = alm + r'''
     \begin{titlepage}
     \begin{center}
-    \textsc{\Large Generated using PyEphem and Skyfield}\\
+    \textsc{\Large Generated using Ephem and Skyfield}\\
     \large http://rhodesmill.org/skyfield/\\[0.7cm]
     % TRIM values: left bottom right top
     \includegraphics[clip, trim=12mm 20cm 12mm 21mm, width=0.92\textwidth]{./A4chart0-180_P.pdf}\\[0.3cm]
