@@ -21,19 +21,48 @@
 # Standard library imports
 import datetime
 import math
+from os import path
 # Third party imports
+from skyfield import VERSION
 from skyfield.api import Topos, Star, load
 from skyfield import almanac
 from skyfield.nutationlib import iau2000b
 from skyfield.data import hipparcos
-##from skyfield.units import Distance
-##from skyfield.units import Angle
+###from skyfield.units import Distance
+###from skyfield.units import Angle
 # Local application imports
 import config
 
-#load    = Loader('~/Documents/fishing/SkyData')  # avoids multiple copies of large files
+#----------------------
+#   initialization
+#----------------------
 
-ts = load.timescale()	# timescale object
+def compareVersion(versions1, version2):
+    #versions1 = [int(v) for v in version1.split(".")]
+    versions2 = [int(v) for v in version2.split(".")]
+    for i in range(max(len(versions1),len(versions2))):
+        v1 = versions1[i] if i < len(versions1) else 0
+        v2 = versions2[i] if i < len(versions2) else 0
+        if v1 > v2:
+            return 1
+        elif v1 < v2:
+            return -1
+    return 0
+
+if config.useIERS:
+    if compareVersion(VERSION, "1.31") >= 0:
+        if path.isfile('finals2000A.all'):
+            if load.days_old('finals2000A.all') > float(config.ageIERS):
+                load.download('finals2000A.all')
+            ts = load.timescale(builtin=False)	# timescale object
+        else:
+            load.download('finals2000A.all')
+            ts = load.timescale(builtin=False)	# timescale object
+    else:
+        ts = load.timescale()	# timescale object with built-in UT1-tables
+else:
+    ts = load.timescale()	# timescale object with built-in UT1-tables
+
 #hipparcos_epoch = ts.tt(1991.25)
 if config.ephndx in set([0, 1, 2]):
     eph = load(config.ephemeris[config.ephndx][0])	# load chosen ephemeris
@@ -120,39 +149,69 @@ def rise_set(t, y, lats):
     ris2 = '--:--'
     set2 = '--:--'
     if len(t) == 2:		# this happens most often
-        t0 = ts.utc((t[0].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
-        t1 = ts.utc((t[1].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
+        dt0 = t[0].utc_datetime()
+        sec0 = dt0.second + int(dt0.microsecond)/1000000.
+        t0 = ts.ut1(dt0.year, dt0.month, dt0.day, dt0.hour, dt0.minute, sec0)
+        dt1 = t[1].utc_datetime()
+        sec1 = dt1.second + int(dt1.microsecond)/1000000.
+        t1 = ts.ut1(dt1.year, dt1.month, dt1.day, dt1.hour, dt1.minute, sec1)
         if y[0] and not(y[1]):
-            rise = t0.utc_iso()[11:16]
-            sett = t1.utc_iso()[11:16]
+            ##rise = t0.utc_iso()[11:16]  # good for UTC only
+            ##sett = t1.utc_iso()[11:16]  # good for UTC only
+            # get the UT1 hours and rounded minutes ...
+            rise = t0.ut1_strftime('%H:%M')
+            sett = t1.ut1_strftime('%H:%M')
         else:
             if not(y[0]) and y[1]:
-                sett = t0.utc_iso()[11:16]
-                rise = t1.utc_iso()[11:16]
+                ##sett = t0.utc_iso()[11:16]  # good for UTC only
+                ##rise = t1.utc_iso()[11:16]  # good for UTC only
+                # get the UT1 hours and rounded minutes ...
+                sett = t0.ut1_strftime('%H:%M')
+                rise = t1.ut1_strftime('%H:%M')
             else:
                 # this should never get here!
                 rise_set_error(y,lats,ts.utc(t[0].utc_datetime()))
     else:
         if len(t) == 1:		# this happens ocassionally
-            t0 = ts.utc((t[0].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
+            dt0 = t[0].utc_datetime()
+            sec0 = dt0.second + int(dt0.microsecond)/1000000.
+            t0 = ts.ut1(dt0.year, dt0.month, dt0.day, dt0.hour, dt0.minute, sec0)
             if y[0]:
-                rise = t0.utc_iso()[11:16]
+                ##rise = t0.utc_iso()[11:16]  # good for UTC only
+                # get the UT1 hours and rounded minutes ...
+                rise = t0.ut1_strftime('%H:%M')
             else:
-                sett = t0.utc_iso()[11:16]
+                ##sett = t0.utc_iso()[11:16]  # good for UTC only
+                # get the UT1 hours and rounded minutes ...
+                sett = t0.ut1_strftime('%H:%M')
         else:
             if len(t) == 3:		# this happens rarely (in high latitudes in summer)
-                t0 = ts.utc((t[0].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
-                t1 = ts.utc((t[1].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
-                t2 = ts.utc((t[2].utc_datetime() + datetime.timedelta(seconds=30)).replace(second=0, microsecond=0))
+                dt0 = t[0].utc_datetime()
+                sec0 = dt0.second + int(dt0.microsecond)/1000000.
+                t0 = ts.ut1(dt0.year, dt0.month, dt0.day, dt0.hour, dt0.minute, sec0)
+                dt1 = t[1].utc_datetime()
+                sec1 = dt1.second + int(dt1.microsecond)/1000000.
+                t1 = ts.ut1(dt1.year, dt1.month, dt1.day, dt1.hour, dt1.minute, sec1)
+                dt2 = t[2].utc_datetime()
+                sec2 = dt2.second + int(dt2.microsecond)/1000000.
+                t2 = ts.ut1(dt2.year, dt2.month, dt2.day, dt2.hour, dt2.minute, sec2)
                 if y[0] and not(y[1]) and y[2]:
-                    rise = t0.utc_iso()[11:16]
-                    sett = t1.utc_iso()[11:16]
-                    ris2 = t2.utc_iso()[11:16]
+                    ##rise = t0.utc_iso()[11:16]  # good for UTC only
+                    ##sett = t1.utc_iso()[11:16]  # good for UTC only
+                    ##ris2 = t2.utc_iso()[11:16]  # good for UTC only
+                    # get the UT1 hours and rounded minutes ...
+                    rise = t0.ut1_strftime('%H:%M')
+                    sett = t1.ut1_strftime('%H:%M')
+                    ris2 = t2.ut1_strftime('%H:%M')
                 else:
                     if not(y[0]) and y[1] and not(y[2]):
-                        sett = t0.utc_iso()[11:16]
-                        rise = t1.utc_iso()[11:16]
-                        set2 = t2.utc_iso()[11:16]
+                        ##sett = t0.utc_iso()[11:16]  # good for UTC only
+                        ##rise = t1.utc_iso()[11:16]  # good for UTC only
+                        ##set2 = t2.utc_iso()[11:16]  # good for UTC only
+                        # get the UT1 hours and rounded minutes ...
+                        sett = t0.ut1_strftime('%H:%M')
+                        rise = t1.ut1_strftime('%H:%M')
+                        set2 = t2.ut1_strftime('%H:%M')
                     else:
                         # this should never get here!
                         rise_set_error(y,lats,ts.utc(t[0].utc_datetime()))
@@ -171,7 +230,8 @@ def rise_set_error(y, lats, t0):
             config.writeLOG("{}".format(y[2]))
         if len(y) > 3:
             config.writeLOG("{}".format(y[3]))
-        config.writeLOG("\n{}".format(t0.utc_iso()))
+        dt = t0.utc_datetime() + datetime.timedelta(seconds = t0.dut1)
+        config.writeLOG("\n{}".format(dt.isoformat()))
     else:
         # unexpected rise/set values - print to console
         msg = "rise_set {} values for {}: {} {}".format(len(y),lats, y[0], y[1])
@@ -180,7 +240,8 @@ def rise_set_error(y, lats, t0):
             print("{}".format(y[2]))
         if len(y) > 3:
             print("{}".format(y[3]))
-        print("{}".format(t0.utc_iso()))
+        dt = t0.utc_datetime() + datetime.timedelta(seconds = t0.dut1)
+        print("{}".format(dt.isoformat()))
     return
 
 #-------------------------------
@@ -190,7 +251,7 @@ def rise_set_error(y, lats, t0):
 def sunGHA(d):              # used in sunmoontab(m)
     # compute sun's GHA and DEC per hour of day
 
-    t = ts.utc(d.year, d.month, d.day, hour_of_day, 0, 0)
+    t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(sun)
     ra = position.apparent().radec(epoch='date')[0]
     dec = position.apparent().radec(epoch='date')[1]
@@ -210,17 +271,17 @@ def sunGHA(d):              # used in sunmoontab(m)
 
 def sunSD(d):               # used in sunmoontab(m)
     # compute semi-diameter of sun and sun's declination change per hour (in minutes)
-    t12 = ts.utc(d.year, d.month, d.day, 12, 0, 0)
+    t12 = ts.ut1(d.year, d.month, d.day, 12, 0, 0)
     position = earth.at(t12).observe(sun)
     distance = position.apparent().radec(epoch='date')[2]
     dist_km = distance.km
     sds = math.degrees(math.atan(695500.0 / dist_km))   # radius of sun = 695500 km
     sdsm = "{:0.1f}".format(sds * 60)   # convert to minutes of arc
 
-    t0 = ts.utc(d.year, d.month, d.day, 0, 0, 0)
+    t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(sun)
     dec0 = position0.apparent().radec(epoch='date')[1]
-    t1= ts.utc(d.year, d.month, d.day, 1, 0, 0)
+    t1= ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(sun)
     dec1 = position1.apparent().radec(epoch='date')[1]
     ds = dec1.degrees - dec0.degrees
@@ -229,7 +290,7 @@ def sunSD(d):               # used in sunmoontab(m)
 
 def moonSD(d):              # used in sunmoontab(m)
     # compute semi-diameter of moon (in minutes)
-    t12 = ts.utc(d.year, d.month, d.day, 12, 0, 0)
+    t12 = ts.ut1(d.year, d.month, d.day, 12, 0, 0)
     position = earth.at(t12).observe(moon)
     distance = position.apparent().radec(epoch='date')[2]
     dist_km = distance.km
@@ -239,18 +300,18 @@ def moonSD(d):              # used in sunmoontab(m)
 
 def moonGHA(d):             # used in sunmoontab(m)
     # compute moon's GHA, DEC and HP per hour of day
-    t = ts.utc(d.year, d.month, d.day, hour_of_day, 0, 0)
+    t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(moon)
     ra = position.apparent().radec(epoch='date')[0]
     dec = position.apparent().radec(epoch='date')[1]
     distance = position.apparent().radec(epoch='date')[2]
 
     # also compute moon's GHA at End of Day (23:59:30) and Start of Day (24 hours earlier)
-    tSoD = ts.utc(d.year, d.month, d.day-1, 23, 59, 30)
+    tSoD = ts.ut1(d.year, d.month, d.day-1, 23, 59, 30)
     posSoD = earth.at(tSoD).observe(moon)
     raSoD = posSoD.apparent().radec(epoch='date')[0]
     ghaSoD = gha2deg(tSoD.gast, raSoD.hours)   # GHA as float
-    tEoD = ts.utc(d.year, d.month, d.day, 23, 59, 30)
+    tEoD = ts.ut1(d.year, d.month, d.day, 23, 59, 30)
     posEoD = earth.at(tEoD).observe(moon)
     raEoD = posEoD.apparent().radec(epoch='date')[0]
     ghaEoD = gha2deg(tEoD.gast, raEoD.hours)   # GHA as float
@@ -279,7 +340,7 @@ def moonGHA(d):             # used in sunmoontab(m)
 
 def moonVD(d0,d):           # used in sunmoontab(m)
     # first value required is from 23:30 on the previous day...
-    t0 = ts.utc(d0.year, d0.month, d0.day, 23, 30, 0)
+    t0 = ts.ut1(d0.year, d0.month, d0.day, 23, 30, 0)
     pos0 = earth.at(t0).observe(moon)
     ra0 = pos0.apparent().radec(epoch='date')[0]
     dec0 = pos0.apparent().radec(epoch='date')[1]
@@ -287,7 +348,7 @@ def moonVD(d0,d):           # used in sunmoontab(m)
     D0 = dec0.degrees
 
     # ...then 24 values at hourly intervals from 23:30 onwards
-    t = ts.utc(d.year, d.month, d.day, hour_of_day, 30, 0)
+    t = ts.ut1(d.year, d.month, d.day, hour_of_day, 30, 0)
     position = earth.at(t).observe(moon)
     ra = position.apparent().radec(epoch='date')[0]
     dec = position.apparent().radec(epoch='date')[1]
@@ -312,7 +373,7 @@ def moonVD(d0,d):           # used in sunmoontab(m)
 #------------------------------------------------
 
 def venusGHA(d):            # used in planetstab(m)
-    t = ts.utc(d.year, d.month, d.day, hour_of_day, 0, 0)
+    t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(venus)
     ra = position.apparent().radec(epoch='date')[0]
     dec = position.apparent().radec(epoch='date')[1]
@@ -329,7 +390,7 @@ def venusGHA(d):            # used in planetstab(m)
     return ghas, decs, degs
 
 def marsGHA(d):             # used in planetstab(m)
-    t = ts.utc(d.year, d.month, d.day, hour_of_day, 0, 0)
+    t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(mars)
     ra = position.apparent().radec(epoch='date')[0]
     dec = position.apparent().radec(epoch='date')[1]
@@ -346,7 +407,7 @@ def marsGHA(d):             # used in planetstab(m)
     return ghas, decs, degs
 
 def jupiterGHA(d):          # used in planetstab(m)
-    t = ts.utc(d.year, d.month, d.day, hour_of_day, 0, 0)
+    t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(jupiter)
     ra = position.apparent().radec(epoch='date')[0]
     dec = position.apparent().radec(epoch='date')[1]
@@ -363,7 +424,7 @@ def jupiterGHA(d):          # used in planetstab(m)
     return ghas, decs, degs
 
 def saturnGHA(d):           # used in planetstab(m)
-    t = ts.utc(d.year, d.month, d.day, hour_of_day, 0, 0)
+    t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(saturn)
     ra = position.apparent().radec(epoch='date')[0]
     dec = position.apparent().radec(epoch='date')[1]
@@ -382,12 +443,12 @@ def saturnGHA(d):           # used in planetstab(m)
 def vdm_Venus(d):           # used in planetstab(m)
     # compute v (GHA correction), d (Declination correction)
     # NOTE: m (magnitude of planet) comes from alma_ephem.py
-    t0 = ts.utc(d.year, d.month, d.day, 0, 0, 0)
+    t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(venus)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     dec0 = position0.apparent().radec(epoch='date')[1]	# declination
 
-    t1 = ts.utc(d.year, d.month, d.day, 1, 0, 0)
+    t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(venus)
     ra1 = position1.apparent().radec(epoch='date')[0]	# RA
     dec1 = position1.apparent().radec(epoch='date')[1]	# declination
@@ -403,12 +464,12 @@ def vdm_Venus(d):           # used in planetstab(m)
 def vdm_Mars(d):            # used in planetstab(m)
     # compute v (GHA correction), d (Declination correction)
     # NOTE: m (magnitude of planet) comes from alma_ephem.py
-    t0 = ts.utc(d.year, d.month, d.day, 0, 0, 0)
+    t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(mars)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     dec0 = position0.apparent().radec(epoch='date')[1]	# declination
 
-    t1 = ts.utc(d.year, d.month, d.day, 1, 0, 0)
+    t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(mars)
     ra1 = position1.apparent().radec(epoch='date')[0]	# RA
     dec1 = position1.apparent().radec(epoch='date')[1]	# declination
@@ -424,12 +485,12 @@ def vdm_Mars(d):            # used in planetstab(m)
 def vdm_Jupiter(d):         # used in planetstab(m)
     # compute v (GHA correction), d (Declination correction)
     # NOTE: m (magnitude of planet) comes from alma_ephem.py
-    t0 = ts.utc(d.year, d.month, d.day, 0, 0, 0)
+    t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(jupiter)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     dec0 = position0.apparent().radec(epoch='date')[1]	# declination
 
-    t1 = ts.utc(d.year, d.month, d.day, 1, 0, 0)
+    t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(jupiter)
     ra1 = position1.apparent().radec(epoch='date')[0]	# RA
     dec1 = position1.apparent().radec(epoch='date')[1]	# declination
@@ -445,12 +506,12 @@ def vdm_Jupiter(d):         # used in planetstab(m)
 def vdm_Saturn(d):          # used in planetstab(m)
     # compute v (GHA correction), d (Declination correction)
     # NOTE: m (magnitude of planet) comes from alma_ephem.py
-    t0 = ts.utc(d.year, d.month, d.day, 0, 0, 0)
+    t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(saturn)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     dec0 = position0.apparent().radec(epoch='date')[1]	# declination
 
-    t1 = ts.utc(d.year, d.month, d.day, 1, 0, 0)
+    t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(saturn)
     ra1 = position1.apparent().radec(epoch='date')[0]	# RA
     dec1 = position1.apparent().radec(epoch='date')[1]	# declination
@@ -468,7 +529,7 @@ def vdm_Saturn(d):          # used in planetstab(m)
 #-----------------------------------------
 
 def ariesGHA(d):            # used in planetstab(m)
-    t = ts.utc(d.year, d.month, d.day, hour_of_day, 0, 0)
+    t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
 
     ghas = ['' for x in range(24)]
     for i in range(24):
@@ -478,7 +539,7 @@ def ariesGHA(d):            # used in planetstab(m)
 def ariestransit(d):        # used in planetstab(m)
     # returns transit time of aries for the *PREVIOUS* date
 
-    t = ts.utc(d.year, d.month, d.day, 0, 0, 0)
+    t = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     trans = 24 - (t.gast / 1.00273790935)
     hr = int(trans)
     # round >=30 seconds to next minute
@@ -497,7 +558,7 @@ def planetstransit(d):      # used in starstab
     d1 = d + datetime.timedelta(days=1)
     
 # Venus
-    t0 = ts.utc(d.year, d.month, d.day, 0, 0, 0)
+    t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(venus)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     vau = position0.apparent().radec(epoch='date')[2]	# distance
@@ -506,7 +567,7 @@ def planetstransit(d):      # used in starstab
 
     # calculate planet transit
     tfr = t0
-    tto = ts.utc(d1.year, d1.month, d1.day, 0, 0, 0)
+    tto = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)
     position = earth.at(tfr).observe(venus)
     ra = position.apparent().radec(epoch='date')[0]
     #print('Venus transit: ', tfr.gast, ra.hours)
@@ -524,7 +585,7 @@ def planetstransit(d):      # used in starstab
 
     # calculate planet transit
     tfr = t0
-    tto = ts.utc(d1.year, d1.month, d1.day, 0, 0, 0)
+    tto = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)
     position = earth.at(tfr).observe(mars)
     ra = position.apparent().radec(epoch='date')[0]
     transit_time, y = almanac.find_discrete(tfr, tto, planet_transit(mars))
@@ -537,7 +598,7 @@ def planetstransit(d):      # used in starstab
 
     # calculate planet transit
     tfr = t0
-    tto = ts.utc(d1.year, d1.month, d1.day, 0, 0, 0)
+    tto = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)
     position = earth.at(tfr).observe(jupiter)
     ra = position.apparent().radec(epoch='date')[0]
     transit_time, y = almanac.find_discrete(tfr, tto, planet_transit(jupiter))
@@ -550,7 +611,7 @@ def planetstransit(d):      # used in starstab
 
     # calculate planet transit
     tfr = t0
-    tto = ts.utc(d1.year, d1.month, d1.day, 0, 0, 0)
+    tto = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)
     position = earth.at(tfr).observe(saturn)
     ra = position.apparent().radec(epoch='date')[0]
     transit_time, y = almanac.find_discrete(tfr, tto, planet_transit(saturn))
@@ -582,7 +643,7 @@ def planet_transit(planet_name):
 def stellar_info(d):        # used in starstab
     # returns a list of lists with name, SHA and Dec all navigational stars for epoch of date.
 
-    t12 = ts.utc(d.year, d.month, d.day, 12, 0, 0)  #calculate at noon
+    t12 = ts.ut1(d.year, d.month, d.day, 12, 0, 0)  #calculate at noon
     out = []
 
     for line in db.strip().split('\n'):
@@ -669,7 +730,7 @@ Markab,113963
 
 def getGHA(d, hh, mm, ss):
     # calculate the Moon's GHA on date d at hh:mm:ss
-    t1 = ts.utc(d.year, d.month, d.day, hh, mm, ss)
+    t1 = ts.ut1(d.year, d.month, d.day, hh, mm, ss)
     pos = earth.at(t1).observe(moon)
     ra = pos.apparent().radec(epoch='date')[0]
     gha = gha2deg(t1.gast, ra.hours)
@@ -773,7 +834,7 @@ def find_transit(d, ghaList, modeLT):
     return transit_time
 
 ##NEW##
-def moonphase(d):
+def moonphase(d):           # used in twilighttab (section 3)
     # returns the moon's elongation (angle to the sun)
 
     # convert python 'date' to 'date with time' ...
@@ -781,7 +842,7 @@ def moonphase(d):
     # phase is calculated at noon
     dt += datetime.timedelta(hours=12)
 
-    t12 = ts.utc(d.year, d.month, d.day, 12, 0, 0)
+    t12 = ts.ut1(d.year, d.month, d.day, 12, 0, 0)
     phase_angle = almanac.phase_angle(eph, 'moon', t12)
     elong = phase_angle.radians
 
@@ -801,11 +862,11 @@ def moonphase(d):
     return phase
 
 ##NEW##
-def moonage(d, d1):
+def moonage(d, d1):         # used in twilighttab (section 3)
     # return the moon's 'age' and percent illuminated
 
     # percent illumination is calculated at noon
-    t12 = ts.utc(d.year, d.month, d.day, 12, 0, 0)
+    t12 = ts.ut1(d.year, d.month, d.day, 12, 0, 0)
     phase_angle = almanac.phase_angle(eph, 'moon', t12)
     pctrad = 50 * (1.0 + math.cos(phase_angle.radians))
     pct = "{:.0f}".format(pctrad)
@@ -832,7 +893,7 @@ def equation_of_time(d, d1, UpperList, LowerList, extras):  # used in twilightta
     # the moon's transit-, antitransit-time, age and percent illumination.
     # (Equation of Time = Mean solar time - Apparent solar time)
 
-    t00 = ts.utc(d.year, d.month, d.day, 0, 0, 0)
+    t00 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position = earth.at(t00).observe(sun)
     ra = position.apparent().radec(epoch='date')[0]
     gha00 = gha2deg(t00.gast, ra.hours)
@@ -841,7 +902,7 @@ def equation_of_time(d, d1, UpperList, LowerList, extras):  # used in twilightta
         eqt00 = r"\colorbox{{lightgray!80}}{{{}}}".format(eqt00)
 
     # percent illumination is calculated at noon
-    t12 = ts.utc(d.year, d.month, d.day, 12, 0, 0)
+    t12 = ts.ut1(d.year, d.month, d.day, 12, 0, 0)
     position = earth.at(t12).observe(sun)
     ra = position.apparent().radec(epoch='date')[0]
     gha12 = gha2deg(t12.gast, ra.hours)

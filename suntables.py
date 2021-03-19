@@ -258,7 +258,7 @@ def page(date):
 \sffamily
 \noindent
 \begin{{flushright}}
-\textbf{{{} to {}}}\par
+\textbf{{{} to {} UT}}\par
 \end{{flushright}}
 \begin{{scriptsize}}
 '''.format(date.strftime("%Y %B %d"), (date + datetime.timedelta(days=14)).strftime("%b. %d"))
