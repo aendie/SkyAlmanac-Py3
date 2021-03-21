@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2019  Andrew Bauer
+#   Copyright (C) 2021  Andrew Bauer
 #   Copyright (C) 2014  Enno Rodegerdts
 
 #   This program is free software; you can redistribute it and/or modify
@@ -22,8 +22,10 @@
 # Standard library imports
 import datetime
 import sys
+
 # Third party imports
 import ephem        # for sunrise/sunset, moonrise/moonset, planet magnitudes
+
 # Local application imports
 import config
 

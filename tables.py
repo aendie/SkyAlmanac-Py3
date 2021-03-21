@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2019  Andrew Bauer
+#   Copyright (C) 2021  Andrew Bauer
 #   Copyright (C) 2014  Enno Rodegerdts
 
 #   This program is free software; you can redistribute it and/or modify
@@ -26,8 +26,10 @@
 import datetime		# required for .timedelta()
 import sys			# required for .stdout.write()
 import math
+
 # Third party imports
 import ephem
+
 # Local application imports
 from alma_skyfield import *
 from alma_ephem import *
@@ -920,6 +922,10 @@ def double_events_found(m1, m2):
 def doublepage(date, page1):
     # creates a doublepage (3 days) of the nautical almanac
 
+    # time delta values for the initial date&time...
+    dut1, deltat = getParams(date)
+    timedelta = r"DUT1 = UT1-UTC = {:+.4f} sec\quad$\Delta$T = TT-UT1 = {:+.4f} sec".format(dut1, deltat)
+
     find_new_moon(date)
     #import alma_skyfield
     #print("previous  new moon: {}".format(alma_skyfield.PreviousNewMoon))
@@ -963,11 +969,11 @@ def doublepage(date, page1):
 \end{{scriptsize}}
 % ------------------ N E W   P A G E ------------------
 \newpage
-\begin{{flushright}}
-\textbf{{{} to {} UT}}{}%
-\end{{flushright}}\par
+\begin{{flushleft}}     % required so that \par works
+{{\footnotesize {}}}\hfill\textbf{{{} to {} UT}}
+\end{{flushleft}}\par
 \begin{{scriptsize}}
-'''.format(date.strftime("%Y %B %d"),(date+datetime.timedelta(days=2)).strftime("%b. %d"),rightindent)
+'''.format(timedelta, date.strftime("%Y %B %d"),(date+datetime.timedelta(days=2)).strftime("%b. %d"),rightindent)
     page = page + str1
     if config.tbls == "m":
         page = page + sunmoontabm(date)
@@ -1007,7 +1013,8 @@ def pages(first_day, p):
 
 
 def almanac(first_day, pagenum):
-    # make almanac from date till date
+
+    # make almanac starting from first_day
     year = first_day.year
     mth = first_day.month
     day = first_day.day

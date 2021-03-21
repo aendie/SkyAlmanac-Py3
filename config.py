@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-#   Copyright (C) 2019  Andrew Bauer
+#   Copyright (C) 2021  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 #   You should have received a copy of the GNU General Public License along
 #   with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# ================ EDIT LINES IN THIS SECTION ONLY ================
+
 # choose an ephemeris (ephndx = 0, 1 or 2):
 #   0   de421.bsp   1900 to 2050
 #   1   de405.bsp   1900 to 2200
@@ -23,15 +25,18 @@
 ephndx = 0
 # note: the datetime strftime() methods require year >= 1900
 
+pgsz = 'A4'     # page size 'A4' or 'Letter' (global variable)
+moonimg = True  # 'True' to include a moon image; otherwise 'False'
+useIERS = True  # 'True' to download finals2000A.all; 'False' to use built-in UT1 tables
+ageIERS = 30    # download a new finals2000A.all version after 'ageIERS' days if useIERS=True
+
+# ================ DO NOT EDIT LINES BELOW HERE ================
+
 # define global variables
+logfileopen = False
 ephemeris = [['de421.bsp',1900,2050],['de405.bsp',1900,2200],['de406.bsp',1900,2750]]
 tbls = ''		# table style (global variable)
 decf = ''		# Declination format (global variable)
-pgsz = 'A4'     # page size 'A4' or 'Letter' (global variable)
-logfileopen = False
-moonimg = True  # 'True' to include a moon image; otherwise 'False'
-useIERS = True # 'True' to download finals2000A.all; otherwise use built-in UT1 tables
-ageIERS = 30    # download new finals2000A.all version after 'ageIERS' days if useIERS=True
 
 # list of latitudes to include for Sunrise/Sunset/Twilight/Moonrise/Moonset...
 lat = [72,70,68,66,64,62,60,58,56,54,52,50,45,40,35,30,20,10,0,-10,-20,-30,-35,-40,-45,-50,-52,-54,-56,-58,-60]

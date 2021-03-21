@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-#   Copyright (C) 2019  Andrew Bauer
+#   Copyright (C) 2021  Andrew Bauer
 #   Copyright (C) 2014  Enno Rodegerdts
 
 #   This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import os
 import sys
 import time
 import datetime
+
 # Local application imports
 import tables
 import suntables 
@@ -56,7 +57,7 @@ if config.pgsz not in set(['A4', 'Letter']):
     print("Please choose a valid paper size in config.py")
     sys.exit(0)
 
-s = input("""What do you want to create?:\n
+s = input("""\nWhat do you want to create?:\n
     1   Full nautical almanac   (for a year)
     2   Just tables for the sun (for a year)
     3   Nautical almanac   - 6 days from today
