@@ -272,7 +272,7 @@ def starstab(date):
 
     # returns 3 tables with SHA & Mer.pass for Venus, Mars, Jupiter and Saturn
     for i in range(3):
-        datestr = r'''{} {} {}'''.format(date.strftime("%b"), (date+datetime.timedelta(days=i)).strftime("%d"), (date+datetime.timedelta(days=i)).strftime("%a"))
+        datestr = r'''{} {} {}'''.format((date+datetime.timedelta(days=i)).strftime("%b"), (date+datetime.timedelta(days=i)).strftime("%d"), (date+datetime.timedelta(days=i)).strftime("%a"))
         m = m + '''\hline
 '''
         if config.tbls == "m":
