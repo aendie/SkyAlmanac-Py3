@@ -61,7 +61,7 @@ Minor changes are included here to this original (non-PyPI) edition to reflect s
 
 **UPDATE: Mar 2021**
 
-&nbsp;&nbsp;&nbsp;&nbsp;:smiley:&nbsp;&nbsp;***UT is the new timescale employed in the almanac.***&nbsp;&nbsp;:smiley:
+&emsp;:smiley:&ensp;***UT is the new timescale employed in the almanac.***&ensp;:smiley:
 
 Two new options have been added into config.py: *useIERS = True* instructs Skyfield (if >= 1.31) to download Earth orientation data from IERS (International Earth Rotation and Reference Systems Service). *ageIERS = 30* instructs Skyfield to download fresh data from IERS if older tham that number of days. This implies greater accuracy for the generated almanacs (if Skyfield >= 1.31).
 
@@ -70,15 +70,15 @@ Note that although you may be using the *de421.bsp* ephemeris (valid from 1900 t
 
 ## Requirements
 
-&nbsp;&nbsp;&nbsp;&nbsp;Computation is done by the free Ephem and Skyfield libraries.  
-&nbsp;&nbsp;&nbsp;&nbsp;Typesetting is typically done by MiKTeX or TeX Live.  
-&nbsp;&nbsp;&nbsp;&nbsp;These need to be installed:
+&emsp;Computation is done by the free Ephem and Skyfield libraries.  
+&emsp;Typesetting is typically done by MiKTeX or TeX Live.  
+&emsp;These need to be installed:
 
 * Python v3.4 or higher (the latest version is recommended)
 * Skyfield 1.35 (see the Skyfield Changelog)
 * Pandas >= 1.0 (to load the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
 * Ephem >=3.7.6
-* MiKTeX&nbsp;&nbsp;or&nbsp;&nbsp;TeX Live
+* MiKTeX&ensp;or&ensp;TeX Live
 
 ## Files required in the execution folder:
 
@@ -88,83 +88,83 @@ Note that although you may be using the *de421.bsp* ephemeris (valid from 1900 t
 * A4chart0-180_P.pdf
 * A4chart180-360_P.pdf
 
-&nbsp;&nbsp;&nbsp;&nbsp;If upgrading from an older version of Skyfield to 1.31 or higher, these files may be deleted:  
-&nbsp;&nbsp;&nbsp;&nbsp;**deltat.data** and **deltat.preds**
+&emsp;If upgrading from an older version of Skyfield to 1.31 or higher, these files may be deleted:  
+&emsp;**deltat.data** and **deltat.preds**
 
 ### INSTALLATION GUIDELINES on Windows 10:
 
-&nbsp;&nbsp;&nbsp;&nbsp;Tested on Windows 10 Pro, Version 20H2 with an AMD Ryzen 7 3700X 8-Core Processor  
+&emsp;Tested on Windows 10 Pro, Version 20H2 with an AMD Ryzen 7 3700X 8-Core Processor  
 
-&nbsp;&nbsp;&nbsp;&nbsp;Install Python 3.9.1 (should be in the system environment variable PATH, e.g. )  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**C:\\Python39\Scripts;C:\\Python39;** .....  
-&nbsp;&nbsp;&nbsp;&nbsp;Install MiKTeX 21.1 from https://miktex.org/  
-&nbsp;&nbsp;&nbsp;&nbsp;When MiKTeX first runs it will require installation of additional packages.  
-&nbsp;&nbsp;&nbsp;&nbsp;Run Command Prompt as Administrator, go to your Python folder and execute, e.g.:
+&emsp;Install Python 3.9.1 (should be in the system environment variable PATH, e.g. )  
+&emsp;&ensp;**C:\\Python39\Scripts;C:\\Python39;** .....  
+&emsp;Install MiKTeX 21.1 from https://miktex.org/  
+&emsp;When MiKTeX first runs it will require installation of additional packages.  
+&emsp;Run Command Prompt as Administrator, go to your Python folder and execute, e.g.:
 
-&nbsp;&nbsp;&nbsp;&nbsp;**cd C:\\Python39**  
-&nbsp;&nbsp;&nbsp;&nbsp;**python.exe -m pip install --upgrade pip**  
-&nbsp;&nbsp;&nbsp;&nbsp;... for a first install (it's preferable to install *wheel* first):  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install wheel**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 uninstall pyephem ephem**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install ephem**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install skyfield**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install pandas**  
-&nbsp;&nbsp;&nbsp;&nbsp;... if already installed, check for upgrades explicitly:  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install --upgrade ephem skyfield pandas**  
+&emsp;**cd C:\\Python39**  
+&emsp;**python.exe -m pip install --upgrade pip**  
+&emsp;... for a first install (it's preferable to install *wheel* first):  
+&emsp;**pip3 install wheel**  
+&emsp;**pip3 uninstall pyephem ephem**  
+&emsp;**pip3 install ephem**  
+&emsp;**pip3 install skyfield**  
+&emsp;**pip3 install pandas**  
+&emsp;... if already installed, check for upgrades explicitly:  
+&emsp;**pip3 install --upgrade ephem skyfield pandas**  
 
-&nbsp;&nbsp;&nbsp;&nbsp;Put the required files for SkyAlmanac in a new folder, run Command Prompt in that folder and start with:  
-&nbsp;&nbsp;&nbsp;&nbsp;**py -3 skyalmanac.py**
+&emsp;Put the required files for SkyAlmanac in a new folder, run Command Prompt in that folder and start with:  
+&emsp;**py -3 skyalmanac.py**
 
-&nbsp;&nbsp;&nbsp;&nbsp;If using MiKTeX 21 or higher, executing 'option 5' (Increments and Corrections) will probably fail with  
-&nbsp;&nbsp;&nbsp;&nbsp;**! TeX capacity exceeded, sorry [main memory size=3000000].**  
-&nbsp;&nbsp;&nbsp;&nbsp;To resolve this problem (assuming MiKTeX has been installed for all users),  
-&nbsp;&nbsp;&nbsp;&nbsp;open a Command Prompt as Administrator and enter:  
-&nbsp;&nbsp;&nbsp;&nbsp;**initexmf --admin --edit-config-file=pdflatex**  
-&nbsp;&nbsp;&nbsp;&nbsp;This opens **pdflatex.ini** in Notepad. Add the following line:  
-&nbsp;&nbsp;&nbsp;&nbsp;**extra_mem_top = 1000000**  
-&nbsp;&nbsp;&nbsp;&nbsp;and save the file. Problem solved. For more details go [here](https://tex.stackexchange.com/questions/438902/how-to-increase-memory-size-for-xelatex-in-miktex/438911#438911)
+&emsp;If using MiKTeX 21 or higher, executing 'option 5' (Increments and Corrections) will probably fail with  
+&emsp;**! TeX capacity exceeded, sorry [main memory size=3000000].**  
+&emsp;To resolve this problem (assuming MiKTeX has been installed for all users),  
+&emsp;open a Command Prompt as Administrator and enter:  
+&emsp;**initexmf --admin --edit-config-file=pdflatex**  
+&emsp;This opens **pdflatex.ini** in Notepad. Add the following line:  
+&emsp;**extra_mem_top = 1000000**  
+&emsp;and save the file. Problem solved. For more details go [here](https://tex.stackexchange.com/questions/438902/how-to-increase-memory-size-for-xelatex-in-miktex/438911#438911)
 
 
 ### INSTALLATION GUIDELINES on Ubuntu 19.10 or 20.04:
 
-&nbsp;&nbsp;&nbsp;&nbsp;Ubuntu 18.04 and higher come with Python 3 preinstalled,  
-&nbsp;&nbsp;&nbsp;&nbsp;however pip may need to be installed:  
-&nbsp;&nbsp;&nbsp;&nbsp;**sudo apt install python3-pip**
+&emsp;Ubuntu 18.04 and higher come with Python 3 preinstalled,  
+&emsp;however pip may need to be installed:  
+&emsp;**sudo apt install python3-pip**
 
-&nbsp;&nbsp;&nbsp;&nbsp;Install the following TeX Live package:  
-&nbsp;&nbsp;&nbsp;&nbsp;**sudo apt install texlive-latex-extra**
+&emsp;Install the following TeX Live package:  
+&emsp;**sudo apt install texlive-latex-extra**
 
-&nbsp;&nbsp;&nbsp;&nbsp;Install the required astronomical libraries etc.:  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install wheel**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 uninstall pyephem ephem**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install ephem**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install skyfield**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip3 install pandas**  
+&emsp;Install the required astronomical libraries etc.:  
+&emsp;**pip3 install wheel**  
+&emsp;**pip3 uninstall pyephem ephem**  
+&emsp;**pip3 install ephem**  
+&emsp;**pip3 install skyfield**  
+&emsp;**pip3 install pandas**  
 
-&nbsp;&nbsp;&nbsp;&nbsp;Put the SkyAlmanac files in a folder and start with:  
-&nbsp;&nbsp;&nbsp;&nbsp;**python3 skyalmanac.py**  
+&emsp;Put the SkyAlmanac files in a folder and start with:  
+&emsp;**python3 skyalmanac.py**  
 
 
 ### INSTALLATION GUIDELINES on MAC:
 
-&nbsp;&nbsp;&nbsp;&nbsp;Every Mac comes with python preinstalled.  
-&nbsp;&nbsp;&nbsp;&nbsp;(Please choose this version of SkyAlmanac if Python 3.* is installed.)  
-&nbsp;&nbsp;&nbsp;&nbsp;You need to install the Skyfield (and Ephem) library to use SFalmanac.  
-&nbsp;&nbsp;&nbsp;&nbsp;Type the following commands at the commandline (terminal app):
+&emsp;Every Mac comes with python preinstalled.  
+&emsp;(Please choose this version of SkyAlmanac if Python 3.* is installed.)  
+&emsp;You need to install the Skyfield (and Ephem) library to use SFalmanac.  
+&emsp;Type the following commands at the commandline (terminal app):
 
-&nbsp;&nbsp;&nbsp;&nbsp;**sudo easy_install pip**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install wheel**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip uninstall pyephem ephem**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install ephem**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install skyfield**  
-&nbsp;&nbsp;&nbsp;&nbsp;**pip install pandas**  
+&emsp;**sudo easy_install pip**  
+&emsp;**pip install wheel**  
+&emsp;**pip uninstall pyephem ephem**  
+&emsp;**pip install ephem**  
+&emsp;**pip install skyfield**  
+&emsp;**pip install pandas**  
 
-&nbsp;&nbsp;&nbsp;&nbsp;If this command fails, your Mac asks you if you would like to install the header files.  
-&nbsp;&nbsp;&nbsp;&nbsp;Do so - you do not need to install the full IDE - and try again.
+&emsp;If this command fails, your Mac asks you if you would like to install the header files.  
+&emsp;Do so - you do not need to install the full IDE - and try again.
 
-&nbsp;&nbsp;&nbsp;&nbsp;Install TeX/LaTeX from http://www.tug.org/mactex/
+&emsp;Install TeX/LaTeX from http://www.tug.org/mactex/
 
-&nbsp;&nbsp;&nbsp;&nbsp;Now you are almost ready. Put the SkyAlmanac files in any directory and start with:  
-&nbsp;&nbsp;&nbsp;&nbsp;**python skyalmanac**  
-&nbsp;&nbsp;&nbsp;&nbsp;or  
-&nbsp;&nbsp;&nbsp;&nbsp;**./skyalmanac**
+&emsp;Now you are almost ready. Put the SkyAlmanac files in any directory and start with:  
+&emsp;**python skyalmanac**  
+&emsp;or  
+&emsp;**./skyalmanac**
