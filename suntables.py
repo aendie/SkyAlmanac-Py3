@@ -411,7 +411,7 @@ def almanac(first_day, pagenum):
     \item[Disclaimer:] These are computer generated tables - use them at your own risk.
     The accuracy has been randomly checked with JPL HORIZONS System, but cannot be guaranteed.
     This means I cannot be held liable if you get lost on the oceans because of errors in this publication.
-    Besides, this publication only contains the 'daily pages' of the Nautical Almanac: an official version of the Nautical Almanac is indispensable.
+    Besides, this publication only contains sun tables: an official version of the Nautical Almanac is indispensable.
     \end{description}
 \end{titlepage}
 '''

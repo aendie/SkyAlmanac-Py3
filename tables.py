@@ -263,7 +263,7 @@ def starstab(date):
 \rule{0pt}{2.4ex} & \multicolumn{1}{c}{\textbf{SHA}} & \multicolumn{1}{c|}{\textbf{Dec}}\\
 \hline\rule{0pt}{2.6ex}\noindent
 '''
-    stars = stellar_info(date+datetime.timedelta(days=1))
+    stars = stellar_info(date + datetime.timedelta(days=1))
     for i in range(len(stars)):
         out = out + r'''{} & {} & {} \\
 '''.format(stars[i][0],stars[i][1],stars[i][2])
@@ -272,7 +272,8 @@ def starstab(date):
 
     # returns 3 tables with SHA & Mer.pass for Venus, Mars, Jupiter and Saturn
     for i in range(3):
-        datestr = r'''{} {} {}'''.format((date+datetime.timedelta(days=i)).strftime("%b"), (date+datetime.timedelta(days=i)).strftime("%d"), (date+datetime.timedelta(days=i)).strftime("%a"))
+        dt = date + datetime.timedelta(days=i)
+        datestr = r'''{} {} {}'''.format(dt.strftime("%b"), dt.strftime("%d"), dt.strftime("%a"))
         m = m + '''\hline
 '''
         if config.tbls == "m":
@@ -1030,7 +1031,7 @@ def almanac(first_day, pagenum):
         rm1 = "10mm"
         tm = "21mm"     # data pages...
         bm = "18mm"
-        lm = "10.5mm"
+        lm = "10mm"
         rm = "9mm"
         if config.tbls == "m":
             tm = "10mm"
