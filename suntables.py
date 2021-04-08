@@ -288,7 +288,7 @@ def page(date):
         page = page + suntab(date + datetime.timedelta(days=6))
         page = page + suntab(date + datetime.timedelta(days=9))
         page = page + suntab(date + datetime.timedelta(days=12))
-    # to avoid "Overfull \hbox" messages, always leave a paragraph end before the end of a size change. (See line below)
+    # to avoid "Overfull \hbox" messages, leave a paragraph end before the end of a size change. (This may only apply to tabular* table style) See lines below...
     page = page + r'''
 
 \end{scriptsize}'''

@@ -40,8 +40,10 @@ LowerLists = [[], [], []]    # moon colong GHA per hour for 3 days
 
 def planetstab(date):
     # generates a LaTeX table for the navigational plantets (traditional style)
+    # OLD: \begin{tabular*}{0.74\textwidth}[t]{@{\extracolsep{\fill}}|c|r|rr|rr|rr|rr|}
     tab = r'''\noindent
-\begin{tabular*}{0.74\textwidth}[t]{@{\extracolsep{\fill}}|c|r|rr|rr|rr|rr|}
+\setlength{\tabcolsep}{5.8pt}  % default 6pt
+\begin{tabular}[t]{|c|r|rr|rr|rr|rr|}
 \multicolumn{1}{c}{\normalsize{}} & \multicolumn{1}{c}{\normalsize{Aries}} &  \multicolumn{2}{c}{\normalsize{Venus}}& \multicolumn{2}{c}{\normalsize{Mars}} & \multicolumn{2}{c}{\normalsize{Jupiter}} & \multicolumn{2}{c}{\normalsize{Saturn}}\\
 '''
     # note: 74% table width above removes "Overfull \hbox (1.65279pt too wide)"
@@ -126,16 +128,17 @@ def planetstab(date):
 '''.format(ariestransit(date+datetime.timedelta(days=1)),RAc_v,Dc_v,mag_v,RAc_m,Dc_m,mag_m,RAc_j,Dc_j,mag_j,RAc_s,Dc_s,mag_s)
         n += 1
         date += datetime.timedelta(days=1)
-    tab = tab + r'''\end{tabular*}
+    tab = tab + r'''\end{tabular}
 '''
     return tab
 
 
 def planetstabm(date):
     # generates a LaTeX table for the navigational plantets (modern style)
+
     tab = r'''\vspace{6Pt}\noindent
 \renewcommand{\arraystretch}{1.1}
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{4pt}  % default 6pt
 \begin{tabular}[t]{crcrrcrrcrrcrr}
 \multicolumn{1}{c}{\normalsize{h}} & 
 \multicolumn{1}{c}{\normalsize{Aries}} & & 
@@ -247,19 +250,23 @@ def planetstabm(date):
 
 def starstab(date):
     # returns a table with ephemerieds for the navigational stars
-    out = r'''\begin{tabular*}{0.251\textwidth}[t]{@{\extracolsep{\fill}}|rrr|}
-\multicolumn{3}{c}{\normalsize{Stars}}\\
-'''
-    # note: 0.251 instead of 0.25 (above) prevents an "Overfull \hbox (0.14297pt too wide)" message on about 5 specific pages in the full year (moonimg=True)
+    # OLD: \begin{tabular*}{0.251\textwidth}[t]{@{\extracolsep{\fill}}|rrr|}
+    # OLD: note: 0.251 instead of 0.25 (above) prevents an "Overfull \hbox (0.14297pt too wide)" message on about 5 specific pages in the full year (moonimg=True)
 
     if config.tbls == "m":
-        out = out + r'''\hline
+        out = r'''\setlength{\tabcolsep}{4pt}  % default 6pt
+\begin{tabular}[t]{|rrr|}
+\multicolumn{3}{c}{\normalsize{Stars}}\\
+\hline
 & \multicolumn{1}{c}{\multirow{2}{*}{\textbf{SHA}}} 
 & \multicolumn{1}{c|}{\multirow{2}{*}{\textbf{Dec}}}\\
 & & \multicolumn{1}{c|}{} \\
 '''
     else:
-        out = out + r'''\hline
+        out = r'''\setlength{\tabcolsep}{5pt}  % default 6pt
+\begin{tabular}[t]{|rrr|}
+\multicolumn{3}{c}{\normalsize{Stars}}\\
+\hline
 \rule{0pt}{2.4ex} & \multicolumn{1}{c}{\textbf{SHA}} & \multicolumn{1}{c|}{\textbf{Dec}}\\
 \hline\rule{0pt}{2.6ex}\noindent
 '''
@@ -314,7 +321,7 @@ def starstab(date):
 '''
     out = out + hp
     
-    out = out + r'''\end{tabular*}'''
+    out = out + r'''\end{tabular}'''
     return out
 
 
@@ -349,12 +356,18 @@ def GHAcolong(gha):
 
 def sunmoontab(date):
     # generates LaTeX table for sun and moon (traditional style)
+    # OLD: \begin{tabular*}{0.54\textwidth}[t]{@{\extracolsep{\fill}}|c|rr|rrrrr|}
+    # OLD note: 54% table width above removes "Overfull \hbox (1.65279pt too wide)"
+    #                 and "Underfull \hbox (badness 10000)"
+    # note: table may have different widths due to the 1st column (e.g. Fri versus Wed)
+    # note: table may have different widths due to the 'v' column (e.g. 6.9' versus 15.3')
+    # note: table may have different widths due to the 'd' column (e.g. -8.2' versus -13.9')
+
     tab = r'''\noindent
-\begin{tabular*}{0.54\textwidth}[t]{@{\extracolsep{\fill}}|c|rr|rrrrr|}
+\setlength{\tabcolsep}{5.8pt}  % default 6pt
+\begin{tabular}[t]{|c|rr|rrrrr|}
 \multicolumn{1}{c}{\normalsize{h}}& \multicolumn{2}{c}{\normalsize{Sun}} & \multicolumn{5}{c}{\normalsize{Moon}}\\
 '''
-    # note: 54% table width above removes "Overfull \hbox (1.65279pt too wide)"
-    #                 and "Underfull \hbox (badness 10000)"
     n = 0
     while n < 3:
         tab = tab + r'''\hline
@@ -424,7 +437,8 @@ def sunmoontab(date):
             tab = tab + r'''\multicolumn{7}{c}{}\\[-1.5ex]'''
         n += 1
         date += datetime.timedelta(days=1)
-    tab = tab + r'''\end{tabular*}'''
+    tab = tab + r'''\end{tabular}
+'''
     return tab
 
 
@@ -432,8 +446,8 @@ def sunmoontabm(date):
     # generates LaTeX table for sun and moon (modern style)
     tab = r'''\noindent
 \renewcommand{\arraystretch}{1.1}
-\setlength{\tabcolsep}{4pt}
-\quad\quad
+\setlength{\tabcolsep}{4pt}  % default 6pt
+\quad
 \begin{tabular}[t]{crrcrrrrr}
 \multicolumn{1}{c}{\normalsize{h}} & 
 \multicolumn{2}{c}{\normalsize{Sun}} & &
@@ -517,8 +531,8 @@ def sunmoontabm(date):
             tab = tab + r'''\multicolumn{{7}}{{c}}{{}}\\{}'''.format(vsep)
         n += 1
         date += datetime.timedelta(days=1)
-    tab = tab + r'''\end{tabular}
-\quad\quad'''
+    tab = tab + r'''\end{tabular}\quad\quad
+'''
     return tab
 
 
@@ -623,15 +637,15 @@ def twilighttab(date):
 # Twilight tables ...........................................
     #lat = [72,70,68,66,64,62,60,58,56,54,52,50,45,40,35,30,20,10,0, -10,-20,-30,-35,-40,-45,-50,-52,-54,-56,-58,-60]
     latNS = [72, 70, 58, 40, 10, -10, -50, -60]
-    tab = r'''
-\begin{tabular*}{0.45\textwidth}[t]{@{\extracolsep{\fill}}|r|ccc|ccc|}
-\multicolumn{7}{c}{\normalsize{}}\\
-'''
+    # OLD: \begin{tabular*}{0.45\textwidth}[t]{@{\extracolsep{\fill}}|r|ccc|ccc|}
 
     if config.tbls == "m":
     # The header begins with a thin empty row as top padding; and the top row with
     # bold text has some padding below it. This result gives a balanced impression.
-        tab = tab + r'''\hline
+        tab = r'''\setlength{\tabcolsep}{5pt}  % default 6pt
+\begin{tabular}[t]{|r|ccc|ccc|}
+\multicolumn{7}{c}{\normalsize{}}\\
+\hline
 \multicolumn{1}{|c|}{} & & & \multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{} & & \multicolumn{1}{c|}{}\\[-2.0ex]
 \multicolumn{1}{|c|}{\multirow{2}{*}{\textbf{Lat.}}} & 
 \multicolumn{2}{c}{\footnotesize{\textbf{Twilight}}} & 
@@ -648,7 +662,10 @@ def twilighttab(date):
 \hline\rule{0pt}{2.6ex}\noindent
 '''
     else:
-        tab = tab + r'''\hline
+        tab = r'''\setlength{\tabcolsep}{5.8pt}  % default 6pt
+\begin{tabular}[t]{|r|ccc|ccc|}
+\multicolumn{7}{c}{\normalsize{}}\\
+\hline
 \multicolumn{1}{|c|}{\rule{0pt}{2.4ex}\multirow{2}{*}{\textbf{Lat.}}} & 
 \multicolumn{2}{c}{\textbf{Twilight}} & 
 \multicolumn{1}{|c|}{\multirow{2}{*}{\textbf{Sunrise}}} & 
@@ -743,17 +760,21 @@ def twilighttab(date):
 # top row...
             for k in range(len(moon)):
                 if moon2[k] != '--:--':
-                    tab = tab + r''' & {}'''.format(moon[k])
+                    #tab = tab + r''' & {}'''.format(moon[k])
+                    tab = tab + r''' & \colorbox{{khaki!45}}{{{}}}'''.format(moon[k])
                 else:
                     tab = tab + r''' & \multirow{{2}}{{*}}{{{}}}'''.format(moon[k])
-            tab = tab + r'''\\'''	# terminate top row
+            tab = tab + r'''\\
+'''	# terminate top row
 # bottom row...
             for k in range(len(moon)):
                 if moon2[k] != '--:--':
-                    tab = tab + r''' & {}'''.format(moon2[k])
+                    #tab = tab + r''' & {}'''.format(moon2[k])
+                    tab = tab + r''' & \colorbox{{khaki!45}}{{{}}}'''.format(moon2[k])
                 else:
                     tab = tab + r'''&'''
-            tab = tab + r'''\\'''	# terminate bottom row
+            tab = tab + r'''\\
+'''	# terminate bottom row
         j += 1
     # add space between tables...
     tab = tab + r'''\hline\multicolumn{7}{c}{}\\[-1.5ex]
@@ -820,7 +841,7 @@ def twilighttab(date):
 '''.format(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4])
             d += datetime.timedelta(days=1)
         tab = tab + r'''\hline
-\end{tabular*}'''
+\end{tabular}'''
     #-----------------  if no moon image displayed... -----------------
     else:
         if config.tbls == "m":
@@ -859,7 +880,7 @@ def twilighttab(date):
 '''.format(d.strftime("%d"),eq[0],eq[1],eq[2],eq[3],eq[4],eq[5],eq[6])
             d += datetime.timedelta(days=1)
         tab = tab + r'''\hline
-\end{tabular*}'''
+\end{tabular}'''
     return tab
 
 
@@ -938,7 +959,8 @@ def doublepage(date, page1):
     if not(page1):
         page = r'''
 % ------------------ N E W   P A G E ------------------
-\newpage'''
+\newpage
+\restoregeometry    % reset to even-page margins'''
 
     leftindent = ""
     rightindent = ""
@@ -952,9 +974,9 @@ def doublepage(date, page1):
 {}\textbf{{{}, {}, {} UT ({}.,  {}.,  {}.)}}'''.format(leftindent,date.strftime("%B %d"),(date+datetime.timedelta(days=1)).strftime("%d"),(date+datetime.timedelta(days=2)).strftime("%d"),date.strftime("%a"),(date+datetime.timedelta(days=1)).strftime("%a"),(date+datetime.timedelta(days=2)).strftime("%a"))
 
     if config.tbls == "m":
-        page = page + r'\par'
+        page = page + r'\\[1.0ex]'  # \par leaves about 1.2ex
     else:
-        page = page + r'\\[1.0ex]'
+        page = page + r'\\[0.7ex]'
 
     page = page + r'''
 \begin{scriptsize}
@@ -963,28 +985,30 @@ def doublepage(date, page1):
     if config.tbls == "m":
         page = page + planetstabm(date)
     else:
-        page = page + planetstab(date)
+        page = page + planetstab(date) + r'''\enskip
+'''
     page = page + starstab(date)
     str1 = r'''
-
 \end{{scriptsize}}
 % ------------------ N E W   P A G E ------------------
 \newpage
+\newgeometry{{nomarginpar, top={}, bottom={}, left={}, right={}}}
 \begin{{flushleft}}     % required so that \par works
 {{\footnotesize {}}}\hfill\textbf{{{} to {} UT}}
 \end{{flushleft}}\par
 \begin{{scriptsize}}
-'''.format(timedelta, date.strftime("%Y %B %d"),(date+datetime.timedelta(days=2)).strftime("%b. %d"),rightindent)
+'''.format(tm, bm, oddim, oddom, timedelta, date.strftime("%Y %B %d"), (date+datetime.timedelta(days=2)).strftime("%b. %d"), rightindent)
     page = page + str1
     if config.tbls == "m":
         page = page + sunmoontabm(date)
     else:
-        page = page + sunmoontab(date)
+        page = page + sunmoontab(date) + r'''\enskip
+'''
     page = page + twilighttab(date)
+    # to avoid "Overfull \hbox" messages, leave a paragraph end before the end of a size change. (This may only apply to tabular* table style) See lines below...
     page = page + r'''
 
 \end{scriptsize}'''
-    # to avoid "Overfull \hbox" messages, always leave a paragraph end before the end of a size change. (See lines above)
     return page
 
 
@@ -1016,6 +1040,7 @@ def pages(first_day, p):
 def almanac(first_day, pagenum):
 
     # make almanac starting from first_day
+    global tm, bm, oddim, oddom
     year = first_day.year
     mth = first_day.month
     day = first_day.day
@@ -1031,13 +1056,19 @@ def almanac(first_day, pagenum):
         rm1 = "10mm"
         tm = "21mm"     # data pages...
         bm = "18mm"
-        lm = "10mm"
-        rm = "9mm"
+        # even data pages...
+        im = "10mm"     # inner margin (right side on even pages)
+        om = "9mm"      # outer margin (left side on even pages)
+        # odd data pages...
+        oddim = "14mm"  # inner margin (left side on odd pages)
+        oddom = "11mm"  # outer margin (right side on odd pages)
         if config.tbls == "m":
             tm = "10mm"
             bm = "15mm"
-            lm = "10mm"
-            rm = "10mm"
+            im = "10mm"
+            om = "10mm"
+            oddim = "14mm"
+            oddom = "11mm"
     else:
         paper = "letterpaper"
         vsep1 = "0.8cm"
@@ -1048,16 +1079,21 @@ def almanac(first_day, pagenum):
         rm1 = "12mm"
         tm = "12.2mm"   # data pages...
         bm = "13mm"
-        lm = "15mm"
-        rm = "11mm"
+        # even data pages...
+        im = "13mm"     # inner margin (right side on even pages)
+        om = "13mm"     # outer margin (left side on even pages)
+        # odd data pages...
+        oddim = "14mm"  # inner margin (left side on odd pages)
+        oddom = "11mm"  # outer margin (right side on odd pages)
         if config.tbls == "m":
             tm = "4mm"
-            bm = "10mm"
-            lm = "13mm"
-            rm = "13mm"
+            bm = "8mm"
+            im = "13mm"
+            om = "13mm"
+            oddim = "14mm"
+            oddom = "14mm"
 
-    alm = r'''\documentclass[10pt, twoside, {}]{{report}}
-'''.format(paper)
+    alm = r'''\documentclass[10pt, twoside, {}]{{report}}'''.format(paper)
 
     alm = alm + r'''
 %\usepackage[utf8]{inputenc}
@@ -1066,21 +1102,23 @@ def almanac(first_day, pagenum):
 
     # to troubleshoot add "showframe, verbose," below:
     alm = alm + r'''
-\usepackage[nomarginpar, top={}, bottom={}, left={}, right={}]{{geometry}}'''.format(tm,bm,lm,rm)
+\usepackage[nomarginpar, top={}, bottom={}, left={}, right={}]{{geometry}}'''.format(tm,bm,im,om)
 
     if config.tbls == "m":
         alm = alm + r'''
 \usepackage[table]{xcolor}
+% [table] option loads the colortbl package for coloring rows, columns, and cells within tables.
 \definecolor{LightCyan}{rgb}{0.88,1,1}
+\definecolor{darknight}{rgb}{0.18, 0.27, 0.33}
 \usepackage{booktabs}'''
-
-    if config.moonimg:
-            alm = alm + r'''
-\usepackage[table]{xcolor}
-\definecolor{darknight}{rgb}{0.18, 0.27, 0.33}'''
+    else:
+        alm = alm + r'''
+\usepackage{xcolor}  % highlight double moon events on same day'''
 
     # Note: \DeclareUnicodeCharacter is not compatible with some versions of pdflatex
     alm = alm + r'''
+\definecolor{darknight}{rgb}{0.18, 0.27, 0.33}
+\definecolor{khaki}{rgb}{0.76, 0.69, 0.57}
 \usepackage{multirow}
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 \setlength{\footskip}{15pt}

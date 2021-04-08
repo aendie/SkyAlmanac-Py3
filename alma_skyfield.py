@@ -914,7 +914,7 @@ def equation_of_time(d, d1, UpperList, LowerList, extras):  # used in twilightta
     gha00 = gha2deg(t00.gast, ra.hours)
     eqt00 = gha2eqt(gha00)
     if gha00 <= 180:
-        eqt00 = r"\colorbox{{lightgray!80}}{{{}}}".format(eqt00)
+        eqt00 = r"\colorbox{{lightgray!60}}{{{}}}".format(eqt00)
 
     # percent illumination is calculated at noon
     t12 = ts.ut1(d.year, d.month, d.day, 12, 0, 0)
@@ -924,7 +924,7 @@ def equation_of_time(d, d1, UpperList, LowerList, extras):  # used in twilightta
     eqt12 = gha2eqt(gha12)
     mpa12 = gha2mpa(gha12)
     if gha12 > 270:
-        eqt12 = r"\colorbox{{lightgray!80}}{{{}}}".format(eqt12)
+        eqt12 = r"\colorbox{{lightgray!60}}{{{}}}".format(eqt12)
 
     # !! transit times are rounded to the nearest minute,
     # !! so the search needs to start and end 30 sec earlier

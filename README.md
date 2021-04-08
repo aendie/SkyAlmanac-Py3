@@ -68,6 +68,10 @@ Two new options have been added into config.py: *useIERS = True* instructs Skyfi
 Note that although you may be using the *de421.bsp* ephemeris (valid from 1900 to 2050), the IERS currently specifies the validity of Earth Orientation Parameters (EOP) from 2nd January 1973 to 
 15th May 2022. Refer to the [IERS web site](https://www.iers.org/IERS/EN/Home/home_node.html) for current information.
 
+**UPDATE: Apr 2021**
+
+Internal technical enhancements and minor text changes.
+
 ## Requirements
 
 &emsp;Computation is done by the free Ephem and Skyfield libraries.  
