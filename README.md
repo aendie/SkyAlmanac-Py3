@@ -70,7 +70,7 @@ Note that although you may be using the *de421.bsp* ephemeris (valid from 1900 t
 
 **UPDATE: Apr 2021**
 
-Internal technical enhancements and minor text changes.
+A double moonrise or moonset on the same day is now highlighted for better legibility. Some internal technical enhancements and minor text changes are included.
 
 ## Requirements
 
