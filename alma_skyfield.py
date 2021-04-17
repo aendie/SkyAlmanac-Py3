@@ -807,8 +807,12 @@ def find_transit(d, ghaList, modeLT):
             gha_top = ghaList[i]
             break
         gha = ghaList[i+1]  # test GHA at {hr+1}:00
+
     # estimate where to begin searching by the minute
     min_start = max(0, int((360-gha_top)/0.25)-1)
+    if hr == 0:
+        # compensation for gha at Start-of-Day being 30 seconds earlier at 23:59:30
+        min_start = max(0, min_start-1)
 
     if hr< 0:
         return transit_time     # no event detected this day
