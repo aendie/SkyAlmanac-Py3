@@ -152,7 +152,7 @@ def twilight(date, lat, hemisph):   # used in twilighttab (section 1)
         out[1] = yn
         out[4] = yn
 #-----------------------------------------------------------
-    obs.horizon = '-0:34'
+    obs.horizon = '-0:34'   # 34' (atmospheric refraction)
     obs.date = d
     try:
         out[2] = hhmm(obs.next_rising(s))	# sunrise
@@ -208,7 +208,7 @@ def moonrise_set(date, lat):    # used in twilighttab (section 2)
     latitude = ephem.degrees('{}:00:00.0'.format(lat))
     obs.lat = latitude
     obs.pressure = 0
-    obs.horizon = '-0:34'
+    obs.horizon = '-0:34'       # 34' (atmospheric refraction)
     # first convert 'date' (a Python datetime.date) to a PyEphem date...
     d = ephem.date(date) - 30 * ephem.second    # search from 30 seconds before midnight
     obs.date = d

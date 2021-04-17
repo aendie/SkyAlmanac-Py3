@@ -18,7 +18,7 @@ NOTE: a 100% [Ephem](https://rhodesmill.org/pyephem/) version of SkyAlmanac is a
 An aim of this development was to maintain:
 
 * **identical PDF output formatting with a similar control program**  
-	 It is then possible to display both generated tables (from Ephem, Skyfield and SkyAlmanac) and compare what has changed by flipping between the two tabs in Adobe Acrobat Reader DC.
+	 It is then possible to display both generated tables (using Ephem or Skyfield astronomical libraries) and compare what has changed by flipping between the two tabs in Adobe Acrobat Reader DC.
 	 Anything that has changed flashes, thereby drawing your attention to
 	 it. This crude and simple method is quite effective in highlihgting data that might need further attention.
 
@@ -70,7 +70,8 @@ Note that although you may be using the *de421.bsp* ephemeris (valid from 1900 t
 
 **UPDATE: Apr 2021**
 
-A double moonrise or moonset on the same day is now highlighted for better legibility. Some internal technical enhancements and minor text changes are included.
+A double moonrise or moonset on the same day is now highlighted for better legibility. Event Time tables can now be generated - these are the tables containing data in hours:minutes:seconds, e.g. sunrise, sunset, moonrise, moonset and Meridian Passage.
+Accuracy to to the second of time is not required for navigational purposes, but may be used to compare accuracy with other algorithms. Some internal technical enhancements and minor changes to text are also included.
 
 ## Requirements
 

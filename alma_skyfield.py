@@ -751,7 +751,22 @@ def getGHA(d, hh, mm, ss):
     gha = gha2deg(t1.gast, ra.hours)
     return gha      # GHA as float (degrees)
 
+def roundup(hr, mi):
+    # round time up to next minute. Both arguments are integers and all times are within one day.
+    # Times (for calculation) between 23:59:30 and 00:00:00 are rounded up to 00:00 ... no 
+    # date adjustment is necessary as the calculated time came on purpose from the day before.
+
+    mi += 1         # round minutes up
+    if(mi == 60):
+        mi = 0
+        hr += 1     # round hours up
+    if(hr == 24):
+        hr = 0
+    return hr, mi
+
 def find_transit(d, ghaList, modeLT):
+    # Determine the Transit Event Time rounded to the nearest minute.
+
     # ghaList contains the 'hourly' GHA values on day 'd' for the times:
     #  23:59:30 on d-1; 01:00; 02:00; 03:00 ... 21:00; 22:00; 23:00; 23:59:30
     # Events between 23:59:30 on d-1 and 23:59:30 will show as 00:00 to 23:59
@@ -759,18 +774,22 @@ def find_transit(d, ghaList, modeLT):
     # This effectively filters out events after 30 seconds before midnight
     #  as these belong to the next day once rounded up to 00:00.
     # Furthermore those from the last 30 seconds of the previous day
-    #  will be automatically included.
-    # In the latter case one cannot compare which GHA is closer to zero
-    #  ... the GHA at 00:00:30 must be inspected.
+    #  will be automatically included (as 00:00).
 
-    # this method may also be used to determine the Lower transit by replacing
+    # This method may also be used to determine the Lower transit by replacing
     #  GHA with the colongitude GHA (and an adapted ghaList). Thus...
     # modeLT = False means find Upper Transit; = True means find Lower Transit
     
     # This OPTIMIZED version does not calculate every minute from 0 to 59 until
-    # it detects a transit event. The search begins from 'min_start'.
+    # it detects a transit event. The minutes search begins from 'min_start'
+    # and is so chosen that 2 or 3 values before the event are searched (with the
+    # exception when the search begins from zero minutes, where the event might
+    # follow immediately).
 
-    hr = -1             # an invalid hour value
+    # If the transit event is very close to the mid-point between minutes, one cannot
+    # reliably estimate to round up or down without inspecting the mid-point GHA value.
+
+    hr = -1                 # an invalid hour value
     transit_time = '--:--'  # assume 'no event'
     prev_gha = 0
     prev_time = '--:--'
@@ -781,74 +800,74 @@ def find_transit(d, ghaList, modeLT):
     gha = ghaList[0]    # GHA at 23:59:30 on d-1
     gha_top = 360       # min_start defaults to 0
 
+    # find the hour after which the transit event occurs
     for i in range(24): # 0 to 23
         if(ghaList[i+1] < gha):
             hr = i      # event is between hr:00 and {hr+1}:00
             gha_top = ghaList[i]
             break
-        gha = ghaList[i+1]  # GHA at {hr+1}:00
-    min_start = int((360-gha_top)/0.245)-1
-    if(min_start < 0):
-        min_start = 0
+        gha = ghaList[i+1]  # test GHA at {hr+1}:00
+    # estimate where to begin searching by the minute
+    min_start = max(0, int((360-gha_top)/0.25)-1)
 
-    if hr >= 0:         # if event found... locate it more precisely
-        prev_gha = ghaList[i]    # GHA before the event (typically on the hour)
-        prev_time = "{:02d}:{:02d}".format(hr,0)
-        for min in range(min_start,60):       # 0 to 59 max
-            gha = getGHA(d, hr, min+1, 0)   # GHA on the minute after the event
-            gha_time = "{:02d}:{:02d}".format(hr,min+1)
-            if(modeLT):
-                gha = GHAcolong(gha)
-            if(gha < prev_gha):
-                break       # break when event detected ('min' is after event)
-            prev_gha = gha   # GHA on the minute before the event
-            prev_time = "{:02d}:{:02d}".format(hr,min+1)
+    if hr< 0:
+        return transit_time     # no event detected this day
 
-        mid_time = '-'      # no value
-        diff = prev_gha - 360 + gha      # if negative, round time up
+    # if event found... locate it more precisely (to the minute)
+    iLoops = 0
+    prev_gha = ghaList[i]    # GHA before the event (typically on the hour)
+    prev_time = "{:02d}:{:02d}".format(hr,0)
+    for mi in range(min_start,60):       # 0 to 59 max
+        gha = getGHA(d, hr, mi+1, 0)   # GHA on the minute after the event
+        gha_time = "{:02d}:{:02d}".format(hr,mi+1)
+        if(modeLT):
+            gha = GHAcolong(gha)
+        if(gha < prev_gha):
+            if(iLoops == 0 and mi > 0): raise ValueError('ERROR: min_start too large')
+            break       # break when event detected ('hr:mi' is before the event)
+        prev_gha = gha  # GHA on the minute before the event
+        prev_time = "{:02d}:{:02d}".format(hr,mi+1)
+        iLoops += 1
 
-        if(hr == 23 and min == 59):
-            pass            # events between 23:59 and 23:59:30 never round up to 00:00
-        elif(hr == 0 and min == 0):
-            mid_gha = getGHA(d, hr, min, 30)
-            mid_time = "{:02d}:{:02d}:{:02d}".format(hr,min,30)
-            if(modeLT):
-                mid_gha = GHAcolong(mid_gha)
-            if(mid_gha > 180):
-                min += 1        # midway is before the event (round up)
-                if(min == 60):
-                    min = 0
-                    hr += 1
-        elif(abs(diff) < 0.002):
-            # midpoint too close to zero: to round up or down it's better
-            #    to check the gha 30 sec earlier (midway between minutes)
-            # (The GHA changes by 0.002 in about 0.5 seconds time)
-            mid_gha = getGHA(d, hr, min, 30)
-            mid_time = "{:02d}:{:02d}:{:02d}".format(hr,min,30)
-            if(modeLT):
-                mid_gha = GHAcolong(mid_gha)
-            if(mid_gha > 180):
-                min += 1        # midway is before the event (round up)
-                if(min == 60):
-                    min = 0
-                    hr += 1
-        elif(diff < 0):
-            # just compare which gha is closer to zero GHA and round accordingly
-            min += 1            # closer to following GHA (round up)
-            if(min == 60):
-                min = 0
-                hr += 1
+    mid_time = '-'      # no value yet for mid-way between minutes
+    diff = prev_gha - 360 + gha      # if negative, round time up
 
-        transit_time = "{:02d}:{:02d}".format(hr,min)
-    #    if(modeLT):
-    #        prev_gha = GHAcolong(prev_gha)
-    #        gha = GHAcolong(gha)
-    #        mid_gha = GHAcolong(mid_gha)
-    #return transit_time, prev_gha, prev_time, gha, gha_time, mid_gha, mid_time
+    if(hr == 23 and mi == 59):
+        pass            # events between 23:59 and 23:59:30 never round up to 00:00 next day
 
+    elif(hr == 0 and mi == 0):
+        mid_gha = getGHA(d, hr, mi, 30)
+        mid_time = "{:02d}:{:02d}:{:02d}".format(hr,mi,30)
+        if(modeLT):
+            mid_gha = GHAcolong(mid_gha)
+        if(mid_gha > 180):
+            hr, mi = roundup(hr, mi)   # midway is before the event (round minutes up)
+
+    elif(abs(diff) < 0.002):
+        # midpoint too close to the transit event to estimate round up or down.
+        #    Check the GHA 30 sec later (midway between minutes).
+        # (The GHA changes by 0.002 in about 0.5 seconds time)
+        mid_gha = getGHA(d, hr, mi, 30)
+        mid_time = "{:02d}:{:02d}:{:02d}".format(hr,mi,30)
+        if(modeLT):
+            mid_gha = GHAcolong(mid_gha)
+        if(mid_gha > 180):
+            hr, mi = roundup(hr, mi)   # midway is before the event (round minutes up)
+
+    elif(diff < 0):
+        # just compare which GHA is closer to zero GHA and round accordingly
+        hr, mi = roundup(hr, mi)   # midway is before the event (round minutes up)
+
+    transit_time = "{:02d}:{:02d}".format(hr,mi)
     return transit_time
 
-##NEW##
+####    if(modeLT):
+####        prev_gha = GHAcolong(prev_gha)
+####        gha = GHAcolong(gha)
+####        mid_gha = GHAcolong(mid_gha)
+####    return transit_time, prev_gha, prev_time, gha, gha_time, mid_gha, mid_time
+
+
 def moonphase(d):           # used in twilighttab (section 3)
     # returns the moon's elongation (angle to the sun)
 
@@ -876,7 +895,6 @@ def moonphase(d):           # used in twilighttab (section 3)
 
     return phase
 
-##NEW##
 def moonage(d, d1):         # used in twilighttab (section 3)
     # return the moon's 'age' and percent illuminated
 
