@@ -789,6 +789,10 @@ def find_transit(d, ghaList, modeLT):
     # If the transit event is very close to the mid-point between minutes, one cannot
     # reliably estimate to round up or down without inspecting the mid-point GHA value.
 
+    if modeLT:
+        txt = "Lower Transit"
+    else:
+        txt = "Upper Transit"
     hr = -1                 # an invalid hour value
     transit_time = '--:--'  # assume 'no event'
     prev_gha = 0
@@ -827,7 +831,7 @@ def find_transit(d, ghaList, modeLT):
         if(modeLT):
             gha = GHAcolong(gha)
         if(gha < prev_gha):
-            if(iLoops == 0 and mi > 0): raise ValueError('ERROR: min_start too large')
+            if(iLoops == 0 and mi > 0): raise ValueError('ERROR: min_start ({}) too large on {} at {} ({})'.format(mi, d, gha_time, txt))
             break       # break when event detected ('hr:mi' is before the event)
         prev_gha = gha  # GHA on the minute before the event
         prev_time = "{:02d}:{:02d}".format(hr,mi+1)
