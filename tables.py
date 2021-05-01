@@ -884,7 +884,6 @@ def twilighttab(date):
     return tab
 
 
-##NEW##
 def lunatikz(phase):
     # argument: moon phase (0:new to π:full to 2π:new)
     # returns the code for a moon image overlaid with a shadow (pardon the function name)

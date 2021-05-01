@@ -831,7 +831,13 @@ def find_transit(d, ghaList, modeLT):
         if(modeLT):
             gha = GHAcolong(gha)
         if(gha < prev_gha):
-            if(iLoops == 0 and mi > 0): raise ValueError('ERROR: min_start ({}) too large on {} at {} ({})'.format(mi, d, gha_time, txt))
+            if(iLoops == 0 and mi > 0):
+                print(d)
+                print("mi = {:02d},  {}  {}".format(mi, prev_time, prev_gha))
+                print("          {}  {}".format(gha_time, gha))
+                print(modeLT)
+                print(ghaList)
+                raise ValueError('ERROR: min_start ({}) too large on {} at {} ({})'.format(mi, d, gha_time, txt))
             break       # break when event detected ('hr:mi' is before the event)
         prev_gha = gha  # GHA on the minute before the event
         prev_time = "{:02d}:{:02d}".format(hr,mi+1)

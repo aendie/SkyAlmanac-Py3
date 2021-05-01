@@ -58,7 +58,7 @@ ts = init_sf()     # in alma_skyfield
 d = datetime.datetime.utcnow().date()
 first_day = datetime.date(d.year, d.month, d.day)
 
-#first_day = datetime.date(2023, 6, 24)	# for testing a specific date
+#first_day = datetime.date(2021, 7, 10)	# for testing a specific date
 #d = first_day							# for testing a specific date
 
 sday = "{:02d}".format(d.day)       # sday = "%02d" % d.day
@@ -161,7 +161,7 @@ if s in set(['1', '2', '3', '4', '5']):
     elif s == '2':      # Sun Tables (for a year)
         for yearint in range(int(yearfr),int(yearto)+1):
             year = "{:4d}".format(yearint)  # year = "%4d" %yearint
-            msg = "\nCreating the sun tables for the year {}".format(year)
+            msg = "\nCreating the sun tables for the year {}\n".format(year)
             print(msg)
             first_day = datetime.date(yearint, 1, 1)
             fn = "sunalmanac{}{}".format(ff,year+DecFmt)
@@ -174,7 +174,7 @@ if s in set(['1', '2', '3', '4', '5']):
     elif s == '3':      # Nautical almanac   -  6 days from today
 ##        config.initLOG()		# initialize log file
         start = time.time()
-        msg = "\nCreating nautical almanac tables - from {}".format(sdmy)
+        msg = "\nCreating nautical almanac tables - from {}\n".format(sdmy)
         print(msg)
         fn = "almanac{}{}".format(ff,symd+DecFmt)
         outfile = open(fn + ".tex", mode="w", encoding="utf8")
@@ -190,7 +190,7 @@ if s in set(['1', '2', '3', '4', '5']):
         tidy_up(fn)
 
     elif s == '4':      # Sun tables only    - 30 days from today
-        msg = "\nCreating the sun tables - from {}".format(sdmy)
+        msg = "\nCreating the sun tables - from {}\n".format(sdmy)
         print(msg)
         fn = "sunalmanac{}{}".format(ff,symd+DecFmt)
         outfile = open(fn + ".tex", mode="w", encoding="utf8")
@@ -200,7 +200,7 @@ if s in set(['1', '2', '3', '4', '5']):
         tidy_up(fn)
 
     elif s == '5':
-        msg = "\nCreating the Increments and Corrections tables"
+        msg = "\nCreating the Increments and Corrections tables\n"
         print(msg)
         fn = "inc"
         outfile = open(fn + ".tex", mode="w", encoding="utf8")
