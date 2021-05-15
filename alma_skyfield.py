@@ -25,7 +25,8 @@ from os import path
 
 # Third party imports
 from skyfield import VERSION
-from skyfield.api import Topos, Star, load
+from skyfield.api import Loader
+from skyfield.api import Topos, Star
 from skyfield import almanac
 from skyfield.nutationlib import iau2000b
 from skyfield.data import hipparcos
@@ -54,10 +55,11 @@ def compareVersion(versions1, version2):
             return -1
     return 0
 
-def init_sf():
+def init_sf(spad):
     global ts, eph, earth, moon, sun, venus, mars, jupiter, saturn, df
+    load = Loader(spad)         # spad = folder to store the downloaded files
     EOPdf  = "finals2000A.all"  # Earth Orientation Parameters data file
-    dfIERS = EOPdf
+    dfIERS = spad + EOPdf
 
     if config.useIERS:
         if compareVersion(VERSION, "1.31") >= 0:

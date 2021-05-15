@@ -22,6 +22,25 @@
 #       will be removed from Python at some later time. See:
 # https://docs.python.org/3/whatsnew/3.0.html#pep-3101-a-new-approach-to-string-formatting
 
+# NOTE: As mentioned by Klaus Höppner in "Typesetting tables with LaTeX", 'tabular*'
+#       style tables often (surprisingly) expand the space between columns.
+#       Switiching to 'tabular' style has the effect that the first column 
+#       varies in width, e.g. as "Wed" is wider than "Fri". 
+#       Also column 'v' in the Moon table, e.g. e.g. 6.9' versus 15.3'.
+#       Also column 'd' in the Moon table, e.g. e.g. -8.2' versus -13.9'.
+#       'Tabular' table style normally permits column width specification only for 
+#       (left-justified) paragraph column content (with the 'p' column specifier).
+#       A workaround is to use 'tabularx' table style and set the custom width
+#       to the maximum column width on variable column-width columns. However -
+#       \multicolumn entries must not cross any X-column, so it's out of question.
+#       A solution to extending the column specifiers on a 'tabular' table style
+#       with left-, center- and right-justified data plus a column width specifier
+#       is possible: https://de.wikibooks.org/wiki/LaTeX-W%C3%B6rterbuch:_tabular
+#       This works, but again increases the overall table width unnecessarily.
+#       Conclusion/Resolution:
+#       The following code now uses the 'tabular' table style without any
+#       column width specifiers - thus table widths vary slightly from page to page.
+
 # Standard library imports
 import datetime		# required for .timedelta()
 import sys			# required for .stdout.write()
@@ -922,12 +941,17 @@ def lunatikz(phase):
         end_angle = 270
         xradius = math.cos(phase) * radius
 
+    if config.dockerized:   # DOCKER ONLY
+        fn = "../croppedmoon.png"
+    else:
+        fn = "croppedmoon.png"
+
     tikz = r'''\multicolumn{{1}}{{|c|}}{{\multirow{{3}}{{*}}
 {{\begin{{tikzpicture}}
-\node[anchor=south west,inner sep=0] at (0,0) {{\includegraphics[width=0.75cm]{{croppedmoon.png}}}};
+\node[anchor=south west,inner sep=0] at (0,0) {{\includegraphics[width=0.75cm]{{{}}}}};
 \path [fill=darknight, opacity=0.75] ({:5.3f},{:5.3f}) arc [x radius=0.375, y radius=0.375, start angle={:d}, end angle={:d}]  arc [x radius={:f}, y radius=0.375, start angle={:d}, end angle={:d}];
 \end{{tikzpicture}}}}}}\\
-'''.format(xstart, ystart, fr_angle, to_angle, xradius, ret_angle, end_angle)
+'''.format(fn, xstart, ystart, fr_angle, to_angle, xradius, ret_angle, end_angle)
     return tikz
 
 
@@ -1139,11 +1163,20 @@ def almanac(first_day, pagenum):
     \begin{titlepage}
     \begin{center}
     \textsc{\Large Generated using Ephem and Skyfield}\\
-    \large http://rhodesmill.org/skyfield/\\[0.7cm]
+    \large http://rhodesmill.org/skyfield/\\[0.7cm]'''
+
+    if config.dockerized:   # DOCKER ONLY
+        fn1 = "../A4chart0-180_P.pdf"
+        fn2 = "../A4chart180-360_P.pdf"
+    else:
+        fn1 = "./A4chart0-180_P.pdf"
+        fn2 = "./A4chart180-360_P.pdf"
+
+    alm = alm + r'''
     % TRIM values: left bottom right top
-    \includegraphics[clip, trim=12mm 20cm 12mm 21mm, width=0.92\textwidth]{./A4chart0-180_P.pdf}\\[0.3cm]
-    \includegraphics[clip, trim=12mm 20cm 12mm 21mm, width=0.92\textwidth]{./A4chart180-360_P.pdf}\\'''
-    
+    \includegraphics[clip, trim=12mm 20cm 12mm 21mm, width=0.92\textwidth]{{{}}}\\[0.3cm]
+    \includegraphics[clip, trim=12mm 20cm 12mm 21mm, width=0.92\textwidth]{{{}}}\\'''.format(fn1,fn2)
+
     alm = alm + r'''[{}]
     \textsc{{\huge The Nautical Almanac}}\\[{}]'''.format(vsep1,vsep2)
 
