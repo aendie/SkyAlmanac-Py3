@@ -268,7 +268,7 @@ def planetstabm(date):
 
 
 def starstab(date):
-    # returns a table with ephemerieds for the navigational stars
+    # returns a table with ephemerides for the navigational stars
     # OLD: \begin{tabular*}{0.251\textwidth}[t]{@{\extracolsep{\fill}}|rrr|}
     # OLD: note: 0.251 instead of 0.25 (above) prevents an "Overfull \hbox (0.14297pt too wide)" message on about 5 specific pages in the full year (moonimg=True)
 

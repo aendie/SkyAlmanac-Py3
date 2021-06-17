@@ -585,8 +585,8 @@ def planetstransit(d):      # used in starstab
     # calculate planet transit
     tfr = t0
     tto = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)
-    position = earth.at(tfr).observe(venus)
-    ra = position.apparent().radec(epoch='date')[0]
+    #position = earth.at(tfr).observe(venus)
+    #ra = position.apparent().radec(epoch='date')[0]
     #print('Venus transit: ', tfr.gast, ra.hours)
     transit_time, y = almanac.find_discrete(tfr, tto, planet_transit(venus))
     #if len(transit_time) != 1:
@@ -603,8 +603,6 @@ def planetstransit(d):      # used in starstab
     # calculate planet transit
     tfr = t0
     tto = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)
-    position = earth.at(tfr).observe(mars)
-    ra = position.apparent().radec(epoch='date')[0]
     transit_time, y = almanac.find_discrete(tfr, tto, planet_transit(mars))
     marstrans = rise_set(transit_time,y,u'Mars    0{} E transit'.format(degree_sign))[0]
 
@@ -616,8 +614,6 @@ def planetstransit(d):      # used in starstab
     # calculate planet transit
     tfr = t0
     tto = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)
-    position = earth.at(tfr).observe(jupiter)
-    ra = position.apparent().radec(epoch='date')[0]
     transit_time, y = almanac.find_discrete(tfr, tto, planet_transit(jupiter))
     jtrans = rise_set(transit_time,y,u'Jupiter 0{} E transit'.format(degree_sign))[0]
     
@@ -629,8 +625,6 @@ def planetstransit(d):      # used in starstab
     # calculate planet transit
     tfr = t0
     tto = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)
-    position = earth.at(tfr).observe(saturn)
-    ra = position.apparent().radec(epoch='date')[0]
     transit_time, y = almanac.find_discrete(tfr, tto, planet_transit(saturn))
     sattrans = rise_set(transit_time,y,u'Saturn  0{} E transit'.format(degree_sign))[0]
     
