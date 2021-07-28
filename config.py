@@ -32,7 +32,7 @@ ageIERS = 30    # download a new finals2000A.all version after 'ageIERS' days if
 
 # ================ DO NOT EDIT LINES BELOW HERE ================
 # Docker-related stuff...
-dockerized = True   # 'True' to build this app to run in a Docker-Linux container
+dockerized = False   # 'True' to build this app to run in a Docker-Linux container
 # NOTE: config.py has been "Dockerized" by use of environment variables in .env
 
 # Docker Container subfolder for creating PDF files (and optionally a LOG file)
