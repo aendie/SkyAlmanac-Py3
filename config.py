@@ -20,10 +20,11 @@
 
 # choose an ephemeris (ephndx = 0, 1 or 2):
 #   0   de421.bsp   1900 to 2050
-#   1   de405.bsp   1900 to 2200
-#   2   de406.bsp   1900 to 2750 (Equation of Time may show ??:?? after 2750)
+#   1   de405.bsp   1600 to 2200
+#   2   de406.bsp   1000 to 2750 (Equation of Time may show ??:?? after 2750)
+#   3   de430t.bsp  1550 to 2650
+#   4   de440.bsp   1550 to 2650
 ephndx = 0
-# note: the datetime strftime() methods require year >= 1900
 
 pgsz = 'A4'     # page size 'A4' or 'Letter' (global variable)
 moonimg = True  # 'True' to include a moon image; otherwise 'False'
@@ -45,7 +46,7 @@ docker_postfix = "/" + docker_pdf if dockerized else ""  # docker image is based
 # ==============================================================
 # define global variables
 logfileopen = False
-ephemeris = [['de421.bsp',1900,2050],['de405.bsp',1900,2200],['de406.bsp',1900,2750]]
+ephemeris = [['de421.bsp',1900,2050],['de405.bsp',1600,2200],['de406.bsp',1000,2750],['de430t.bsp',1550,2650],['de440.bsp',1550,2650]]
 tbls = ''		# table style (global variable)
 decf = ''		# Declination format (global variable)
 

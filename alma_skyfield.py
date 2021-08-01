@@ -75,16 +75,19 @@ def init_sf(spad):
     else:
         ts = load.timescale()	# timescale object with built-in UT1-tables
 
-    if config.ephndx in set([0, 1, 2]):
+    if config.ephndx in set([0, 1, 2, 3, 4]):
     
         eph = load(config.ephemeris[config.ephndx][0])	# load chosen ephemeris
         earth   = eph['earth']
         moon    = eph['moon']
         sun     = eph['sun']
         venus   = eph['venus']
-        mars    = eph['mars']
         jupiter = eph['jupiter barycenter']
         saturn  = eph['saturn barycenter']
+        if config.ephndx >= 3:
+            mars    = eph['mars barycenter']
+        else:
+            mars    = eph['mars']
 
     # load the Hipparcos catalog as a 118,218 row Pandas dataframe.
     with load.open(hipparcos.URL) as f:

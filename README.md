@@ -47,7 +47,7 @@ the [old](https://docs.python.org/2/library/stdtypes.html#string-formatting) sty
 **UPDATE: Jun 2020**
 
 The Equation Of Time is shaded whenever EoT is negative indicating that apparent solar time is slow compared to mean solar time (mean solar time > apparent solar time).
-It is possible to extend the maximum year beyond 2050 by choosing a different ephemeris in config.py.
+It is possible to extend the maximum year beyond 2050 by choosing a different ephemeris in *config.py*.
 Bugfix applied to correct the Meridian Passage times.
 
 **UPDATE: Jul 2020**
@@ -62,7 +62,7 @@ Minor changes are included here to this original (non-PyPI) edition to reflect s
 
 UT is the timescale now employed in the almanac.
 
-Two new options have been added into config.py: *useIERS = True* instructs Skyfield (if >= 1.31) to download Earth orientation data from IERS (International Earth Rotation and Reference Systems Service). *ageIERS = 30* instructs Skyfield to download fresh data from IERS if older tham that number of days. This implies greater accuracy for the generated almanacs (if Skyfield >= 1.31).
+Two new options have been added into *config.py*: *useIERS = True* instructs Skyfield (if >= 1.31) to download Earth orientation data from IERS (International Earth Rotation and Reference Systems Service). *ageIERS = 30* instructs Skyfield to download fresh data from IERS if older tham that number of days. This implies greater accuracy for the generated almanacs (if Skyfield >= 1.31).
 
 Note that although you may be using the *de421.bsp* ephemeris (valid from 1900 to 2050), the IERS currently specifies the validity of Earth Orientation Parameters (EOP) from 2nd January 1973 to 
 15th May 2022. Refer to the [IERS web site](https://www.iers.org/IERS/EN/Home/home_node.html) for current information.
@@ -83,6 +83,23 @@ Correction to Sun Data: "Sun continually above/below horizon" now shown if it ap
 &emsp;:smiley:&ensp;SkyAlmanac is now available on DockerHub [here](https://hub.docker.com/repository/docker/aendie/skyalmanac).&ensp;:smiley:
 
 The DockerHub image contains a Linux-based OS, TeX Live, the application code, and third party Python imports (including the astronomical libraries). It can be executed "in a container" on Windows 10 Pro, macOS or a Linux-based OS.
+
+**UPDATE: Jul 2021**
+
+The PDF filenames have been revised:
+
+* modna_\<starting date or year\>.pdf: for Nautical Almanacs in modern style
+* modst_\<starting date or year\>.pdf: for Sun Tables in modern style
+* tradna_\<starting date or year\>.pdf: for Nautical Almanacs in traditional style
+* tradst_\<starting date or year\>.pdf: for Sun Tables in traditional style
+
+One command line argument may be appended to the run command:
+
+* -v to invoke verbose mode (send pdfTeX execution steps to the console)
+* -log to preserve the log file
+* -tex to preserve the tex file
+
+de430t and de440 ephemerides have been added to *config.py*.
 
 ## Requirements
 
