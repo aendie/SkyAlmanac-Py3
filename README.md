@@ -52,7 +52,7 @@ Bugfix applied to correct the Meridian Passage times.
 
 **UPDATE: Jul 2020**
 
-A new option has been added into config.py: *moonimg = True* will display a graphic image of the moon phase (making the resulting PDF slightly larger). Use *moonimg = False* to revert to the previous format without the graphic moon image.
+A new option has been added into *config.py*: *moonimg = True* will display a graphic image of the moon phase (making the resulting PDF slightly larger). Use *moonimg = False* to revert to the previous format without the graphic moon image.
 
 **UPDATE: Feb 2021**
 
