@@ -71,11 +71,11 @@ except IndexError:
     arg = ""
 if len(sys.argv) > 2 or not (arg == "" or arg == "-v" or arg == "-log" or arg == "-tex"):
     print("One optional command line parameter is permitted:")
-    print(" python -m skyalmanac -v")
+    print(" python skyalmanac.py -v")
     print(" ... to send pdfTeX output to the terminal")
-    print(" python -m skyalmanac -log")
+    print(" python skyalmanac.py -log")
     print(" ... to keep the log file")
-    print(" python -m skyalmanac -tex")
+    print(" python skyalmanac.py -tex")
     print(" ... to keep the tex file")
     sys.exit(0)
 
