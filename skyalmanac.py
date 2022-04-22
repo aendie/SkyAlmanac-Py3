@@ -31,6 +31,16 @@ import increments
 from alma_skyfield import init_sf
 
 
+def deletePDF(filename):
+    if os.path.exists(filename + ".pdf"):
+        try:
+            os.remove(filename + ".pdf")
+        except PermissionError:
+            print("ERROR: please close '{}' so it can be re-created".format(filename + ".pdf"))
+            sys.exit(0)
+    if os.path.exists(filename + ".tex"):
+        os.remove(filename + ".tex")
+
 def makePDF(args, fn, msg = ""):
     command = 'pdflatex {}'.format(args + fn + ".tex")
     if args == "":
@@ -240,8 +250,9 @@ if s in set(['1', '2', '3', '4', '5']):
             print(msg)
 ##            config.writeLOG(msg)
             first_day = datetime.date(yearint, 1, 1)
-            ff = "tradna_" if config.tbls != 'm' else "modna_"
+            ff = "NAtrad_" if config.tbls != 'm' else "NAmod_"
             fn = "{}{}".format(ff,year+DecFmt)
+            deletePDF(f_prefix + fn)
             outfile = open(f_prefix + fn + ".tex", mode="w", encoding="utf8")
             outfile.write(tables.almanac(first_day,122))
             outfile.close()
@@ -262,8 +273,9 @@ if s in set(['1', '2', '3', '4', '5']):
             msg = "\nCreating the sun tables for the year {}\n".format(year)
             print(msg)
             first_day = datetime.date(yearint, 1, 1)
-            ff = "tradst_" if config.tbls != 'm' else "modst_"
+            ff = "STtrad_" if config.tbls != 'm' else "STmod_"
             fn = "{}{}".format(ff,year+DecFmt)
+            deletePDF(f_prefix + fn)
             outfile = open(f_prefix + fn + ".tex", mode="w", encoding="utf8")
             outfile.write(suntables.almanac(first_day,25))
             outfile.close()
@@ -277,8 +289,9 @@ if s in set(['1', '2', '3', '4', '5']):
         start = time.time()
         msg = "\nCreating nautical almanac tables - from {}\n".format(sdmy)
         print(msg)
-        ff = "tradna_" if config.tbls != 'm' else "modna_"
+        ff = "NAtrad_" if config.tbls != 'm' else "NAmod_"
         fn = "{}{}".format(ff,symd+DecFmt)
+        deletePDF(f_prefix + fn)
         outfile = open(f_prefix + fn + ".tex", mode="w", encoding="utf8")
         outfile.write(tables.almanac(first_day,2))
         outfile.close()
@@ -295,8 +308,9 @@ if s in set(['1', '2', '3', '4', '5']):
     elif s == '4':      # Sun tables only    - 30 days from today
         msg = "\nCreating the sun tables - from {}\n".format(sdmy)
         print(msg)
-        ff = "tradst_" if config.tbls != 'm' else "modst_"
+        ff = "STtrad_" if config.tbls != 'm' else "STmod_"
         fn = "{}{}".format(ff,symd+DecFmt)
+        deletePDF(f_prefix + fn)
         outfile = open(f_prefix + fn + ".tex", mode="w", encoding="utf8")
         outfile.write(suntables.almanac(first_day,2))
         outfile.close()
@@ -308,6 +322,7 @@ if s in set(['1', '2', '3', '4', '5']):
         msg = "\nCreating the Increments and Corrections tables\n"
         print(msg)
         fn = "inc"
+        deletePDF(f_prefix + fn)
         outfile = open(f_prefix + fn + ".tex", mode="w", encoding="utf8")
         outfile.write(increments.makelatex())
         outfile.close()

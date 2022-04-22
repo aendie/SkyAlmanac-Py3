@@ -107,6 +107,13 @@ Skyfield relies on the IERS, the International Earth Rotation Service, for accur
 
 However the IERS server is currently undergoing maintenance and thus unavailable, which causes Skyalmanac to fail. This version first tests is the IERS server is available and otherwise downloads the EOP (Earth Orientation Parameters) data from USNO (US Naval Observatory) instead.
 
+The PDF filenames have been revised (again):
+
+* NAmod_\<starting date or month or year\>.pdf: for Nautical Almanacs in modern style
+* STmod_\<starting date or month or year\>.pdf: for Sun Tables in modern style
+* NAtrad_\<starting date or month or year\>.pdf: for Nautical Almanacs in traditional style
+* STtrad_\<starting date or month or year\>.pdf: for Sun Tables in traditional style
+
 ## Requirements
 
 &emsp;Computation is done by the free Ephem and Skyfield libraries.  
