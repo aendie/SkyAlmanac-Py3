@@ -41,9 +41,9 @@ def deletePDF(filename):
     if os.path.exists(filename + ".tex"):
         os.remove(filename + ".tex")
 
-def makePDF(args, fn, msg = ""):
-    command = 'pdflatex {}'.format(args + fn + ".tex")
-    if args == "":
+def makePDF(pdfcmd, fn, msg = ""):
+    command = 'pdflatex {}'.format(pdfcmd + fn + ".tex")
+    if pdfcmd == "":
         os.system(command)
         print("finished" + msg)
     else:
@@ -73,25 +73,21 @@ def tidy_up(fn):
 
 ##Main##
 if sys.version_info[0] < 3:
-    raise Exception("Must be using Python 3")
+    raise Exception("This runs only with Python 3")
 
-try:
-    arg = sys.argv[1]
-except IndexError:
-    arg = ""
-if len(sys.argv) > 2 or not (arg == "" or arg == "-v" or arg == "-log" or arg == "-tex"):
-    print("One optional command line parameter is permitted:")
-    print(" python skyalmanac.py -v")
-    print(" ... to send pdfTeX output to the terminal")
-    print(" python skyalmanac.py -log")
-    print(" ... to keep the log file")
-    print(" python skyalmanac.py -tex")
-    print(" ... to keep the tex file")
-    sys.exit(0)
-
-args = "" if arg == "-v" else "-interaction=batchmode -halt-on-error "
-keeplog = True if arg == "-log" else False
-keeptex = True if arg == "-tex" else False
+# command line arguments...
+validargs = ['-v', '-log', '-tex']
+for i in list(range(1, len(sys.argv))):
+    if sys.argv[i] not in validargs:
+        print("Invalid argument: {}".format(sys.argv[i]))
+        print("\nValid command line arguments are:")
+        print(" -v   ... to send pdfTeX output to the terminal")
+        print(" -log ... to keep the log file")
+        print(" -tex ... to keep the tex file")
+        sys.exit(0)
+listarg = "" if "-v" in set(sys.argv[1:]) else "-interaction=batchmode -halt-on-error "
+keeplog = True if "-log" in set(sys.argv[1:]) else False
+keeptex = True if "-tex" in set(sys.argv[1:]) else False
 
 d = datetime.datetime.utcnow().date()
 first_day = datetime.date(d.year, d.month, d.day)
@@ -280,7 +276,7 @@ if s in set(['1', '2', '3', '4', '5']):
             outfile.write(suntables.almanac(first_day,25))
             outfile.close()
             if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
-            makePDF(args, fn, " creating sun tables for {}".format(year))
+            makePDF(listarg, fn, " creating sun tables for {}".format(year))
             tidy_up(fn)
             if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
 
@@ -302,7 +298,7 @@ if s in set(['1', '2', '3', '4', '5']):
 ##        config.closeLOG()
         print()
         if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
-        makePDF(args, fn)
+        makePDF(listarg, fn)
         tidy_up(fn)
 
     elif s == '4':      # Sun tables only    - 30 days from today
@@ -315,7 +311,7 @@ if s in set(['1', '2', '3', '4', '5']):
         outfile.write(suntables.almanac(first_day,2))
         outfile.close()
         if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
-        makePDF(args, fn)
+        makePDF(listarg, fn)
         tidy_up(fn)
 
     elif s == '5':
@@ -327,7 +323,7 @@ if s in set(['1', '2', '3', '4', '5']):
         outfile.write(increments.makelatex())
         outfile.close()
         if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
-        makePDF(args, fn)
+        makePDF(listarg, fn)
         tidy_up(fn)
 
 else:

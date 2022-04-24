@@ -18,7 +18,7 @@
 
 # ================ EDIT LINES IN THIS SECTION ONLY ================
 
-# choose an ephemeris (ephndx = 0, 1 or 2):
+# choose an ephemeris (ephndx = 0, 1, 2, 3 or 4):
 #   0   de421.bsp   1900 to 2050
 #   1   de405.bsp   1600 to 2200
 #   2   de406.bsp   1000 to 2750 (Equation of Time may show ??:?? after 2750)

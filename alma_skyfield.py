@@ -90,7 +90,7 @@ def testIERSserver(filename):
     return True     # server works
 
 def downloadUSNO(path, filename):
-    print("Downloading from USNO...", end ="")
+    print("Downloading EOP data from USNO...", end ="")
     filepath = os.path.join(path, filename)
     url = "https://maia.usno.navy.mil/ser7/" + filename
     connection = urlopen(url)
@@ -98,7 +98,7 @@ def downloadUSNO(path, filename):
 
     # Claim our own unique download filename.
 
-    tempbase = tempname = path + '.download'
+    tempbase = tempname = path + filename + '.download'
     flags = getattr(os, 'O_BINARY', 0) | os.O_CREAT | os.O_EXCL | os.O_RDWR
     i = 1
     while True:
