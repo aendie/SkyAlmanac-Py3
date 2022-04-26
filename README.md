@@ -123,7 +123,7 @@ The PDF filenames have been revised (again):
 * Python v3.4 or higher (the latest version is recommended)
 * Skyfield 1.35 (see the Skyfield Changelog)
 * Pandas >= 1.0 (to load the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
-* Ephem >=3.7.6
+* Ephem >=3.7.6 (4.1 is good; 4.1.1, 4.1.2 or 4.1.3 are faulty)
 * MiKTeX&ensp;or&ensp;TeX Live
 
 ## Files required in the execution folder:
