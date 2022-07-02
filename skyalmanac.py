@@ -258,7 +258,7 @@ if s in set(['1', '2', '3', '4', '5']):
 ##            config.writeLOG("\n\n" + msg + "\n")
             print()
             if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
-            makePDF(args, fn, " creating nautical almanac for {}".format(year))
+            makePDF(listarg, fn, " creating nautical almanac for {}".format(year))
             tidy_up(fn)
             if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
 ##        config.closeLOG()     # close log after the for-loop
