@@ -121,7 +121,7 @@ The PDF filenames have been revised (again):
 &emsp;These need to be installed:
 
 * Python v3.4 or higher (the latest version is recommended)
-* Skyfield 1.35 (see the Skyfield Changelog)
+* Skyfield >= 1.31 (the latest is recommended; see the Skyfield Changelog)
 * Pandas >= 1.0 (to load the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
 * Ephem >=3.7.6 (4.1 is good; 4.1.1, 4.1.2 or 4.1.3 are faulty)
 * MiKTeX&ensp;or&ensp;TeX Live
@@ -141,13 +141,13 @@ The PDF filenames have been revised (again):
 
 &emsp;Tested on Windows 10 Pro, Version 20H2 with an AMD Ryzen 7 3700X 8-Core Processor  
 
-&emsp;Install Python 3.9.1 (should be in the system environment variable PATH, e.g. )  
-&emsp;&ensp;**C:\\Python39\Scripts;C:\\Python39;** .....  
+&emsp;Install Python 3.10.6 (should be in the system environment variable PATH, e.g. )  
+&emsp;&ensp;**C:\\Python310\Scripts;C:\\Python310;** .....  
 &emsp;Install MiKTeX 21.1 from https://miktex.org/  
 &emsp;When MiKTeX first runs it will require installation of additional packages.  
 &emsp;Run Command Prompt as Administrator, go to your Python folder and execute, e.g.:
 
-&emsp;**cd C:\\Python39**  
+&emsp;**cd C:\\Python310**  
 &emsp;**python.exe -m pip install --upgrade pip**  
 &emsp;... for a first install (it's preferable to install *wheel* first):  
 &emsp;**pip3 install wheel**  
