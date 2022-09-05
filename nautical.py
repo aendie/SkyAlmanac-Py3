@@ -49,7 +49,7 @@ import signal       # for init_worker
 from math import cos, copysign, pi
 
 ###### Local application imports ######
-from alma_ephem import magnitudes
+#from alma_ephem import magnitudes
 import config
 if config.MULTIpr:  # in multi-processing mode ...
     # ! DO NOT PLACE imports IN CONDITIONAL 'if'-STATEMENTS WHEN MULTI-PROCESSING !
@@ -373,11 +373,11 @@ def planetstab(Date, ts):
                 tab = tab + line + lineterminator
                 h += 1
 
-        mag_v, mag_m, mag_j, mag_s = magnitudes(Date)   # magnitudes from Ephem
+        #mag_v, mag_m, mag_j, mag_s = magnitudes(Date)   # magnitudes from Ephem
         RAc_v, Dc_v, mag_v = vdm_Venus(Date)
-        RAc_m, Dc_m = vdm_Mars(Date)
+        RAc_m, Dc_m, mag_m = vdm_Mars(Date)             # in Skyfield >= 1.40
         RAc_j, Dc_j, mag_j = vdm_Jupiter(Date)
-        RAc_s, Dc_s = vdm_Saturn(Date)
+        RAc_s, Dc_s, mag_s = vdm_Saturn(Date)           # in Skyfield >= 1.40
         tab = tab + r'''\hline
 \multicolumn{{2}}{{|c|}}{{\rule{{0pt}}{{2.4ex}}Mer.pass. {}}} & 
 \multicolumn{{2}}{{c|}}{{\(\nu\) {}$'$ \emph{{d}} {}$'$ m {}}} & 
@@ -507,11 +507,11 @@ def planetstabm(Date, ts):
                 tab = tab + line
                 h += 1
 
-        mag_v, mag_m, mag_j, mag_s = magnitudes(Date)   # magnitudes from Ephem
+        #mag_v, mag_m, mag_j, mag_s = magnitudes(Date)   # magnitudes from Ephem
         RAc_v, Dc_v, mag_v = vdm_Venus(Date)
-        RAc_m, Dc_m = vdm_Mars(Date)
+        RAc_m, Dc_m, mag_m = vdm_Mars(Date)             # in Skyfield >= 1.40
         RAc_j, Dc_j, mag_j = vdm_Jupiter(Date)
-        RAc_s, Dc_s = vdm_Saturn(Date)
+        RAc_s, Dc_s, mag_s = vdm_Saturn(Date)           # in Skyfield >= 1.40
         tab = tab + r'''\cmidrule{{1-2}} \cmidrule{{4-5}} \cmidrule{{7-8}} \cmidrule{{10-11}} \cmidrule{{13-14}}
 \multicolumn{{2}}{{c}}{{\footnotesize{{Mer.pass. {}}}}} && 
 \multicolumn{{2}}{{c}}{{\footnotesize{{\(\nu\){}$'$ \emph{{d}}{}$'$ m{}}}}} && 

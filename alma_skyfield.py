@@ -691,6 +691,7 @@ def vdm_Mars(d):            # used in planetstab(m)
     position0 = earth.at(t0).observe(mars)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    mag = "{:0.2f}".format(planetary_magnitude(position0))  # planetary magnitude
 
     t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(mars)
@@ -703,7 +704,7 @@ def vdm_Mars(d):            # used in planetstab(m)
     RAcorrm = "{:0.1f}".format(sha * 60)	# convert to minutes of arc
     Dcorr = dec1.degrees - dec0.degrees
     Dcorrm = "{:0.1f}".format(Dcorr * 60)	# convert to minutes of arc
-    return RAcorrm, Dcorrm
+    return RAcorrm, Dcorrm, mag
 
 def vdm_Jupiter(d):         # used in planetstab(m)
     # compute v (GHA correction), d (Declination correction), m (magnitude of planet)
@@ -733,6 +734,7 @@ def vdm_Saturn(d):          # used in planetstab(m)
     position0 = earth.at(t0).observe(saturn)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    mag = "{:0.2f}".format(planetary_magnitude(position0))  # planetary magnitude
 
     t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(saturn)
@@ -745,7 +747,7 @@ def vdm_Saturn(d):          # used in planetstab(m)
     RAcorrm = "{:0.1f}".format(sha * 60)	# convert to minutes of arc
     Dcorr = dec1.degrees - dec0.degrees
     Dcorrm = "{:0.1f}".format(Dcorr * 60)	# convert to minutes of arc
-    return RAcorrm, Dcorrm
+    return RAcorrm, Dcorrm, mag
 
 #-----------------------------------------
 #   Aries & planet transit calculations
