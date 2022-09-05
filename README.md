@@ -275,8 +275,8 @@ Previously execution could hang when aborting a multiprocessing task (in nautica
 
 &emsp;**sudo easy_install pip**  
 &emsp;**pip install wheel**  
-&emsp;**pip3 uninstall pyephem ephem**  
-&emsp;**pip3 install ephem==4.1**  
+&emsp;**pip uninstall pyephem ephem**  
+&emsp;**pip install ephem==4.1**  
 &emsp;**pip install skyfield**  
 &emsp;**pip install pandas**  
 
