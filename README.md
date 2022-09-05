@@ -4,7 +4,7 @@ Skyalmanac-Py3 is a Python 3 script that creates the daily pages of the Nautical
 The daily pages are needed for celestial navigation with a sextant. Although you are strongly advised to purchase the official Nautical Almanac, this program will reproduce the tables with no warranty or guarantee of accuracy.
 
 Skyalmanac-Py3 was developed with the intention of having identical output format as Pyalmanac-Py3 to facilitate manual observation of data discrepancies.
-Also it is based entirely on the newer Skyfield astronomical library: https://rhodesmill.org/skyfield/ (although Ephem is still required to calculate some planet magnitudes). Skyalmanac uses the star database in Skyfield, which is based on data from the Hipparcos Catalogue.
+Also it is based entirely on the newer Skyfield astronomical library: https://rhodesmill.org/skyfield/. Skyalmanac uses the star database in Skyfield, which is based on data from the Hipparcos Catalogue.
 
 **Users are encouraged to install the Python Package Index (PyPI) edition to be found here:**  
 https://pypi.org/project/skyalmanac/  
@@ -178,6 +178,7 @@ Previously execution could hang when aborting a multiprocessing task (in nautica
 * Three locations are tried to obtain *finals2000A.all* IERS EOP data
 * The LaTeX *fancyhdr* package is employed when MiKTeX (or a TeX Live version >= 2020) is detected.
 * Better support for Letter-sized pages.
+* Skyalmanac no longer requires the Ephem astronomical library.
 * Command line options:
     * -v   ... 'verbose': to send pdfTeX output to the terminal
 	* -q   ... quiet mode for LD charts
@@ -198,7 +199,6 @@ Previously execution could hang when aborting a multiprocessing task (in nautica
 * Python v3.4 or higher (v3.10.x is recommended)
 * Skyfield >= 1.31 (the latest is recommended; see the Skyfield Changelog)
 * Pandas >= 1.0 (to decode the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
-* Ephem = 4.1 (required for some planet magnitudes)
 * MiKTeX&ensp;or&ensp;TeX Live
 
 ## Files required in the execution folder:
@@ -226,8 +226,6 @@ Previously execution could hang when aborting a multiprocessing task (in nautica
 &emsp;**python.exe -m pip install --upgrade pip**  
 &emsp;... for a first install (it's preferable to install *wheel* first):  
 &emsp;**pip3 install wheel**  
-&emsp;**pip3 uninstall pyephem ephem**  
-&emsp;**pip3 install ephem==4.1**  
 &emsp;**pip3 install skyfield**  
 &emsp;**pip3 install pandas**  
 &emsp;... if already installed, check for upgrades explicitly:  
@@ -257,8 +255,6 @@ Previously execution could hang when aborting a multiprocessing task (in nautica
 
 &emsp;Install the required astronomical libraries etc.:  
 &emsp;**pip3 install wheel**  
-&emsp;**pip3 uninstall pyephem ephem**  
-&emsp;**pip3 install ephem==4.1**  
 &emsp;**pip3 install skyfield**  
 &emsp;**pip3 install pandas**  
 
@@ -275,8 +271,6 @@ Previously execution could hang when aborting a multiprocessing task (in nautica
 
 &emsp;**sudo easy_install pip**  
 &emsp;**pip install wheel**  
-&emsp;**pip uninstall pyephem ephem**  
-&emsp;**pip install ephem==4.1**  
 &emsp;**pip install skyfield**  
 &emsp;**pip install pandas**  
 
