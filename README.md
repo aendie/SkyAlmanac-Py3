@@ -1,28 +1,23 @@
-# SkyAlmanac-Py3
+# Skyalmanac-Py3
 
-SkyAlmanac-Py3 is a Python 3 script that creates the daily pages of the Nautical Almanac **using the UT1 timescale** :smiley:. Official Nautical Almanacs employ a UT timescale (equivalent to UT1).
-These are tables that are needed for celestial navigation with a sextant. Although you are strongly advised to purchase the official Nautical Almanac, this program will reproduce the tables with no warranty or guarantee of accuracy.
+Skyalmanac-Py3 is a Python 3 script that creates the daily pages of the Nautical Almanac as well as Lunar Distance tables and charts.
+The daily pages are needed for celestial navigation with a sextant. Although you are strongly advised to purchase the official Nautical Almanac, this program will reproduce the tables with no warranty or guarantee of accuracy.
 
-SkyAlmanac-Py3 was developed with the intention of having identical output format as SFalmanac-Py3. It is a hybrid version based on two astronomical libraries:  
+Skyalmanac-Py3 was developed with the intention of having identical output format as Pyalmanac-Py3 to facilitate manual observation of data discrepancies.
+Also it is based entirely on the newer Skyfield astronomical library: https://rhodesmill.org/skyfield/ (although Ephem is still required to calculate some planet magnitudes). Skyalmanac uses the star database in Skyfield, which is based on data from the Hipparcos Catalogue.
 
-* the older Ephem library:  https://rhodesmill.org/pyephem/
-* the newer Skyfield library: https://rhodesmill.org/skyfield/
-
-It uses the star database in Skyfield, which is based on data from the Hipparcos Catalogue. Ephem is used for calculating twilight (actual, civil and nautical sunrise/sunset) and moonrise/moonset. As a consequence, it is **four times faster** than SFalmanac (which uses Skyfield for almost everything).
-
-**NOTE: the Python Package Index (PyPI) edition is here:** https://pypi.org/project/skyalmanac/  
-**Users are encouraged to install the PyPI edition instead.**  
-NOTE: a 100% [Ephem](https://rhodesmill.org/pyephem/)-based version of SkyAlmanac is available here: https://github.com/aendie/Pyalmanac-Py3
-
-An aim of this development was to maintain:
-
-* **identical PDF output formatting with a similar control program**  
-	 It is then possible to display both generated tables (using Ephem or Skyfield astronomical libraries) and compare what has changed by flipping between the two tabs in Adobe Acrobat Reader DC.
-	 Anything that has changed flashes, thereby drawing your attention to
-	 it. This crude and simple method is quite effective in highlihgting data that might need further attention.
+**Users are encouraged to install the Python Package Index (PyPI) edition to be found here:**  
+https://pypi.org/project/skyalmanac/  
 
 The results have been crosschecked with USNO data to some extent.  
-(However, constructive feedback is always appreciated.)
+
+**THE OLDER Skyalmanac HAS BEEN TOTALLY REPLACED**
+
+Please note that Skyalmanac *was* originally an interim 'hybrid' version that was required to overcome performance deficiencies in SFalmanac in single-processing mode. The introduction of multiprocessing overcame these deficiencies to such an extent that the 'hybrid' version was no longer required (and was no longer maintained). 
+
+That 'hybrid' version has now been discarded and Skyalmanac now contains all the latest features of SFalmanac - so SFalmanac and Skyalmanac are now practically identical. (Newcomers typically chose Skyalmanac for its name without being aware it's obsolete.) Looking forward, Skyalmanac will be the future product of choice but for the time being both will be maintained in parallel.
+
+The Update History below has been taken over from SFalmanac...
 
 **UPDATE: Nov 2019**
 
@@ -37,7 +32,7 @@ P.S. The *Overfull \hbox in paragraph...* messages can be ignored - the PDF is c
 
 **UPDATE: Feb 2020**
 
-The main focus was on cleaning up the TeX code and eliminating the *Overfull/Underfull hbox/vbox* messages. Other minor improvements were included.
+The main focus was on cleaning up the TeX code and eliminating the *Overfull/Underfull hbox/vbox* messages. Other minor improvements were included. A Skyfield issue with days that have no moonrise or moonset at a specific latitude was resolved.
 
 **UPDATE: Mar 2020**
 
@@ -47,12 +42,12 @@ the [old](https://docs.python.org/2/library/stdtypes.html#string-formatting) sty
 **UPDATE: Jun 2020**
 
 The Equation Of Time is shaded whenever EoT is negative indicating that apparent solar time is slow compared to mean solar time (mean solar time > apparent solar time).
-It is possible to extend the maximum year beyond 2050 by choosing a different ephemeris in *config.py*.
+It is possible to extend the maximum year beyond 2050 by choosing a different ephemeris in config.py.
 Bugfix applied to correct the Meridian Passage times.
 
 **UPDATE: Jul 2020**
 
-A new option has been added into *config.py*: *moonimg = True* will display a graphic image of the moon phase (making the resulting PDF slightly larger). Use *moonimg = False* to revert to the previous format without the graphic moon image.
+A new option has been added into config.py: *moonimg = True* will display a graphic image of the moon phase (making the resulting PDF slightly larger). Use *moonimg = False* to revert to the previous format without the graphic moon image.
 
 **UPDATE: Feb 2021**
 
@@ -62,7 +57,7 @@ Minor changes are included here to this original (non-PyPI) edition to reflect s
 
 UT is the timescale now employed in the almanac.
 
-Two new options have been added into *config.py*: *useIERS = True* instructs Skyfield (if >= 1.31) to download Earth orientation data from IERS (International Earth Rotation and Reference Systems Service). *ageIERS = 30* instructs Skyfield to download fresh data from IERS if older tham that number of days. This implies greater accuracy for the generated almanacs (if Skyfield >= 1.31).
+Two new options have been added into config.py: *useIERS = True* instructs Skyfield (if >= 1.31) to download Earth orientation data from IERS (International Earth Rotation and Reference Systems Service). *ageIERS = 30* instructs Skyfield to download fresh data from IERS if older tham that number of days. This implies greater accuracy for the generated almanacs (if Skyfield >= 1.31).
 
 Note that although you may be using the *de421.bsp* ephemeris (valid from 1900 to 2050), the IERS currently specifies the validity of Earth Orientation Parameters (EOP) from 2nd January 1973 to 
 15th May 2022. Refer to the [IERS web site](https://www.iers.org/IERS/EN/Home/home_node.html) for current information.
@@ -70,7 +65,7 @@ Note that although you may be using the *de421.bsp* ephemeris (valid from 1900 t
 **UPDATE: Apr 2021**
 
 A double moonrise or moonset on the same day is now highlighted for better legibility. Event Time tables can now be generated - these are the tables containing data in hours:minutes:seconds, e.g. sunrise, sunset, moonrise, moonset and Meridian Passage.
-Accuracy to to the second of time is not required for navigational purposes, but may be used to compare accuracy with other algorithms. Some internal technical enhancements and minor changes to text are also included.
+Accuracy to to the second of time is not required for navigational purposes, but may be used to compare accuracy with other algorithms. Some internal technical enhancements and minor changes to text are also included. For example, moonrise and moonset times now take into account the lunar distance from the Earth (which varies slightly).
 
 **UPDATE: May 2021**
 
@@ -78,11 +73,24 @@ The indication of objects (Sun or Moon) continuously above or below the horizon 
 
 Regarding Moon Data: ".. .." has been added to indicate that the moonrise/moonset event occurs the following day (at the specified latitude). If there is no moonrise/moonset for two or more consecutive days, black boxes indicate "moon below horizon"; white boxes indicate "moon above horizon". This brings it in line with Nautical Almanacs. (Previously they were only displayed when there was no moonrise *and* no moonset on a single day.)
 
+The additional calculations required are compensated with a transient Moon Data buffer store that always holds the latest five adjacent days of moon data, eliminating any need to recalculate data for the next or previous day (to determine if "moon above/below horizon" spans a minimum of two days.)
+
 Correction to Sun Data: "Sun continually above/below horizon" now shown if it applies to both Sunrise and Sunset, or *additionally* to both Civil Twilight Start & End; or *additionally* to both Astronomical Twilight Start & End, i.e. as two, four or six events per day and latitude. This brings it in line with Nautical Almanacs.
 
-&emsp;:smiley:&ensp;SkyAlmanac is now available on DockerHub [here](https://hub.docker.com/repository/docker/aendie/skyalmanac).&ensp;:smiley:
+&emsp;:smiley:&ensp;Skyalmanac is now available on DockerHub [here](https://hub.docker.com/repository/docker/aendie/skyalmanac).&ensp;:smiley:
 
 The DockerHub image contains a Linux-based OS, TeX Live, the application code, and third party Python imports (including the astronomical libraries). It can be executed "in a container" on Windows 10 Pro, macOS or a Linux-based OS.
+
+**UPDATE: Jun 2021**
+
+This version introduces multiprocessing and thus a gain in performance. Single-processing is also a selectable option, if required. Testing has been successfully performed on Windows 10 and Ubuntu 20.04 LTS. (No testing can be performed on Mac OS.) Compared to single-processing ...
+
+* Creation (excluding conversion to PDF) of a 6-day Nautical Almanac is 4x faster on Windows 10; 2x faster on Linux.
+* Creation (excluding conversion to PDF) of 6-day Event Time Tables is almost 5x faster on Windows 10; 3x faster on Linux.
+
+Windows 10 uses up to 8 threads; Linux uses up to 12 threads in parallel. Testing was performed on a PC with an AMD Ryzen 7 3700X 8-Core (16 threads) Processor. Windows & Mac OS spawn new processes; Linux forks new processes (the code is compatible with both techniques and will also run on CPUs with fewer cores/threads).
+
+This performance gain infers that there is practically no justification to use the *original* Skyalmanac, which was an interim solution to overcome the poor performance in SFalmanac at the cost of marginally poorer accuracy in event times (sunset/twilight/sunrise; moonrise/moonset).
 
 **UPDATE: Jul 2021**
 
@@ -101,11 +109,20 @@ One command line argument may be appended to the run command:
 
 de430t and de440 ephemerides have been added to *config.py*.
 
-**UPDATE: Apr 2022**
+**UPDATE: Nov 2021**
 
-Skyfield relies on the IERS, the International Earth Rotation Service, for accurate measurements of UT1 and for the schedule of leap seconds that keeps UTC from straying more than 0.9 seconds away from UT1.
+* Enhanced User Interface includes the possibility to generate tables starting at any valid date, or for any month (within -12/+11 months from today).
+* It now checks if there is an Internet connection before attempting to update the Earth Orientation Parameters (EOP) from IERS.
+* Minor cosmetic improvements ('d'-correction in italics; greek 'nu' replaces 'v'-correction; Minutes-symbol added to SD and d)
 
-However the IERS server is currently undergoing maintenance and thus unavailable, which causes Skyalmanac to fail. This version first tests is the IERS server is available and otherwise downloads the EOP (Earth Orientation Parameters) data from USNO (US Naval Observatory) instead.
+Increased accuracy due to the following minor improvements:
+* Moon phase (percent illumination) is based on midnight (as opposed to midday)
+* Star positions are based on midnight (as opposed to midday)
+* Sun's SD (semi-diameter) is based on midnight (as opposed to mid-day)
+* Moon v and d for hour ‘n’ are based on “hour ‘n+1’ minus hour ‘n’” as opposed to “hour ‘n’ + 30 minutes minus hour ‘n’ – 30 minutes”
+* Moon HP is based on a “volumetric mean radius of earth = 6371.0” as opposed to an “equatorial radius of earth = 6378.0 km”
+* Moon SD (semi-diameter) is based on a “volumetric mean radius of moon = 1737.4 km” as opposed to an “equatorial radius of moon = 1738.1 km”
+* Planet magnitudes for Venus and Jupiter are obtained from Skyfield (>= 1.26), despite it still being a prototype function
 
 The PDF filenames have been revised (again):
 
@@ -114,16 +131,74 @@ The PDF filenames have been revised (again):
 * NAtrad_\<starting date or month or year\>.pdf: for Nautical Almanacs in traditional style
 * STtrad_\<starting date or month or year\>.pdf: for Sun Tables in traditional style
 
+BUGFIX (solved here and in PyPI sfalmanac 1.6.1):  
+The first day in a Nautical Almanac did not initialize the moon state 'above or below horizon' when there was no Moonrise or Moonset at some latitudes on that day in Multiprocessing mode (only).
+
+BUGFIX (solved here and in PyPI sfalmanac 1.6.2):  
+The Moon Declination on the last hour of the day did not indicate 'N' or 'S' when it had just changed, i.e. since 22h. This rare case occurs, for example, on 14th Jun 2024 and 15th Oct 2024.
+
+BUGFIX (solved here and in PyPI sfalmanac 1.6.3):  
+Two import statements (essential for Linux and MacOS) were missing.
+
+**UPDATE: Apr 2022**
+
+Lunar Distance tables have been added as a new option.
+
+Skyfield relies on the IERS, the International Earth Rotation Service, for accurate measurements of UT1 and for the schedule of leap seconds that keeps UTC from straying more than 0.9 seconds away from UT1.
+
+However the IERS server is currently undergoing maintenance and thus unavailable, which causes Skyalmanac to fail. This version first tests if the IERS server is available and otherwise downloads the EOP (Earth Orientation Parameters) data from USNO (US Naval Observatory) instead.
+
+BUGFIX: Event Time tables no longer fail on 24.08.2063 (Lower Transit).
+
+**UPDATE: May 2022**
+
+Lunar Distance charts have been added as a new option to complement the Lunar Distance tables.
+
+Skyalmanac in DockerHub has been updated to match this May 2022 release:
+https://hub.docker.com/r/aendie/skyalmanac
+
+The PDF filenames have been revised (again), where 'A4' (or 'Letter') is the selected papersize:
+
+* NAmod(A4)_\<starting date or month or year\>.pdf: for Nautical Almanacs in modern style
+* STmod(A4)_\<starting date or month or year\>.pdf: for Sun Tables in modern style
+* NAtrad(A4)_\<starting date or month or year\>.pdf: for Nautical Almanacs in traditional style
+* STtrad(A4)_\<starting date or month or year\>.pdf: for Sun Tables in traditional style
+
+PATCH1: Sun SD added to Lunar Distance tables when appropriate
+
+**UPDATE: Aug 2022**
+
+The 'fancyhdr' LaTeX package is now used to format header and footer lines on a page. This is a more professional solution with added features. Footer lines now contain left-, center- and right-justified text.
+
+BUGFIX (solved here and in PyPI sfalmanac 1.9):
+Previously execution could hang when aborting a multiprocessing task (in nautical.py or eventtables.py) on entering Ctrl-C to kill all processes.
+
+**UPDATE: Sep 2022**
+
+* Three locations are tried to obtain *finals2000A.all* IERS EOP data
+* The LaTeX *fancyhdr* package is employed when MiKTeX (or a TeX Live version >= 2020) is detected.
+* Better support for Letter-sized pages.
+* Command line options:
+    * -v   ... 'verbose': to send pdfTeX output to the terminal
+	* -q   ... quiet mode for LD charts
+	* -sky ... stars only in LD charts
+    * -log ... to keep the log file
+    * -tex ... to keep the tex file
+    * -old ... old formatting without the 'fancyhdr' package
+    * -a4  ... A4 papersize
+    * -let ... Letter papersize
+    * -dpo ... data pages only
+
 ## Requirements
 
-&emsp;Computation is done by the free Ephem and Skyfield libraries.  
-&emsp;Typesetting is typically done by MiKTeX or TeX Live.  
-&emsp;These need to be installed:
+&emsp;Most of the computation is done by the free Skyfield library.  
+&emsp;Typesetting is done typically by MiKTeX or TeX Live.  
+&emsp;Here are the requirements/recommendations:
 
-* Python v3.4 or higher (the latest version is recommended)
+* Python v3.4 or higher (v3.10.x is recommended)
 * Skyfield >= 1.31 (the latest is recommended; see the Skyfield Changelog)
-* Pandas >= 1.0 (to load the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
-* Ephem >=3.7.6 (4.1 is good; 4.1.1, 4.1.2 or 4.1.3 are faulty)
+* Pandas >= 1.0 (to decode the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
+* Ephem = 4.1 (required for some planet magnitudes)
 * MiKTeX&ensp;or&ensp;TeX Live
 
 ## Files required in the execution folder:
@@ -139,11 +214,11 @@ The PDF filenames have been revised (again):
 
 ### INSTALLATION GUIDELINES on Windows 10:
 
-&emsp;Tested on Windows 10 Pro, Version 20H2 with an AMD Ryzen 7 3700X 8-Core Processor  
+&emsp;Tested on Windows 10 Pro, Version 21H2 with an AMD Ryzen 7 3700X 8-Core Processor  
 
 &emsp;Install Python 3.10.6 (should be in the system environment variable PATH, e.g. )  
 &emsp;&ensp;**C:\\Python310\Scripts;C:\\Python310;** .....  
-&emsp;Install MiKTeX 21.1 from https://miktex.org/  
+&emsp;Install MiKTeX 22.7 from https://miktex.org/  
 &emsp;When MiKTeX first runs it will require installation of additional packages.  
 &emsp;Run Command Prompt as Administrator, go to your Python folder and execute, e.g.:
 
@@ -152,16 +227,16 @@ The PDF filenames have been revised (again):
 &emsp;... for a first install (it's preferable to install *wheel* first):  
 &emsp;**pip3 install wheel**  
 &emsp;**pip3 uninstall pyephem ephem**  
-&emsp;**pip3 install ephem**  
+&emsp;**pip3 install ephem==4.1**  
 &emsp;**pip3 install skyfield**  
 &emsp;**pip3 install pandas**  
 &emsp;... if already installed, check for upgrades explicitly:  
-&emsp;**pip3 install --upgrade ephem skyfield pandas**  
+&emsp;**pip3 install --upgrade skyfield pandas**  
 
-&emsp;Put the required files for SkyAlmanac in a new folder, run Command Prompt in that folder and start with:  
+&emsp;Put the required files for Skyalmanac in a new folder, run Command Prompt in that folder and start with:  
 &emsp;**py -3 skyalmanac.py**
 
-&emsp;If using MiKTeX 21 or higher, executing 'option 5' (Increments and Corrections) will probably fail with  
+&emsp;If using MiKTeX 21 or higher, executing 'option 6' (Increments and Corrections) will probably fail with  
 &emsp;**! TeX capacity exceeded, sorry [main memory size=3000000].**  
 &emsp;To resolve this problem (assuming MiKTeX has been installed for all users),  
 &emsp;open a Command Prompt as Administrator and enter:  
@@ -183,25 +258,25 @@ The PDF filenames have been revised (again):
 &emsp;Install the required astronomical libraries etc.:  
 &emsp;**pip3 install wheel**  
 &emsp;**pip3 uninstall pyephem ephem**  
-&emsp;**pip3 install ephem**  
+&emsp;**pip3 install ephem==4.1**  
 &emsp;**pip3 install skyfield**  
 &emsp;**pip3 install pandas**  
 
-&emsp;Put the SkyAlmanac files in a folder and start with:  
+&emsp;Put the Skyalmanac files in a folder and start with:  
 &emsp;**python3 skyalmanac.py**  
 
 
-### INSTALLATION GUIDELINES on MAC:
+### INSTALLATION GUIDELINES on Mac OS:
 
 &emsp;Every Mac comes with python preinstalled.  
-&emsp;(Please choose this version of SkyAlmanac if Python 3.* is installed.)  
-&emsp;You need to install the Skyfield (and Ephem) library to use SFalmanac.  
+&emsp;(Please choose this version of Skyalmanac if Python 3.* is installed.)  
+&emsp;You need to install the Ephem and Skyfield libraries to use Skyalmanac.  
 &emsp;Type the following commands at the commandline (terminal app):
 
 &emsp;**sudo easy_install pip**  
 &emsp;**pip install wheel**  
-&emsp;**pip uninstall pyephem ephem**  
-&emsp;**pip install ephem**  
+&emsp;**pip3 uninstall pyephem ephem**  
+&emsp;**pip3 install ephem==4.1**  
 &emsp;**pip install skyfield**  
 &emsp;**pip install pandas**  
 
@@ -210,7 +285,7 @@ The PDF filenames have been revised (again):
 
 &emsp;Install TeX/LaTeX from http://www.tug.org/mactex/
 
-&emsp;Now you are almost ready. Put the SkyAlmanac files in any directory and start with:  
+&emsp;Now you are almost ready. Put the Skyalmanac files in any directory and start with:  
 &emsp;**python skyalmanac**  
 &emsp;or  
 &emsp;**./skyalmanac**
