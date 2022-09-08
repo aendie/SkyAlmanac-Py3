@@ -710,11 +710,21 @@ def getHipparcos(HIPnum, t00):          # used in ld_charts.getc and .getstar
 
     return ra, dec, mag
 
-def getMyStar(star, t00):
+def getCustomStar(starname, t00):
+    if starname == "HIP78727": # getHipparcos returns 'nan' for ra & dec
+        star = Star(ra_hours=(16, 4, 22.60), dec_degrees=(-11, 22, 23.0), ra_mas_per_year=-60.0, dec_mas_per_year=-29.0)
+        mag = 4.16
+    elif starname == "HIP55203": # getHipparcos returns 'nan' for ra & dec
+        star = Star(ra_hours=(11, 18, 11.24), dec_degrees=(31, 31, 50.8))
+        mag = 3.79
+    else:
+        print("Error: {} not implemented in getCustomStar".format(starname))
+        sys.exit(0)
+
     astrometric = earth.at(t00).observe(star)
     ra, dec, distance = astrometric.radec(epoch='date')
 
-    return ra, dec
+    return ra, dec, mag
 
 #---------------------------------
 #   Lunar Distance calculations

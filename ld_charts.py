@@ -26,13 +26,10 @@ import sys
 from datetime import datetime, timedelta
 import math
 
-###### Third party imports ######
-from skyfield.api import Star
-
 ###### Local application imports ######
 import config
 import ld_stardata
-from ld_skyfield import sunGHA, moonGHA, venusGHA, marsGHA, jupiterGHA, saturnGHA, ld_planets, ld_stars, getHipparcos, getMyStar
+from ld_skyfield import sunGHA, moonGHA, venusGHA, marsGHA, jupiterGHA, saturnGHA, ld_planets, ld_stars, getHipparcos, getCustomStar
 
 #   My apologies to those who read this . . .
 #   Although use of global variables is frowned upon by the Python community,
@@ -479,29 +476,20 @@ def findstar(bayercode):
 
 def getstar(fname):
     # return SHA and Dec for epoch of date.
-    inHIPcat = True
-    if fname == "HIP78727": # getHipparcos returns 'nan' for ra & dec
-        inHIPcat = False
-        star = Star(ra_hours=(16, 4, 22.60), dec_degrees=(-11, 22, 23.0), ra_mas_per_year=-60.0, dec_mas_per_year=-29.0)
-        mag = 4.16
-    if fname == "HIP55203": # getHipparcos returns 'nan' for ra & dec
-        inHIPcat = False
-        star = Star(ra_hours=(11, 18, 11.24), dec_degrees=(31, 31, 50.8))
-        mag = 3.79
-    if inHIPcat:
-        for line in ld_stardata.popstars.split('\n'):
-            if line[7:] == fname:
-                HIPnum = line[:6].lstrip(' ')
-                ra, dec, mag = getHipparcos(HIPnum, t00)
-                #if math.isnan(ra) or math.isnan(dec):    # e.g. HIP78727, HIP55203
-                sha = ra_sha(ra.hours)
-                return fname,sha,dec.degrees,mag
-        print("getstar error: {} not found in Hipparcos catalogue".format(fname))
-        sys.exit(0)
-    else:
-        ra, dec = getMyStar(star, t00)
+    if fname[:3] == "HIP":
+        ra, dec, mag = getCustomStar(fname, t00)
         sha = ra_sha(ra.hours)
         return fname,sha,dec.degrees,mag
+
+    for line in ld_stardata.popstars.split('\n'):
+        if line[7:] == fname:
+            HIPnum = line[:6].lstrip(' ')
+            ra, dec, mag = getHipparcos(HIPnum, t00)
+            #if math.isnan(ra) or math.isnan(dec):    # e.g. HIP78727, HIP55203
+            sha = ra_sha(ra.hours)
+            return fname,sha,dec.degrees,mag
+    print("getstar error: {} not found in Hipparcos catalogue".format(fname))
+    sys.exit(0)
 
 def plotstar(x, y, mag=5.0, c='black', op=1.0, c2='black'):
     if mag == 5.0:
