@@ -22,14 +22,17 @@
 # https://docs.python.org/3/whatsnew/3.0.html#pep-3101-a-new-approach-to-string-formatting
 
 ###### Standard library imports ######
-import ephem
+import sys
 from datetime import datetime, timedelta
 import math
+
+###### Third party imports ######
+from skyfield.api import Star
 
 ###### Local application imports ######
 import config
 import ld_stardata
-from ld_skyfield import sunGHA, moonGHA, venusGHA, marsGHA, jupiterGHA, saturnGHA, ld_planets, ld_stars, getHipparcos
+from ld_skyfield import sunGHA, moonGHA, venusGHA, marsGHA, jupiterGHA, saturnGHA, ld_planets, ld_stars, getHipparcos, getMyStar
 
 #   My apologies to those who read this . . .
 #   Although use of global variables is frowned upon by the Python community,
@@ -219,31 +222,6 @@ def sha_inc(shamin, shamax):
     if shamax >= 360: shamax -= 360
     return shamin, shamax
 
-def nadeg(rad, fixedwidth=1):
-    # changes ephem.angle (rad) to the format usually used in the nautical almanac (ddd°mm.m) and returns a string object.
-	# the optional argument specifies the minimum width for degrees (only)
-    theminus = ""
-    if rad < 0:
-    	theminus = "-"
-    df = abs(math.degrees(rad))	# convert radians to degrees (float)
-    di = int(df)			# degrees (integer)
-    # note: round() uses "Rounding Half To Even" strategy
-    mf = round((df-di)*60, 1)	# minutes (float), rounded to 1 decimal place
-    mi = int(mf)			# minutes (integer)
-    if mi == 60:
-        mf -= 60
-        di += 1
-        if di == 360:
-            di = 0
-    if fixedwidth == 2:
-        gm = "%s%02i%s%04.1f" %(theminus,di,degree_sign,mf)
-    else:
-        if fixedwidth == 3:
-            gm = "%s%03i%s%04.1f" %(theminus,di,degree_sign,mf)
-        else:
-            gm = "%s%s%s%04.1f" %(theminus,di,degree_sign,mf)
-    return gm
-
 def ra_sha(ra):
     # convert angle (hours) to sha (degrees)
     sha = (- ra) * 15
@@ -292,7 +270,7 @@ def group_range(cdec):
 #   graphical functions for chart constructon
 #-----------------------------------------------
 
-# global variables >>>> decmin, decmax, sharng, t00, pandasDF
+# global variables >>>> decmin, decmax, sharng, t00
 def getc(cname, skipstars=[], c='consGrey'):
 #   get constellation parameters and plot it
 # cname     = constellation name
@@ -499,20 +477,31 @@ def findstar(bayercode):
             break
     return x, y
 
-def getstar(fname, date):
+def getstar(fname):
     # return SHA and Dec for epoch of date.
-    ra = None
-    dec = None
-    for line in ld_stardata.db.strip().split('\n'):
-        st = ephem.readdb(line)
-        if st.name == fname:
-            #st.compute(date+0.5)    # calculate at noon
-            st.compute(date)    # calculate at midnight
-            sha = math.degrees(2*math.pi - ephem.degrees(st.g_ra).norm)
-            dec = math.degrees(st.g_dec)
-            mag = st.mag
-            break
-    return  fname,sha,dec,mag
+    inHIPcat = True
+    if fname == "HIP78727": # getHipparcos returns 'nan' for ra & dec
+        inHIPcat = False
+        star = Star(ra_hours=(16, 4, 22.60), dec_degrees=(-11, 22, 23.0), ra_mas_per_year=-60.0, dec_mas_per_year=-29.0)
+        mag = 4.16
+    if fname == "HIP55203": # getHipparcos returns 'nan' for ra & dec
+        inHIPcat = False
+        star = Star(ra_hours=(11, 18, 11.24), dec_degrees=(31, 31, 50.8))
+        mag = 3.79
+    if inHIPcat:
+        for line in ld_stardata.popstars.split('\n'):
+            if line[7:] == fname:
+                HIPnum = line[:6].lstrip(' ')
+                ra, dec, mag = getHipparcos(HIPnum, t00)
+                #if math.isnan(ra) or math.isnan(dec):    # e.g. HIP78727, HIP55203
+                sha = ra_sha(ra.hours)
+                return fname,sha,dec.degrees,mag
+        print("getstar error: {} not found in Hipparcos catalogue".format(fname))
+        sys.exit(0)
+    else:
+        ra, dec = getMyStar(star, t00)
+        sha = ra_sha(ra.hours)
+        return fname,sha,dec.degrees,mag
 
 def plotstar(x, y, mag=5.0, c='black', op=1.0, c2='black'):
     if mag == 5.0:
@@ -620,7 +609,7 @@ def numpos(p, rn, n):
 def addstar(starname, n=0, c='black', p='right', rn=''):
     global stars_LD
     # plot the star as a filled circle ...
-    name, sha, dec, mag = getstar(starname,ephem.date(d00))
+    name, sha, dec, mag = getstar(starname)
     if outofbounds_sha(sha): return ""
     if outofbounds_dec(dec) != 0: return ""
     if SHAleftofzero(sha): sha = sha - 360       # NEW
@@ -673,7 +662,7 @@ def addstar(starname, n=0, c='black', p='right', rn=''):
 # global variables >>> d00, sharng
 def addtext(starname, txt, c='black', p='right'):
 # add text without plotting a star
-    name, sha, dec, mag = getstar(starname,ephem.date(d00))
+    name, sha, dec, mag = getstar(starname)
     if outofbounds_sha(sha): return ""
     if outofbounds_dec(dec) != 0: return ""
     if SHAleftofzero(sha): sha = sha - 360       # NEW
@@ -691,7 +680,7 @@ def addtext(starname, txt, c='black', p='right'):
 
 # global variables >>> d00
 def adddot(starname):
-    name, sha, dec, mag = getstar(starname,ephem.date(d00))
+    name, sha, dec, mag = getstar(starname)
     if outofbounds_sha(sha): return ""
     if outofbounds_dec(dec) != 0: return ""
     if SHAleftofzero(sha): sha = sha - 360       # NEW
@@ -1181,9 +1170,7 @@ def beginPDF():
 %%colours for Lunar Distance lines...
 \definecolor{Dark chestnut}{rgb}{0.6, 0.41, 0.38}
 \definecolor{Green (pigment)}{rgb}{0.0, 0.65, 0.31}
-%%\definecolor{Light slate gray}{rgb}{0.47, 0.53, 0.6}
 \definecolor{Gold (metallic)}{rgb}{0.83, 0.69, 0.22}
-%%\definecolor{Dark Gold}{rgb}{0.71, 0.59, 0.19}
 \definecolor{Celestial blue}{rgb}{0.29, 0.59, 0.82}
 \definecolor{Dark turquoise}{rgb}{0.0, 0.79, 0.79}
 \definecolor{Rose pink}{rgb}{1.0, 0.4, 0.8}
@@ -1262,7 +1249,7 @@ def beginPDF():
 
     tex += r'''
   \noindent
-  \textbf{Acknowledgements:} \newline The charts and LD tables are created with Ephem (\url{https://rhodesmill.org/pyephem/}) and Skyfield (\url{https://rhodesmill.org/skyfield/}), thanks to Brandon Rhodes. The graphics are created with LaTeX using TikZ (\url{https://www.ctan.org/pkg/pgf}), thanks to Till Tantau and the team that maintain it. Kudos to the Python Software Foundation! Thanks also to Jorrit Visser for his Lunar Distance tables (\url{http://celnav.nl/}).\\[-6pt]
+  \textbf{Acknowledgements:} \newline The charts and LD tables are created with Skyfield (\url{https://rhodesmill.org/skyfield/}), thanks to Brandon Rhodes. The graphics are created with LaTeX using TikZ (\url{https://www.ctan.org/pkg/pgf}), thanks to Till Tantau and the team that maintain it. Kudos to the Python Software Foundation! Thanks also to Jorrit Visser for his Lunar Distance tables (\url{http://celnav.nl/}).\\[-6pt]
   \end{multicols}
   \noindent
   \textbf{Disclaimer:} These are computer generated tables - use them at your own risk. They replicate Lunar Distance algorithms with no guarantee of accuracy. They are intended to encourage people to use a sextant, be it as a hobby or as a backup when electronics fail.
@@ -1642,7 +1629,7 @@ def showLD(obj, xyMoon=[0.0, 0.0], c='red', hh=0, drawLD=False):
 
         if objname == "": return out, None, None, None, None
         navn = int(objnum)
-        name, sha, dec, mag = getstar(objname,ephem.date(d00))
+        name, sha, dec, mag = getstar(objname)
         #print(name, sha, dec, mag)
 
         global stars_LD

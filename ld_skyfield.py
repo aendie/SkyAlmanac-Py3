@@ -700,15 +700,21 @@ def saturnGHA(d):           # used in addPLANET and showLD
 #   star calculations
 #-----------------------
 
-def getHipparcos(HIPnum, t00):          # used in ld_charts.getc
+def getHipparcos(HIPnum, t00):          # used in ld_charts.getc and .getstar
 
     # get star data from Hipparcos (HIgh Precision PARallax COllecting Satellite)
     star = Star.from_dataframe(pandasDF.loc[int(HIPnum)])
-    astrometric = earth.at(t00).observe(star).apparent()
+    astrometric = earth.at(t00).observe(star)
     ra, dec, distance = astrometric.radec(epoch='date')
     mag = pandasDF.loc[int(HIPnum)]['magnitude']
 
     return ra, dec, mag
+
+def getMyStar(star, t00):
+    astrometric = earth.at(t00).observe(star)
+    ra, dec, distance = astrometric.radec(epoch='date')
+
+    return ra, dec
 
 #---------------------------------
 #   Lunar Distance calculations
