@@ -81,7 +81,7 @@ moonHorizonFound = 0   # moon continuously above/below horizon seeks found in tr
 
 # define global variables for Lunar Distance tables and charts
 # 'True' on 'debug_....' variables expands the terminal/console output
-debug_strategy = False   # 'True' also prints the reason LD values are excluded *within* the page tables
+debug_strategy = False   # 'True' prints *within* the page tables the reason LD values are excluded
 debug_star_data = False     # console output: Lunar Distance star-moon per hour
 debug_planet_data = False   # console output: Lunar Distance planet-moon per hour
 debug_showLD = False        # console output: Lunar Distance line colours

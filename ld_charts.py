@@ -337,7 +337,7 @@ def getc(cname, skipstars=[], c='consGrey'):
                 x = (x_o + sha) * sf / 10.0
                 y = dec.degrees * sf / 10.0
 #####                print("cstars = {} {} {} {}".format(bayercode,x,y,mag))
-                #out = out + plotstar(x,y)  # don't plot here!
+                #out += plotstar(x,y)  # don't plot here!
                 cstars[ndx][0] = bayercode
                 cstars[ndx][1] = x
                 cstars[ndx][2] = y
@@ -367,11 +367,10 @@ def getc(cname, skipstars=[], c='consGrey'):
     y1 = decmin * sf / 10.0
     x2 = sharng * sf / 10.0
     y2 = decmax * sf / 10.0
-    out = out + r"""
+    out += r"""
+% constellation: {}
 \begin{{scope}}
-  % constellation: {}
-  \clip ({:.3f},{:.3f}) rectangle ({:.3f},{:.3f});
-""".format(cname, x1, y1, x2, y2)
+  \clip ({:.3f},{:.3f}) rectangle ({:.3f},{:.3f});""".format(cname, x1, y1, x2, y2)
 
     # draw constellation shape pattern
     while len(cpattern) > 4:
@@ -390,8 +389,8 @@ def getc(cname, skipstars=[], c='consGrey'):
             x1, y1 = findstar(starfr)
             x2, y2 = findstar(starto)
             # draw constellation shape in colour 'c'
-            out = out + r"""  \draw[%s%s] (%0.3f,%0.3f) -- (%0.3f,%0.3f);
-""" %(dp,c,x1,y1,x2,y2)
+            out += r"""
+  \draw[%s%s] (%0.3f,%0.3f) -- (%0.3f,%0.3f);""" %(dp,c,x1,y1,x2,y2)
 
     # plot stars in constellation (*after* drawing the shape pattern)
     for ndx in range(csize):
@@ -401,10 +400,10 @@ def getc(cname, skipstars=[], c='consGrey'):
             x = cstars[ndx][1]
             y = cstars[ndx][2]
             mag = cstars[ndx][3]
-            out = out + plotstar(x,y,mag)
+            out += plotstar(x,y,mag)
 
-    out = out + r"""\end{scope}
-"""
+    out += r"""
+\end{scope}"""
     # print constellation name at locn in degrees
     out1 = ""
     if cnameDEC != 100.0:
@@ -413,9 +412,9 @@ def getc(cname, skipstars=[], c='consGrey'):
         out2 = printcname(cname2,cname2SHA,cname2DEC)
         # second word exists - was the first word printed?
         if out1 != "" and out2 != "":
-            out = out + out1 + out2     # print both or none
+            out += out1 + out2     # print both or none
     else:
-        out = out + out1
+        out += out1
 
     return out
 
@@ -438,7 +437,8 @@ def printcname(cname, sha, dec, p='right', c='gray'):
         # first declare a new variable and store the length of 'cname' text in it
         # within tikz, it's necessary to surround this in \pgfinterruptpicture ... \endpgfinterruptpicture
         # use tcolorbox to apply a background color (colback), text color (colupper) and opacity (opacityfill) - this requires 'standard jigsaw'
-        out = r"""  \settowidth{\myl}{\pgfinterruptpicture\%s{%s}\endpgfinterruptpicture}
+        out = r"""
+  \settowidth{\myl}{\pgfinterruptpicture\%s{%s}\endpgfinterruptpicture}
   \draw (%0.2f,%0.2f) node[%s] {\begin{tcolorbox}[standard jigsaw,size=minimal,colupper=%s,colback=white,opacityfill=0.7,width=\myl]{\%s{%s}}\end{tcolorbox}};
 """ %(const_fs,cname,x,y,p,c,const_fs,cname)
 
@@ -457,8 +457,8 @@ def printcname(cname, sha, dec, p='right', c='gray'):
         #elif x/sf > x_max - 1.0 and p == 'right' and len(cname) >= 6: deltaX = 1.0
         x -= deltaX
 
-        out = r"""  \draw[color=%s] (%0.2f,%0.2f) node[%s] {\%s{%s}};
-""" %(c,x,y,p,const_fs,cname)
+        out = r"""
+  \draw[color=%s] (%0.2f,%0.2f) node[%s] {\%s{%s}};""" %(c,x,y,p,const_fs,cname)
 
     return out
 
@@ -501,13 +501,13 @@ def plotstar(x, y, mag=5.0, c='black', op=1.0, c2='black'):
     if c == 'white':
         # c2 is the circle colour
         m2 = m - 0.18    # subtract just less than half the line thickness (in pt)
-        out = r"""  \fill[color=%s%s] (%0.3f,%0.3f) circle[radius=%0.2f pt];
-  \draw [color=%s] (%0.3f,%0.3f) circle[radius=%0.2f pt];
-""" %(c, pct, x, y, m, c2, x, y, m2)
+        out = r"""
+  \fill[color=%s%s] (%0.3f,%0.3f) circle[radius=%0.2f pt];
+  \draw [color=%s] (%0.3f,%0.3f) circle[radius=%0.2f pt];""" %(c, pct, x, y, m, c2, x, y, m2)
 
     else:
-        out = r"""  \fill[color=%s%s] (%0.3f,%0.3f) circle[radius=%0.2f pt];
-""" %(c, pct, x, y, m)
+        out = r"""
+  \fill[color=%s%s] (%0.3f,%0.3f) circle[radius=%0.2f pt];""" %(c, pct, x, y, m)
 
     return out
 
@@ -619,31 +619,31 @@ def addstar(starname, n=0, c='black', p='right', rn=''):
         # first declare a new variable and store the length of 'starname' text in it
         # within tikz, it's necessary to surround this in \pgfinterruptpicture ... \endpgfinterruptpicture
         # use tcolorbox to apply a background color (colback), text color (colupper) and opacity (opacityfill) - this requires 'standard jigsaw'
-        out = out + r"""  \settowidth{\myl}{\pgfinterruptpicture\%s{%s}\endpgfinterruptpicture}
-  \draw (%0.2f,%0.2f) node[%s] {\begin{tcolorbox}[standard jigsaw,size=minimal,colupper=%s,colback=white,opacityfill=0.7,width=\myl]{\%s{%s}}\end{tcolorbox}};
-""" %(fsize,name,x,y,p,c,fsize,name)
+        out += r"""
+  \settowidth{\myl}{\pgfinterruptpicture\%s{%s}\endpgfinterruptpicture}
+  \draw (%0.2f,%0.2f) node[%s] {\begin{tcolorbox}[standard jigsaw,size=minimal,colupper=%s,colback=white,opacityfill=0.7,width=\myl]{\%s{%s}}\end{tcolorbox}};""" %(fsize,name,x,y,p,c,fsize,name)
 
     else:
         if n == 0:
             # prevent starname crossing the right or left plot border...
             if not (x/sf > x_max - 1.0 and p.startswith('right') and len(name) >= 5) and not (x/sf < 1.2 and p.startswith('left')):
                 p2 = "opacity=0.4," + p
-                out = out + r"""  \draw[color=%s] (%0.2f,%0.2f) node[%s,font=\%s] {%s};
-""" %(c, x, y, p2, fsize, name)
+                out += r"""
+  \draw[color=%s] (%0.2f,%0.2f) node[%s,font=\%s] {%s};""" %(c, x, y, p2, fsize, name)
         else:
             nsf = ''
             p2 = "opacity=0.5," + numpos(p,rn,n)
             # prevent starname crossing the left or right plot border...
             if not (x/sf > x_max - 1.0 and p.startswith('right')) and not (x/sf < 1.2 and p.startswith('left')):
                 # print star name AND navigational star number from the Nautical Almanac
-                out = out + r"""  \draw[color=%s] (%0.2f,%0.2f) node[%s,font=\%s%s] {%s};
-  \draw[color=airforceBlue] (%0.2f,%0.2f) node[%s] {\fontfamily{phv}\%s\textbf{%s}};
-""" %(c, x, y, p, fsize, nsf, name, x, y, p2, navnum_fs, n)
+                out += r"""
+  \draw[color=%s] (%0.2f,%0.2f) node[%s,font=\%s%s] {%s};
+  \draw[color=airforceBlue] (%0.2f,%0.2f) node[%s] {\fontfamily{phv}\%s\textbf{%s}};""" %(c, x, y, p, fsize, nsf, name, x, y, p2, navnum_fs, n)
             else:
                 # print only the navigational star number from the Nautical Almanac
                 stars_LD.append([starname, n, False])   # append star name, nav number, 'True' if used for LD
-                out = out + r"""  \draw[color=airforceBlue] (%0.2f,%0.2f) node[%s] {\fontfamily{phv}\%s\textbf{%s}};
-""" %(x, y, p2, navnum_fs, n)
+                out += r"""
+  \draw[color=airforceBlue] (%0.2f,%0.2f) node[%s] {\fontfamily{phv}\%s\textbf{%s}};""" %(x, y, p2, navnum_fs, n)
 
     return out
 
@@ -661,8 +661,8 @@ def addtext(starname, txt, c='black', p='right'):
     x_max = sharng / 10.0
     if not (x/sf > x_max - 1.0 and p.startswith('right') and len(name) >= 5) and not (x/sf < 1.2 and p.startswith('left')):
         p2 = "opacity=0.4," + p
-        out = r"""  \draw[color=%s] (%0.2f,%0.2f) node[%s,font=\%s] {%s};
-""" %(c, x, y, p2, star_fs, txt)
+        out = r"""
+  \draw[color=%s] (%0.2f,%0.2f) node[%s,font=\%s] {%s};""" %(c, x, y, p2, star_fs, txt)
 
     return out
 
@@ -739,8 +739,8 @@ def addMOON(newMoon, checkpos = False):
         # print the associated time of day
         x = (x_o + sha -0.4) * sf / 10.0
         y = (dec + 1.5) * sf / 10.0
-        out += r"""  \draw[color=%s] (%0.2f,%0.2f) node[font=\%s] {%s};
-""" %('black', x, y, star_fs, t[i])
+        out += r"""
+  \draw[color=%s] (%0.2f,%0.2f) node[font=\%s] {%s};""" %('black', x, y, star_fs, t[i])
 
     txt = "New Moon" if newMoon else "Moon"
     dx = s[0] - s[2]
@@ -751,8 +751,8 @@ def addMOON(newMoon, checkpos = False):
     txtsep = 4.5
     x = (x_o + s[1] - (txtsep*math.sin(ang))) * sf / 10.0
     y = (d[1] + (txtsep*math.cos(ang))) * sf / 10.0
-    out += r"""  \draw[color=%s] (%0.3f,%0.3f) node[opacity=0.6,rotate=%s] {\fontfamily{phv}\%s\textbf{%s}};
-""" %('amaranth', x, y, rot, navnum_fs, txt)
+    out += r"""
+  \draw[color=%s] (%0.3f,%0.3f) node[opacity=0.6,rotate=%s] {\fontfamily{phv}\%s\textbf{%s}};""" %('amaranth', x, y, rot, navnum_fs, txt)
 
     if checkpos: return x, y    # only return the coordinates of "Moon" text
     # also return the coordinates of the moon at 0h
@@ -876,14 +876,14 @@ def addPLANET(planet):
         x3 = x2
         y3 = y0 - arlng*math.sin(arang) * sf / 10.0
 
-    out += r"""  \draw[color=%s] (%0.3f,%0.3f) node[rotate=%s,font=\%s] {%s};
-""" %(c2, x, y, rot, navstar_fs, planet)
+    out += r"""
+  \draw[color=%s] (%0.3f,%0.3f) node[rotate=%s,font=\%s] {%s};""" %(c2, x, y, rot, navstar_fs, planet)
 
-    out += r"""  \begin{scope}
-    \draw [rotate around={%.1f:(%0.3f,%0.3f)},color=%s] (%0.3f,%0.3f) -- (%0.3f,%0.3f)
-    (%0.3f,%0.3f) -- (%0.3f,%0.3f) -- (%0.3f,%0.3f);
-  \end{scope}
-""" %(ang*todegrees, x0, y0, c2, x0, y0, x1, y1, x2, y2, x0, y0, x3, y3)
+    out += r"""
+\begin{scope}
+  \draw [rotate around={%.1f:(%0.3f,%0.3f)},color=%s] (%0.3f,%0.3f) -- (%0.3f,%0.3f)
+  (%0.3f,%0.3f) -- (%0.3f,%0.3f) -- (%0.3f,%0.3f);
+\end{scope}""" %(ang*todegrees, x0, y0, c2, x0, y0, x1, y1, x2, y2, x0, y0, x3, y3)
 
     return out
 
@@ -1100,35 +1100,9 @@ def LDstrategy(strat):
 
     return LDlist, H0list, SGNlist
 
-def beginPDF():
-
-    # A4     = 210mm x 297mm (8.27 x 11.69 in)
-    # Letter = 8.5 x 11 in   (216mm x 279mm)
-    if config.pgsz == "A4": # parameters for A4 Landscape
-        ori = "a4paper,landscape"
-        tm = "5mm"
-        bm = "5mm"
-        lm = "2mm"
-        rm = "2mm"
-        tm1 = "15mm"    # first page...
-        bm1 = "15mm"
-        lm1 = "10mm"
-        rm1 = "10mm"
-        parsep = "[12pt]"
-    else:                   # parameters for Letter Landscape
-        ori = "letterpaper,landscape"
-        tm = "5mm"
-        bm = "5mm"
-        lm = "2mm"
-        rm = "2mm"
-        tm1 = "13mm"    # first page...
-        bm1 = "13mm"
-        lm1 = "10mm"
-        rm1 = "10mm"
-        parsep = "[8pt]"
+def beginPDF(ori, tm, bm, lm, rm):
 
 # ---------- DOCUMENT INITIALIZATION ----------
-
     tex = r"""\pdfminorversion=4
 \documentclass[10pt, %s]{report}
 \usepackage[utf8]{inputenc}
@@ -1175,10 +1149,13 @@ def beginPDF():
   \thispagestyle{{empty}}         % no page number
   \newlength{{\myl}}              % for \tcolorbox
   %\renewcommand{{\sfdefault}}{{cmss}}
-  \newcommand*{{\gangnamstyle}}{{\sffamily\{}\color{{Teal}}}}
-'''.format(navstar_fs)
+  \newcommand*{{\gangnamstyle}}{{\sffamily\{}\color{{Teal}}}}'''.format(navstar_fs)
 
-    tex += r'''
+    return tex
+
+def Page1(tm1, bm1, lm1, rm1, parsep):
+
+    tex = r'''
   % for the first page only...
   \newgeometry{{nomarginpar, top={}, bottom={}, left={}, right={}}}'''.format(tm1,bm1,lm1,rm1)
 
@@ -1242,16 +1219,14 @@ def beginPDF():
   \noindent
   \textbf{Disclaimer:} These are computer generated tables - use them at your own risk. They replicate Lunar Distance algorithms with no guarantee of accuracy. They are intended to encourage people to use a sextant, be it as a hobby or as a backup when electronics fail.
 \newpage
-\restoregeometry    % so it does not affect the rest of the pages
-'''
+\restoregeometry    % so it does not affect the rest of the pages'''
 
 # ---------- END DOCUMENT INITIALIZATION ----------
     return tex
 
 def endPDF():
     tex = r"""
-\end{document}
-"""
+\end{document}"""
     return tex
 
 #===========================================================
@@ -1646,12 +1621,11 @@ def showLD(obj, xyMoon=[0.0, 0.0], c='red', hh=0, drawLD=False):
     y2 = decmax * sf / 10.0
 
     dp = "thick,"             # default is 'thin' 0.4pt
-    out = out + r"""
+    out += r"""
 \begin{{scope}}
   \clip ({:.3f},{:.3f}) rectangle ({:.3f},{:.3f});
   \draw[{}{}] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});
-\end{{scope}}
-""".format(x1, y1, x2, y2, dp, c, xObj, yObj, xyMoon[0], xyMoon[1])
+\end{{scope}}""".format(x1, y1, x2, y2, dp, c, xObj, yObj, xyMoon[0], xyMoon[1])
 
     offY = outofbounds_dec(dec)     # -1, 0 or +1
     if (not offX and offY == 0) or objname == "": return out
@@ -1713,8 +1687,8 @@ def showLD(obj, xyMoon=[0.0, 0.0], c='red', hh=0, drawLD=False):
         x = x3 + (txtsep*math.sin(ang))
         y = y3 - (txtsep*math.cos(ang))
 
-    out += r"""  \draw[color=%s,anchor=%s] (%0.3f,%0.3f) node[rotate=%s,font=\%s] {%s};
-""" %(c, anchor, x, y, rot, navstar_fs, objname)
+    out += r"""
+  \draw[color=%s,anchor=%s] (%0.3f,%0.3f) node[rotate=%s,font=\%s] {%s};""" %(c, anchor, x, y, rot, navstar_fs, objname)
 
     return out
 
@@ -1779,13 +1753,15 @@ def buildchart(LDlist, H0list, SGNlist, onlystars, quietmode, page1=False):
     tex = ""
 
     if not page1:
-        tex = tex + r"""  \newpage
-"""
+        tex += r"""
+\newpage"""
+
     # A4/Letter landscape (center vertically)
-    tex = tex + r"""  \hspace{0pt}
+    tex += r"""
+  \hspace{0pt}
   \vfill"""
     
-    tex = tex + r"""
+    tex += r"""
 \begin{center}                  % center picture horizontally
 \begin{tikzpicture}"""
 
@@ -1794,24 +1770,22 @@ def buildchart(LDlist, H0list, SGNlist, onlystars, quietmode, page1=False):
     mw, mw2, tX, tY = galactic_plane()
 
     if len(mw) > 0:
-        tex = tex + r"""
-  % plot galactic plane first element (so it's in the background)
+        tex += r"""
+% plot galactic plane first element (so it's in the background)
   \draw[dashed,very thick,color=Tan] plot[smooth,tension=0.5] coordinates{
 """
         for ndx in range(len(mw)):
-            tex = tex + r"""%s """ %mw[ndx]
-        tex = tex + r"""};
-"""
+            tex += r"""%s """ %mw[ndx]
+        tex += r"""};"""
 
     if len(mw2) > 0:
-        tex = tex + r"""
-  % plot galactic plane second element (so it's in the background)
+        tex += r"""
+% plot galactic plane second element (so it's in the background)
   \draw[dashed,very thick,color=Tan] plot[smooth,tension=0.5] coordinates{
 """
         for ndx in range(len(mw2)):
-            tex = tex + r"""%s """ %mw2[ndx]
-        tex = tex + r"""};
-"""
+            tex += r"""%s """ %mw2[ndx]
+        tex += r"""};"""
     if tY != 0:
         if tY > 0:
             tYg = (tY + 0.38)*sf
@@ -1820,18 +1794,16 @@ def buildchart(LDlist, H0list, SGNlist, onlystars, quietmode, page1=False):
             tYg = (tY - 0.17)*sf
             tYp = (tY - 0.39)*sf
         tX0 = tX*sf # + x_o*sf/10
-        tex = tex + r"""
+        tex += r"""
   \node[color=darkTan,font=\{}] at ({:.3f},{:.3f}) {{Galactic}};
-  \node[color=darkTan,font=\{}] at ({:.3f},{:.3f}) {{Plane}};
-""".format(
+  \node[color=darkTan,font=\{}] at ({:.3f},{:.3f}) {{Plane}};""".format(
 navstar_fs,tX0,tYg,
 navstar_fs,tX0,tYp)
 
 # --------------------------------------------------------------
 # draw plot inner vertical lines & horizontal borders with ticks
-    tex = tex + r"""
-  % draw plot inner vertical lines & horizontal borders with ticksmarks...
-"""
+    tex += r"""
+% draw plot inner vertical lines & horizontal borders with tickmarks..."""
     x = 0
     xmax = sharng / 10.0
     ymax = decmax / 10.0
@@ -1843,21 +1815,22 @@ navstar_fs,tX0,tYp)
         #print(x, o5, sha)
         if x == 0 or x == xmax or sha % 30 == 0:
             # draw a vertical line
-            tex = tex + r"""  \draw[ultra thin] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});
-""".format(x*sf,ymin*sf,x*sf,ymax*sf)
+            tex += r"""
+  \draw[ultra thin] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});""".format(
+x*sf,ymin*sf,x*sf,ymax*sf)
         if sha % 30 == 0:
             # upper & lower SHA axis value
-            tex = tex + r"""
+            tex += r"""
   \node[font=\{}] at ({:.3f},{:.3f}) {{\textbf {{{:d}°}}}};
-  \node[font=\{}] at ({:.3f},{:.3f}) {{\textbf {{{:d}°}}}};
-""".format(title_fs,x*sf,(ymax+0.28)*sf,sha,
+  \node[font=\{}] at ({:.3f},{:.3f}) {{\textbf {{{:d}°}}}};""".format(
+title_fs,x*sf,(ymax+0.28)*sf,sha,
            title_fs,x*sf,(ymin-0.28)*sf,sha)
         if not (sha % 30 == 0) and not (x == 0 or x == xmax):
             # draw tick marks on upper & lower plot borders
-            tex = tex + r"""
+            tex += r"""
   \draw[thick] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});
-  \draw[thick] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});
-""".format(x*sf,ymax*sf,x*sf,ymax*sf-sf/7,
+  \draw[thick] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});""".format(
+x*sf,ymax*sf,x*sf,ymax*sf-sf/7,
            x*sf,ymin*sf,x*sf,ymin*sf+sf/7)
         if o5 > 0:
             x += 0.5            # initial step 
@@ -1872,9 +1845,8 @@ navstar_fs,tX0,tYp)
 
 # -------------------------------------------------------------------
 # draw plot inner horizontal lines & vertical borders with tick marks
-    tex = tex + r"""
-  % draw plot inner horizontal lines & vertical borders with tickssmarks...
-"""
+    tex += r"""
+% draw plot inner horizontal lines & vertical borders with tickmarks..."""
     y = ymin
     dec = decmin
     o5 = dec % 10           # 0 or 5
@@ -1882,19 +1854,20 @@ navstar_fs,tX0,tYp)
         #print(y, o5, dec)
         if y == ymin or y == ymax or dec % 30 == 0:
             # draw a horizontal line
-            tex = tex + r"""  \draw[ultra thin] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});
-""".format(0,y*sf,xmax*sf,y*sf)
+            tex += r"""
+  \draw[ultra thin] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});""".format(
+0,y*sf,xmax*sf,y*sf)
         if dec % 10 == 0:
             # left DEC axis value
-            tex = tex + r"""
-  \node[font=\{}] at ({:.3f},{:.3f}) {{\scalebox{{.7}}[1.0]{{\textbf {{{}°}}}}}};
-""".format(title_fs,-sf/4.09,y*sf,abs(dec))
+            tex += r"""
+  \node[font=\{}] at ({:.3f},{:.3f}) {{\scalebox{{.7}}[1.0]{{\textbf {{{}°}}}}}};""".format(
+title_fs,-sf/4.09,y*sf,abs(dec))
         if not (dec % 30 == 0) and not (y == ymin or y == ymax):
             # draw tick marks on left & right plot borders
-            tex = tex + r"""
+            tex += r"""
   \draw[thick] (0.0,{:.3f}) -- ({:.3f},{:.3f});
-  \draw[thick] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});
-""".format(y*sf,sf/7,y*sf,
+  \draw[thick] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});""".format(
+y*sf,sf/7,y*sf,
 xmax*sf,y*sf,xmax*sf-sf/7,y*sf)
 
         if o5 > 0:
@@ -1912,8 +1885,8 @@ xmax*sf,y*sf,xmax*sf-sf/7,y*sf)
 # now plot the ecliptic from 0° to 180° over the plot area
 
     eps = 23.43927945   # eps = 23° 26' 21".406 for 2010.
-    tex = tex + r"""
-  % plot the ecliptic from 0° to 180°
+    tex += r"""
+% plot the ecliptic from 0° to 180°
 \begin{{scope}}
   \clip ({:.3f},{:.3f}) rectangle ({:.3f},{:.3f});
   \pgfsetlinewidth{{0.5pt}}
@@ -1926,8 +1899,8 @@ xmax*sf,y*sf,xmax*sf-sf/7,y*sf)
   \pgfsetlinewidth{{0.15mm}}
   \draw [decorate,decoration={{text along path,raise=0.45ex,text align={{left indent={:.3f}cm}},text={{|\gangnamstyle|ECLIPTIC}}}}] ({:.3f}cm,{:.3f}cm) sin ({:.3f}cm,{:.3f}cm);
   \pgfsetstrokecolor{{Black}}
-\end{{scope}}
-""".format(0,ymin*sf,xmax*sf,ymax*sf,
+\end{{scope}}""".format(
+0,ymin*sf,xmax*sf,ymax*sf,
 x_o/10*sf,
 9*sf,-eps*sf/10,
 9*sf,eps*sf/10,
@@ -1935,8 +1908,8 @@ ecliptic_indentA,x_o/10*sf,0.0,(x_o+90)/10*sf,-eps*sf/10)
 
 # now plot the ecliptic from 180° to 360° over the plot area
     xx_o = x_o + 180 if x_o <= 0 else x_o - 180
-    tex = tex + r"""
-  % plot the ecliptic from 180° to 360°
+    tex += r"""
+% plot the ecliptic from 180° to 360°
 \begin{{scope}}
   \clip ({:.3f},{:.3f}) rectangle ({:.3f},{:.3f});
   \pgfsetlinewidth{{0.5pt}}
@@ -1949,8 +1922,8 @@ ecliptic_indentA,x_o/10*sf,0.0,(x_o+90)/10*sf,-eps*sf/10)
   \pgfsetlinewidth{{0.15mm}}
   \draw [decorate,decoration={{text along path,raise={:.1f}ex,text align={{left indent={:.3f}cm}},text={{|\gangnamstyle|ECLIPTIC}}}}] ({:.3f}cm,{:.3f}cm) cos ({:.3f}cm,{:.3f}cm);
   \pgfsetstrokecolor{{Black}}
-\end{{scope}}
-""".format(0,ymin*sf,xmax*sf,ymax*sf,
+\end{{scope}}""".format(
+0,ymin*sf,xmax*sf,ymax*sf,
 xx_o/10*sf,
 9*sf,eps*sf/10,
 9*sf,-eps*sf/10,
@@ -1959,12 +1932,11 @@ ecliptic_raiseB,ecliptic_indentB,(xx_o+90)/10*sf,eps*sf/10,(xx_o+180)/10*sf,0.0)
 # ------------------- B O R D E R  lines --------------------
 
   # NOTE: adding -0.6pt is not necessary with "-- cycle" ...
-    tex = tex + r"""
-  % draw thick bounding box
+    tex += r"""
+% draw thick bounding box
 \begin{{scope}}[{}]
   \draw plot coordinates {{({:.3f},{:.3f}) ({:.3f},{:.3f}) ({:.3f},{:.3f}) ({:.3f},{:.3f})}} -- cycle;
-\end{{scope}}
-""".format(
+\end{{scope}}""".format(
 bb,-sf/1.8,ymin*sf-sf/1.8,
 -sf/1.8,ymax*sf+sf/1.8,
 xmax*sf+sf/2.2,ymax*sf+sf/1.8,
@@ -1972,14 +1944,14 @@ xmax*sf+sf/2.2,ymin*sf-sf/1.8)
 
 # ------------- Text outside B O R D E R  lines -------------
 
-    tex = tex + r"""
+    tex += r"""
+% text outside border lines
   \node[font=\{}] at ({:.3f},{:.3f}) {{SIDEREAL HOUR ANGLE}};
   \node[font=\{}, anchor=east] at ({:.3f},{:.3f}) {{\textcopyright\enspace 2022 Andrew Bauer}};
   \node[font=\{}] at ({:.3f},{:.3f}) {{\textbf{{LUNAR DISTANCE (SHA {}° to {}°)\quad{}}}}};
   \node[rotate=90,font=\{}] at ({:.3f},0.0) {{DECLINATION}};
   \node[rotate=90,font=\{}] at ({:.3f},{:.3f}) {{South}};
-  \node[rotate=90,font=\{}] at ({:.3f},{:.3f}) {{North}};
-""".format(
+  \node[rotate=90,font=\{}] at ({:.3f},{:.3f}) {{North}};""".format(
 title_fs,(xmax/2)*sf,(ymin-0.89)*sf,
 navstar_fs,(xmax)*sf,(ymin-0.89)*sf,
 title_fs,(xmax/2)*sf,(ymax+0.84)*sf,shamin,shamax,datestr,
@@ -1989,272 +1961,272 @@ ns_fs,-0.9*sf,2.67*sf)
 
 # -------------------- B O R D E R  end ---------------------
 
-    tex = tex + getc("Tucana")
+    tex += getc("Tucana")
 
-    tex = tex + getc("Pisces")
+    tex += getc("Pisces")
 
-    tex = tex + getc("Pegasus",['del','alf','bet','gam','eps'])
+    tex += getc("Pegasus",['del','alf','bet','gam','eps'])
 
-    tex = tex + addstar("Alpheratz",1,'blue','right,xshift=-0.3ex,yshift=-2.0ex','xshift=0.3ex')
-    tex = tex + addstar("Markab",57,'blue','right','yshift=-1.7ex')
-    tex = tex + addstar("Scheat",0,'black','right,xshift=0.0ex,yshift=-0.5ex')
-    tex = tex + addstar("Algenib",0,'black','right,xshift=0.0ex,yshift=-1.7ex')
-    tex = tex + addstar("Enif",54,'blue','above,yshift=0.4ex')
+    tex += addstar("Alpheratz",1,'blue','right,xshift=-0.3ex,yshift=-2.0ex','xshift=0.3ex')
+    tex += addstar("Markab",57,'blue','right','yshift=-1.7ex')
+    tex += addstar("Scheat",0,'black','right,xshift=0.0ex,yshift=-0.5ex')
+    tex += addstar("Algenib",0,'black','right,xshift=0.0ex,yshift=-1.7ex')
+    tex += addstar("Enif",54,'blue','above,yshift=0.4ex')
 
-    tex = tex + getc("Aquarius",['alf','bet'])
-    tex = tex + addstar("Sadalmelik",0,'black','right,xshift=-1.0ex,yshift=1.5ex')
-    tex = tex + addstar("Sadalsuud",0,'black','right,xshift=0.0ex,yshift=1.5ex')
+    tex += getc("Aquarius",['alf','bet'])
+    tex += addstar("Sadalmelik",0,'black','right,xshift=-1.0ex,yshift=1.5ex')
+    tex += addstar("Sadalsuud",0,'black','right,xshift=0.0ex,yshift=1.5ex')
 
-    tex = tex + getc("Grus",['alf'])
-    tex = tex + addstar("Al Na'ir",55,'blue','below,yshift=-0.4ex')
+    tex += getc("Grus",['alf'])
+    tex += addstar("Al Na'ir",55,'blue','below,yshift=-0.4ex')
 
-    tex = tex + getc("Piscis Austrinus",['alf'],'consGrey')
-    tex = tex + addstar("Fomalhaut",56,'blue','left,xshift=1.0ex,yshift=2.2ex','xshift=0.8ex,yshift=-0.6ex')
+    tex += getc("Piscis Austrinus",['alf'],'consGrey')
+    tex += addstar("Fomalhaut",56,'blue','left,xshift=1.0ex,yshift=2.2ex','xshift=0.8ex,yshift=-0.6ex')
 
-    tex = tex + getc("Lacerta")
+    tex += getc("Lacerta")
 
-    tex = tex + getc("Cepheus",['alf'])
-    tex = tex + addstar("Alderamin",0,'black','below,xshift=0.5ex,yshift=0.3ex')
+    tex += getc("Cepheus",['alf'])
+    tex += addstar("Alderamin",0,'black','below,xshift=0.5ex,yshift=0.3ex')
 
-    tex = tex + getc("Indus")
+    tex += getc("Indus")
 
-    tex = tex + getc("Capricornus",['del'])
-    tex = tex + addstar("Deneb Algedi",0,'black','left')
+    tex += getc("Capricornus",['del'])
+    tex += addstar("Deneb Algedi",0,'black','left')
 
-    tex = tex + getc("Delphinus")
+    tex += getc("Delphinus")
 
-    tex = tex + getc("Cygnus",['alf','gam','bet'])
-    tex = tex + addstar("Deneb",53,'blue','right,xshift=0.6ex,yshift=-0.4ex','xshift=2.4ex,yshift=2.3ex')
-    tex = tex + addstar("Sadr",0,'black','right,yshift=1.0ex')
-    tex = tex + addstar("Albireo",0,'black','left')
+    tex += getc("Cygnus",['alf','gam','bet'])
+    tex += addstar("Deneb",53,'blue','right,xshift=0.6ex,yshift=-0.4ex','xshift=2.4ex,yshift=2.3ex')
+    tex += addstar("Sadr",0,'black','right,yshift=1.0ex')
+    tex += addstar("Albireo",0,'black','left')
 
-    tex = tex + getc("Sagitta")
+    tex += getc("Sagitta")
 
-    tex = tex + getc("Aquila",['alf','bet','gam'])
-    tex = tex + addstar("Altair",51,'blue','above,xshift=-3.2ex,yshift=0.1ex','xshift=1.2ex,yshift=-0.4ex')
-    tex = tex + addstar("Alshain",0,'black','left,xshift=0.0ex,yshift=-0.1ex')
-    tex = tex + addstar("Tarazed",0,'black','right,xshift=0.0ex,yshift=1.0ex')
+    tex += getc("Aquila",['alf','bet','gam'])
+    tex += addstar("Altair",51,'blue','above,xshift=-3.2ex,yshift=0.1ex','xshift=1.2ex,yshift=-0.4ex')
+    tex += addstar("Alshain",0,'black','left,xshift=0.0ex,yshift=-0.1ex')
+    tex += addstar("Tarazed",0,'black','right,xshift=0.0ex,yshift=1.0ex')
 
-    tex = tex + getc("Microscopium")
+    tex += getc("Microscopium")
 
-    tex = tex + getc("Octans")
+    tex += getc("Octans")
 
-    tex = tex + getc("Pavo",['alf'])
-    tex = tex + addstar("Peacock",52,'blue','right,xshift=0.2ex,yshift=0.0ex','xshift=-0.2ex,yshift=1.0ex')
+    tex += getc("Pavo",['alf'])
+    tex += addstar("Peacock",52,'blue','right,xshift=0.2ex,yshift=0.0ex','xshift=-0.2ex,yshift=1.0ex')
 
-    tex = tex + getc("Lyra",['alf'])
-    tex = tex + addstar("Vega",49,'blue','right,xshift=0.3ex,yshift=0.0ex','xshift=2.8ex,yshift=-2.5ex')
+    tex += getc("Lyra",['alf'])
+    tex += addstar("Vega",49,'blue','right,xshift=0.3ex,yshift=0.0ex','xshift=2.8ex,yshift=-2.5ex')
 
-    tex = tex + getc("Sagittarius",['eps','sig'])
-    tex = tex + addstar("Nunki",50,'blue','left,xshift=0.0ex,yshift=1.6ex')
-    tex = tex + addstar("Kaus Aust.",48,'blue','left,xshift=-4.0ex,yshift=-1.6ex','xshift=-5.0ex')
+    tex += getc("Sagittarius",['eps','sig'])
+    tex += addstar("Nunki",50,'blue','left,xshift=0.0ex,yshift=1.6ex')
+    tex += addstar("Kaus Aust.",48,'blue','left,xshift=-4.0ex,yshift=-1.6ex','xshift=-5.0ex')
 
-    tex = tex + getc("Serpens_Cauda",[],'PastelOrange')
+    tex += getc("Serpens_Cauda",[],'PastelOrange')
 
-    tex = tex + getc("Hercules",['alf'])
-    tex = tex + addstar("Rasalgethi",0,'black','right,xshift=0.0ex,yshift=1.1ex')
+    tex += getc("Hercules",['alf'])
+    tex += addstar("Rasalgethi",0,'black','right,xshift=0.0ex,yshift=1.1ex')
 
-    tex = tex + getc("Ophiuchus",['alf','bet','eta'])
-    tex = tex + addstar("Rasalhague",46,'blue','above,xshift=-2.5ex,yshift=0.2ex','xshift=1.5ex')
-    tex = tex + addstar("Cebalrai",0,'black','right,xshift=0.0ex,yshift=1.0ex')
-    tex = tex + addstar("Sabik",44,'blue','right,xshift=0.2ex,yshift=0.0ex')
+    tex += getc("Ophiuchus",['alf','bet','eta'])
+    tex += addstar("Rasalhague",46,'blue','above,xshift=-2.5ex,yshift=0.2ex','xshift=1.5ex')
+    tex += addstar("Cebalrai",0,'black','right,xshift=0.0ex,yshift=1.0ex')
+    tex += addstar("Sabik",44,'blue','right,xshift=0.2ex,yshift=0.0ex')
 
-    tex = tex + getc("Ara")
+    tex += getc("Ara")
 
-    tex = tex + getc("Scorpius",['alf','lam'],'consGrey')
-    tex = tex + addstar("Antares",42,'blue','right,xshift=0.2ex,yshift=-1.1ex','yshift=1.6ex')
-    tex = tex + addstar("Shaula",45,'blue','left,xshift=0.6ex,yshift=1.8ex','xshift=-2.5ex,yshift=-2.9ex')
-    tex = tex + adddot("HIP78727")
+    tex += getc("Scorpius",['alf','lam'],'consGrey')
+    tex += addstar("Antares",42,'blue','right,xshift=0.2ex,yshift=-1.1ex','yshift=1.6ex')
+    tex += addstar("Shaula",45,'blue','left,xshift=0.6ex,yshift=1.8ex','xshift=-2.5ex,yshift=-2.9ex')
+    tex += adddot("HIP78727")
 
-    tex = tex + getc("Draco",['gam','eta'])
-    tex = tex + addstar("Eltanin",47,'blue','left,xshift=-0.1ex,yshift=0.2ex','xshift=-0.8ex,yshift=-1.6ex')
-    tex = tex + addstar("Athebyne",0,'black','left')
-    tex = tex + getc("Draco2",['the'])
+    tex += getc("Draco",['gam','eta'])
+    tex += addstar("Eltanin",47,'blue','left,xshift=-0.1ex,yshift=0.2ex','xshift=-0.8ex,yshift=-1.6ex')
+    tex += addstar("Athebyne",0,'black','left')
+    tex += getc("Draco2",['the'])
 
-    tex = tex + getc("Tri. Aust.",['alf'])
-    tex = tex + addstar("Atria",43,'blue','right,xshift=-0.3ex,yshift=-1.0ex')
+    tex += getc("Tri. Aust.",['alf'])
+    tex += addstar("Atria",43,'blue','right,xshift=-0.3ex,yshift=-1.0ex')
 
-    tex = tex + getc("Serpens_Caput",['alf'],'PastelOrange')
-    tex = tex + addstar("Unukalhai")
+    tex += getc("Serpens_Caput",['alf'],'PastelOrange')
+    tex += addstar("Unukalhai")
 
-    tex = tex + getc("Cor. Bor.",['alf'])
-    tex = tex + addstar("Alphecca",41,'blue','right,xshift=-0.2ex,yshift=-1.3ex','xshift=0.0ex,yshift=1.6ex')
+    tex += getc("Cor. Bor.",['alf'])
+    tex += addstar("Alphecca",41,'blue','right,xshift=-0.2ex,yshift=-1.3ex','xshift=0.0ex,yshift=1.6ex')
 
-    tex = tex + getc("Libra",['alf'])
-    tex = tex + addstar("Zuben'ubi",39,'blue','right,xshift=0.2ex,yshift=-0.8ex','xshift=5.0ex,yshift=-3.5ex')
+    tex += getc("Libra",['alf'])
+    tex += addstar("Zuben'ubi",39,'blue','right,xshift=0.2ex,yshift=-0.8ex','xshift=5.0ex,yshift=-3.5ex')
 
-    tex = tex + getc("Apus")
+    tex += getc("Apus")
 
-    tex = tex + getc("Lupus")
+    tex += getc("Lupus")
 
-    tex = tex + getc("Centaurus",['alf','bet','the'])
-    tex = tex + addstar("Hadar",35,'blue','right,xshift=0.4ex')
-    tex = tex + addstar("Menkent",36,'blue','right,xshift=0.3ex,yshift=0.0ex','yshift=0.7ex')
-    tex = tex + addstar("Rigil Kent.",38,'blue','below,yshift=-0.4ex')
+    tex += getc("Centaurus",['alf','bet','the'])
+    tex += addstar("Hadar",35,'blue','right,xshift=0.4ex')
+    tex += addstar("Menkent",36,'blue','right,xshift=0.3ex,yshift=0.0ex','yshift=0.7ex')
+    tex += addstar("Rigil Kent.",38,'blue','below,yshift=-0.4ex')
 
-    tex = tex + getc("Ursa_Minor",['alf','bet'])
-    tex = tex + addstar("Kochab",40,'blue','right,xshift=0.0ex,yshift=-1.4ex')
-    tex = tex + addstar("Polaris",0,'black','right,xshift=0.2ex,yshift=0.5ex')
+    tex += getc("Ursa_Minor",['alf','bet'])
+    tex += addstar("Kochab",40,'blue','right,xshift=0.0ex,yshift=-1.4ex')
+    tex += addstar("Polaris",0,'black','right,xshift=0.2ex,yshift=0.5ex')
 
-    tex = tex + getc("Boötes",['alf','eps'])
-    tex = tex + addstar("Arcturus",37,'blue','right,xshift=0.3ex,yshift=1ex','yshift=0ex')
-    tex = tex + addstar("Izar")
+    tex += getc("Boötes",['alf','eps'])
+    tex += addstar("Arcturus",37,'blue','right,xshift=0.3ex,yshift=1ex','yshift=0ex')
+    tex += addstar("Izar")
 
-    tex = tex + getc("Canes Venatici")
+    tex += getc("Canes Venatici")
 
-    tex = tex + getc("Virgo",['alf','eps'])
-    tex = tex + addstar("Spica",33,'blue','right,xshift=0.2ex,yshift=0.0ex','xshift=2.2ex,yshift=-2.2ex')
-    tex = tex + addstar("Vindemiatrix",0,'black','left,xshift=0.0ex,yshift=0.0ex')
+    tex += getc("Virgo",['alf','eps'])
+    tex += addstar("Spica",33,'blue','right,xshift=0.2ex,yshift=0.0ex','xshift=2.2ex,yshift=-2.2ex')
+    tex += addstar("Vindemiatrix",0,'black','left,xshift=0.0ex,yshift=0.0ex')
 
-    tex = tex + getc("Hydra2",[],'ColumbiaBlue')
+    tex += getc("Hydra2",[],'ColumbiaBlue')
 
-    tex = tex + getc("Coma_Berenices")
+    tex += getc("Coma_Berenices")
 
-    tex = tex + getc("Corvus",['gam'])
-    tex = tex + addstar("Gienah",29,'blue','above,xshift=1.4ex,yshift=0.2ex')
+    tex += getc("Corvus",['gam'])
+    tex += addstar("Gienah",29,'blue','above,xshift=1.4ex,yshift=0.2ex')
 
-    tex = tex + getc("Musca")
+    tex += getc("Musca")
 
-    tex = tex + getc("Crux",['alf','gam'])
-    tex = tex + addstar("Acrux",30,'blue','above,xshift=0.4ex,yshift=0.2ex')
-    tex = tex + addstar("Gacrux",31,'blue','left,xshift=-0.3ex,yshift=0.6ex')
+    tex += getc("Crux",['alf','gam'])
+    tex += addstar("Acrux",30,'blue','above,xshift=0.4ex,yshift=0.2ex')
+    tex += addstar("Gacrux",31,'blue','left,xshift=-0.3ex,yshift=0.6ex')
 
-    tex = tex + getc("Crater")
+    tex += getc("Crater")
 
-    tex = tex + getc("Ursa Major",['eps','alf','eta','zet','bet','gam','del','ggg'])
-    tex = tex + addstar("Alioth",32,'blue','left,xshift=0.0ex,yshift=1.0ex','yshift=-1.7ex')
-    tex = tex + addstar("Dubhe",27,'blue','left,yshift=1.0ex')
-    tex = tex + addstar("Alkaid",34,'blue')
-    tex = tex + addstar("Mizar",0,'black','right,yshift=-0.8ex')  # partially overlaid by Alcor
-    tex = tex + addstar("Alcor",0,'black','left')
-    tex = tex + addstar("Megrez",0,'black','left,yshift=1.0ex')
-    tex = tex + addstar("Phecda",0,'black','left,yshift=-0.2ex')
-    tex = tex + addstar("Merak",0,'black','left,yshift=0.8ex')
-    #tex = tex + addstar("Muscida",0,'black')
-    #tex = tex + addstar("Talitha",0,'black','left')
+    tex += getc("Ursa Major",['eps','alf','eta','zet','bet','gam','del','ggg'])
+    tex += addstar("Alioth",32,'blue','left,xshift=0.0ex,yshift=1.0ex','yshift=-1.7ex')
+    tex += addstar("Dubhe",27,'blue','left,yshift=1.0ex')
+    tex += addstar("Alkaid",34,'blue')
+    tex += addstar("Mizar",0,'black','right,yshift=-0.8ex')  # partially overlaid by Alcor
+    tex += addstar("Alcor",0,'black','left')
+    tex += addstar("Megrez",0,'black','left,yshift=1.0ex')
+    tex += addstar("Phecda",0,'black','left,yshift=-0.2ex')
+    tex += addstar("Merak",0,'black','left,yshift=0.8ex')
+    #tex += addstar("Muscida",0,'black')
+    #tex += addstar("Talitha",0,'black','left')
 
-    tex = tex + adddot("HIP55203")
+    tex += adddot("HIP55203")
 
-    tex = tex + getc("Leo",['bet','alf','gam'])
-    tex = tex + addstar("Denebola",28,'blue','right,xshift=0.0ex,yshift=-1.3ex','xshift=1.4ex,yshift=1.9ex')
-    tex = tex + addstar("Regulus",26,'blue','left,xshift=-0.2ex,yshift=0.0ex','xshift=-1.7ex,yshift=-2.0ex')
-    tex = tex + addstar("Algieba",0,'black','right,xshift=0.0ex,yshift=-0.2ex')
+    tex += getc("Leo",['bet','alf','gam'])
+    tex += addstar("Denebola",28,'blue','right,xshift=0.0ex,yshift=-1.3ex','xshift=1.4ex,yshift=1.9ex')
+    tex += addstar("Regulus",26,'blue','left,xshift=-0.2ex,yshift=0.0ex','xshift=-1.7ex,yshift=-2.0ex')
+    tex += addstar("Algieba",0,'black','right,xshift=0.0ex,yshift=-0.2ex')
 
-    tex = tex + getc("Sextans")
+    tex += getc("Sextans")
 
-    tex = tex + getc("Hydra",['alf'],'ColumbiaBlue')
-    tex = tex + addstar("Alphard",25,'blue')
+    tex += getc("Hydra",['alf'],'ColumbiaBlue')
+    tex += addstar("Alphard",25,'blue')
 
-    tex = tex + getc("Cancer")
+    tex += getc("Cancer")
 
-    tex = tex + getc("Chamaeleon")
+    tex += getc("Chamaeleon")
 
     # place before 'Puppis' (it connects to 'Puppis zet')
-    tex = tex + getc("Pyxis",['Pze'])
+    tex += getc("Pyxis",['Pze'])
 
-    tex = tex + getc("Lynx")
+    tex += getc("Lynx")
 
-    tex = tex + getc("Volans")
+    tex += getc("Volans")
 
     # place before 'Vela' (it connects to 'Vela gam' & 'Vela del')
     # place before 'Puppis' (it connects to 'Puppis nu.')
-    tex = tex + getc("Carina",['alf','bet','eps','VEg','VEd','Pnu'])
-    tex = tex + addstar("Canopus",17,'blue','right,xshift=0.4ex,yshift=-0.6ex','yshift=0.6ex')
-    tex = tex + addstar("Avior",22,'blue','below,xshift=0.0ex,yshift=-0.3ex')
-    tex = tex + addstar("Miaplacidus",24,'blue','right,xshift=0.1ex,yshift=-0.4ex')
+    tex += getc("Carina",['alf','bet','eps','VEg','VEd','Pnu'])
+    tex += addstar("Canopus",17,'blue','right,xshift=0.4ex,yshift=-0.6ex','yshift=0.6ex')
+    tex += addstar("Avior",22,'blue','below,xshift=0.0ex,yshift=-0.3ex')
+    tex += addstar("Miaplacidus",24,'blue','right,xshift=0.1ex,yshift=-0.4ex')
 
     # place before 'Vela' (it connects to 'Vela gam')
-    tex = tex + getc("Puppis",[],'consGrey')
+    tex += getc("Puppis",[],'consGrey')
 
-    tex = tex + getc("Vela",['lam'],'OliveDrab')
-    tex = tex + addstar("Suhail",23,'blue','above,xshift=1.6ex,yshift=0.2ex')
+    tex += getc("Vela",['lam'],'OliveDrab')
+    tex += addstar("Suhail",23,'blue','above,xshift=1.6ex,yshift=0.2ex')
 
-    tex = tex + getc("Monoceros")
+    tex += getc("Monoceros")
 
-    tex = tex + getc("Canis Minor",['alf'])
-    tex = tex + addstar("Procyon",20,'blue','right,xshift=0.2ex,yshift=-0.3ex')
+    tex += getc("Canis Minor",['alf'])
+    tex += addstar("Procyon",20,'blue','right,xshift=0.2ex,yshift=-0.3ex')
     
-    tex = tex + getc("Gemini",['bet','gam'])
-    tex = tex + addstar("Pollux",21,'blue','left,xshift=-0.2ex,yshift=1.3ex')
-    tex = tex + addstar("Alhena",0,'black','xshift=3.8ex,yshift=0.0ex')
-    tex = tex + addstar("Castor",0,'black','above')
+    tex += getc("Gemini",['bet','gam'])
+    tex += addstar("Pollux",21,'blue','left,xshift=-0.2ex,yshift=1.3ex')
+    tex += addstar("Alhena",0,'black','xshift=3.8ex,yshift=0.0ex')
+    tex += addstar("Castor",0,'black','above')
 
-    tex = tex + getc("Canis_Major",['alf','eps'])
-    tex = tex + addstar("Sirius",18,'blue','right,xshift=0.3ex,yshift=1.6ex','xshift=6.1ex,yshift=4.0ex')
-    tex = tex + addstar("Adhara",19,'blue','right,xshift=0.4ex,yshift=0.8ex','xshift=1.9ex,yshift=-2.4ex')
+    tex += getc("Canis_Major",['alf','eps'])
+    tex += addstar("Sirius",18,'blue','right,xshift=0.3ex,yshift=1.6ex','xshift=6.1ex,yshift=4.0ex')
+    tex += addstar("Adhara",19,'blue','right,xshift=0.4ex,yshift=0.8ex','xshift=1.9ex,yshift=-2.4ex')
 
-    tex = tex + getc("Orion",['bet','gam','eps','alf','kap'])
-    tex = tex + addstar("Rigel",11,'blue','right,xshift=0.8ex,yshift=-0.8ex','xshift=6.6ex,yshift=-3.2ex')
-    tex = tex + addstar("Bellatrix",13,'blue','right,xshift=-0.5ex,yshift=1.7ex','xshift=5.5ex,yshift=-1.3ex')
-    tex = tex + addstar("Alnilam",15,'blue','left,xshift=-1.2ex,yshift=-0.5ex','xshift=-6.4ex,yshift=-2.9ex')
-    tex = tex + addstar("Betelgeuse",16,'blue','left,xshift=-0.4ex,yshift=0.5ex','xshift=-5.9ex,yshift=-1.5ex')
-    tex = tex + addstar("Saiph",0,'black','xshift=3.6ex,yshift=-0.2ex')
+    tex += getc("Orion",['bet','gam','eps','alf','kap'])
+    tex += addstar("Rigel",11,'blue','right,xshift=0.8ex,yshift=-0.8ex','xshift=6.6ex,yshift=-3.2ex')
+    tex += addstar("Bellatrix",13,'blue','right,xshift=-0.5ex,yshift=1.7ex','xshift=5.5ex,yshift=-1.3ex')
+    tex += addstar("Alnilam",15,'blue','left,xshift=-1.2ex,yshift=-0.5ex','xshift=-6.4ex,yshift=-2.9ex')
+    tex += addstar("Betelgeuse",16,'blue','left,xshift=-0.4ex,yshift=0.5ex','xshift=-5.9ex,yshift=-1.5ex')
+    tex += addstar("Saiph",0,'black','xshift=3.6ex,yshift=-0.2ex')
 
-    tex = tex + getc("Columba")
+    tex += getc("Columba")
     
-    tex = tex + getc("Dorado")
+    tex += getc("Dorado")
 
-    tex = tex + getc("Lepus")
+    tex += getc("Lepus")
 
     # place before 'Taurus' (they both share 'Elnath')
-    tex = tex + getc("Auriga",['alf','gam','bet'])
-    tex = tex + addstar("Capella",12,'blue','left,xshift=-0.3ex,yshift=0.3ex')
-    tex = tex + addstar("Menkalinan",0,'black','left,yshift=-0.3ex')
+    tex += getc("Auriga",['alf','gam','bet'])
+    tex += addstar("Capella",12,'blue','left,xshift=-0.3ex,yshift=0.3ex')
+    tex += addstar("Menkalinan",0,'black','left,yshift=-0.3ex')
 
-    tex = tex + getc("Camelopardalis")
+    tex += getc("Camelopardalis")
 
-    tex = tex + getc("Taurus",['alf','bet','eta'])
-    tex = tex + addstar("Aldebaran",10,'blue','left,xshift=-0.4ex','xshift=-3.4ex,yshift=2.1ex')
-    tex = tex + addstar("Elnath",14,'blue','right,xshift=2.0ex,yshift=-0.2ex','xshift=-0.1ex,yshift=-0.3ex')
-    tex = tex + addstar("Alcyone",0,'black','right,yshift=1.0ex')
-    tex = tex + addtext("Alcyone","(Pleiades)",'black','right,yshift=-1.0ex')
+    tex += getc("Taurus",['alf','bet','eta'])
+    tex += addstar("Aldebaran",10,'blue','left,xshift=-0.4ex','xshift=-3.4ex,yshift=2.1ex')
+    tex += addstar("Elnath",14,'blue','right,xshift=2.0ex,yshift=-0.2ex','xshift=-0.1ex,yshift=-0.3ex')
+    tex += addstar("Alcyone",0,'black','right,yshift=1.0ex')
+    tex += addtext("Alcyone","(Pleiades)",'black','right,yshift=-1.0ex')
 
-    tex = tex + getc("Reticulum")
+    tex += getc("Reticulum")
 
-    tex = tex + getc("Eridanus",['alf','the'])
-    tex = tex + addstar("Achernar",5,'blue','right,xshift=0.3ex')
-    tex = tex + addstar("Acamar",7,'blue','above,yshift=0.4ex')
+    tex += getc("Eridanus",['alf','the'])
+    tex += addstar("Achernar",5,'blue','right,xshift=0.3ex')
+    tex += addstar("Acamar",7,'blue','above,yshift=0.4ex')
 
-    tex = tex + getc("Hydrus")
+    tex += getc("Hydrus")
 
-    tex = tex + getc("Cetus",['bet','alf'])
-    tex = tex + addstar("Diphda",4,'blue','right,xshift=0.0ex,yshift=-0.2ex','yshift=-1.2ex')
-    tex = tex + addstar("Menkar",8,'blue','below,xshift=0.0ex,yshift=-0.2ex','xshift=-1.2ex')
+    tex += getc("Cetus",['bet','alf'])
+    tex += addstar("Diphda",4,'blue','right,xshift=0.0ex,yshift=-0.2ex','yshift=-1.2ex')
+    tex += addstar("Menkar",8,'blue','below,xshift=0.0ex,yshift=-0.2ex','xshift=-1.2ex')
 
-    tex = tex + getc("Perseus",['alf','bet'])
-    tex = tex + addstar("Mirfak",9,'blue','right,xshift=-0.1ex,yshift=-1.4ex','yshift=0.8ex')
-    tex = tex + addstar("Algol",0,'black')
+    tex += getc("Perseus",['alf','bet'])
+    tex += addstar("Mirfak",9,'blue','right,xshift=-0.1ex,yshift=-1.4ex','yshift=0.8ex')
+    tex += addstar("Algol",0,'black')
 
-    tex = tex + getc("Aries",['alf','bet'])
-    tex = tex + addstar("Hamal",6,'blue','right,xshift=-0.5ex,yshift=2.2ex')
-    tex = tex + addstar("Sheratan",0,'black','left,xshift=-0.4ex')
+    tex += getc("Aries",['alf','bet'])
+    tex += addstar("Hamal",6,'blue','right,xshift=-0.5ex,yshift=2.2ex')
+    tex += addstar("Sheratan",0,'black','left,xshift=-0.4ex')
 
-    tex = tex + getc("Phoenix",['alf'])
-    tex = tex + addstar("Ankaa",2,'blue','right,xshift=0.2ex,yshift=0.0ex','yshift=0.8ex')
+    tex += getc("Phoenix",['alf'])
+    tex += addstar("Ankaa",2,'blue','right,xshift=0.2ex,yshift=0.0ex','yshift=0.8ex')
 
-    tex = tex + getc("Sculptor")
+    tex += getc("Sculptor")
 
-    tex = tex + getc("Triangulum")
+    tex += getc("Triangulum")
 
-    tex = tex + getc("Cassiopeia",['alf','bet'])
-    tex = tex + addstar("Schedar",3,'blue','left,xshift=0.0ex,yshift=-0.3ex','xshift=0.4ex')
-    tex = tex + addstar("Caph",0,'black','above')
+    tex += getc("Cassiopeia",['alf','bet'])
+    tex += addstar("Schedar",3,'blue','left,xshift=0.0ex,yshift=-0.3ex','xshift=0.4ex')
+    tex += addstar("Caph",0,'black','above')
 
-    tex = tex + getc("Andromeda",['alf','bet','gam'])
-    tex = tex + addstar("Mirach",0,'black','left')
-    tex = tex + addstar("Almach",0,'black','left')
+    tex += getc("Andromeda",['alf','bet','gam'])
+    tex += addstar("Mirach",0,'black','left')
+    tex += addstar("Almach",0,'black','left')
 
     if not onlystars:
         # our solar system (closest objects last)
-        tex = tex + addSUN()
-        tex = tex + addPLANET("Venus")
-        tex = tex + addPLANET("Mars")
-        tex = tex + addPLANET("Jupiter")
-        tex = tex + addPLANET("Saturn")
+        tex += addSUN()
+        tex += addPLANET("Venus")
+        tex += addPLANET("Mars")
+        tex += addPLANET("Jupiter")
+        tex += addPLANET("Saturn")
 
         newMoon = True if len(LDlist) == 0 else False
         texMoon, xyMoon00, xyMoon24 = addMOON(newMoon)
-        tex = tex + texMoon
+        tex += texMoon
     else: texMoon = ""
 
     #   colours for the 8 max. Lunar Distance Moon-to-object connecting lines
@@ -2292,9 +2264,9 @@ ns_fs,-0.9*sf,2.67*sf)
             # Moon coordinates (at 00h or 24h)
             xyMoon = xyMoon24 if take24 else xyMoon00
             hh = 4 if take24 else 0    # 4 = 24h; 0 = 00h for Sun and planets
-            tex = tex + showLD(LDobj, xyMoon, LDcolour[ObjCol], hh, True)
+            tex += showLD(LDobj, xyMoon, LDcolour[ObjCol], hh, True)
             if SGNlist[i] == u"\u00B1":     # plus-minus symbol
-                tex = tex + showLD(LDobj, xyMoon24, LDcolour[ObjCol], 2, True)
+                tex += showLD(LDobj, xyMoon24, LDcolour[ObjCol], 2, True)
             i += 1
 
         PREVobjColour = ColourObj                   # save colour assignments for the next page
@@ -2313,29 +2285,27 @@ ns_fs,-0.9*sf,2.67*sf)
         if n > 3: break
         if item[2]:         # if used as a LD object (connected to the Moon)
             n += 1
-            txt = txt + r"""\fontfamily{phv}\%s\color{airforceBlue}\textbf{%s}\fontfamily{cmr}\color{black}\%s = {%s}\quad""" %(navnum_fs,item[1],navstar_fs,item[0])
+            txt += r"""\fontfamily{phv}\%s\color{airforceBlue}\textbf{%s}\fontfamily{cmr}\color{black}\%s = {%s}\quad""" %(navnum_fs,item[1],navstar_fs,item[0])
 
     for item in stars_LD:
         if n > 3: break
         if not item[2]:     # if not used as a LD object (connected to the Moon)
             n += 1
-            txt = txt + r"""\fontfamily{phv}\%s\color{airforceBlue}\textbf{%s}\fontfamily{cmr}\color{black}\%s = {%s}\quad""" %(navnum_fs,item[1],navstar_fs,item[0])
+            txt += r"""\fontfamily{phv}\%s\color{airforceBlue}\textbf{%s}\fontfamily{cmr}\color{black}\%s = {%s}\quad""" %(navnum_fs,item[1],navstar_fs,item[0])
 
     if txt != "":
-        tex = tex + r"""
-  \node[anchor=west] at (%0.3f,%0.3f) {%s};
-""" %(-sf/1.8,(ymin-0.89)*sf,txt)
+        tex += r"""
+  \node[anchor=west] at (%0.3f,%0.3f) {%s};""" %(-sf/1.8,(ymin-0.89)*sf,txt)
+# -------------- terminate TikZ picture --------------
 
-    tex = tex + r"""
+    tex += r"""
 \end{tikzpicture}
-\end{center}
-"""
+\end{center}"""
 
     # A4/Letter landscape (center vertically)
-    tex = tex + r"""
+    tex += r"""
   \vfill
-  \hspace{0pt}
-"""
+  \hspace{0pt}"""
     return tex
 
 #--------------------------
@@ -2356,8 +2326,38 @@ def makeLDcharts(first_day, strat, daystoprocess, outfile, ts, onlystars, quietm
     d00 = first_day
 ##    print("first_day = {}; type = {}".format(first_day,type(first_day)))
 ##    print("d00 = {}; type = {}".format(d00,type(d00)))
-    outfile.write(beginPDF())
-    firstpage = True
+
+    # A4     = 210mm x 297mm (8.27 x 11.69 in)
+    # Letter = 8.5 x 11 in   (216mm x 279mm)
+    if config.pgsz == "A4": # parameters for A4 Landscape
+        ori = "a4paper,landscape"
+        tm = "5mm"
+        bm = "5mm"
+        lm = "2mm"
+        rm = "2mm"
+        tm1 = "15mm"    # first page...
+        bm1 = "15mm"
+        lm1 = "10mm"
+        rm1 = "10mm"
+        parsep = "[12pt]"
+    else:                   # parameters for Letter Landscape
+        ori = "letterpaper,landscape"
+        tm = "5mm"
+        bm = "5mm"
+        lm = "2mm"
+        rm = "2mm"
+        tm1 = "13mm"    # first page...
+        bm1 = "13mm"
+        lm1 = "10mm"
+        rm1 = "10mm"
+        parsep = "[8pt]"
+
+    outfile.write(beginPDF(ori,tm,bm,lm,rm))
+    firstpage = False
+
+    if not config.DPonly:
+        outfile.write(Page1(tm1,bm1,lm1,rm1,parsep))
+        firstpage = True
 
     # determine most suitable LD target objects
     while daystoprocess > 0:

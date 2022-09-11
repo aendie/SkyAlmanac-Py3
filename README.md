@@ -179,6 +179,7 @@ Previously execution could hang when aborting a multiprocessing task (in nautica
 * The LaTeX *fancyhdr* package is employed when MiKTeX (or a TeX Live version >= 2020) is detected.
 * Better support for Letter-sized pages.
 * Skyalmanac no longer requires the Ephem astronomical library.
+* Hipparcos data (*hip_main.dat*) and one ephemeris (*de421.bsp*) are included in the PyPI package.
 * Command line options:
     * -v   ... 'verbose': to send pdfTeX output to the terminal
 	* -q   ... quiet mode for LD charts
