@@ -1107,7 +1107,7 @@ def beginPDF(ori, tm, bm, lm, rm):
 \documentclass[10pt, %s]{report}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
-\usepackage[T1]{fontenc}
+\usepackage{fontenc}    %% tikz fonts are clearer than with \usepackage[T1]{fontenc}
 \usepackage{url}""" %(ori)
 
     if config.pgsz == "Letter":
