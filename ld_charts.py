@@ -1824,14 +1824,14 @@ x*sf,ymin*sf,x*sf,ymax*sf)
   \node[font=\{}] at ({:.3f},{:.3f}) {{\textbf {{{:d}°}}}};
   \node[font=\{}] at ({:.3f},{:.3f}) {{\textbf {{{:d}°}}}};""".format(
 title_fs,x*sf,(ymax+0.28)*sf,sha,
-           title_fs,x*sf,(ymin-0.28)*sf,sha)
+title_fs,x*sf,(ymin-0.28)*sf,sha)
         if not (sha % 30 == 0) and not (x == 0 or x == xmax):
             # draw tick marks on upper & lower plot borders
             tex += r"""
   \draw[thick] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});
   \draw[thick] ({:.3f},{:.3f}) -- ({:.3f},{:.3f});""".format(
 x*sf,ymax*sf,x*sf,ymax*sf-sf/7,
-           x*sf,ymin*sf,x*sf,ymin*sf+sf/7)
+x*sf,ymin*sf,x*sf,ymin*sf+sf/7)
         if o5 > 0:
             x += 0.5            # initial step 
             sha = shaadd(sha,5)
