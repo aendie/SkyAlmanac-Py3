@@ -51,8 +51,18 @@ from increments import makelatex
 #   simplifies porting from the original code for development and testing.
 
 def toUnix(fn):
-    if config.dockerized or config.LINUXpf or config.MACOSpf:
+    # replacing parentheses with square brackets in Ubuntu works, but is not required.
+    if squarebr and (config.LINUXpf or config.MACOSpf):
         fn = fn.replace("(","[").replace(")","]")
+    return fn
+
+def toUNIX(fn):
+    if not squarebr and (config.LINUXpf or config.MACOSpf):
+        # either of the following commands work in Ubuntu:
+        if True:
+            fn = "'" + fn + "'"
+        else:
+            fn = fn.replace("(","\(").replace(")","\)")
     return fn
 
 def deletePDF(filename):
@@ -66,7 +76,7 @@ def deletePDF(filename):
         os.remove(filename + ".tex")
 
 def makePDF(pdfcmd, fn, msg = ""):
-    command = 'pdflatex {}'.format(pdfcmd + fn + ".tex")
+    command = r'pdflatex {}'.format(pdfcmd + toUNIX(fn + ".tex"))
     print()     # blank line before "This is pdfTex, Version 3.141592653...
     if pdfcmd == "":
         os.system(command)
@@ -86,9 +96,9 @@ def makePDF(pdfcmd, fn, msg = ""):
                 print("finished creating '{}'".format(fn + ".pdf"))
     return
 
-def tidy_up(fn, kl, kt):
-    if not kt: os.remove(fn + ".tex")
-    if not kl:
+def tidy_up(fn):
+    if not keeptex: os.remove(fn + ".tex")
+    if not keeplog:
         if os.path.isfile(fn + ".log"):
             os.remove(fn + ".log")
     if os.path.isfile(fn + ".aux"):
@@ -245,7 +255,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             config.FANCYhd = True  # assume MiKTeX can handle the 'fancyhdr' package
 
     # command line arguments...
-    validargs = ['-v', '-q', '-log', '-tex', '-sky', '-old', '-a4', '-let', '-dpo', '-nmg', '-d1', '-d2', '-d3', '-d4']
+    validargs = ['-v', '-q', '-log', '-tex', '-sky', '-old', '-a4', '-let', '-dpo', '-sbr', '-nmg', '-d1', '-d2', '-d3', '-d4']
     # (the 4 dummy arguments d1 d2 d3 d4 are specified in 'dockerfile')
     for i in list(range(1, len(sys.argv))):
         if sys.argv[i] not in validargs:
@@ -260,6 +270,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             print(" -a4  ... A4 papersize")
             print(" -let ... Letter papersize")
             print(" -dpo ... data pages only")
+            print(" -sbr ... square brackets in Unix filenames")
             sys.exit(0)
 
     # NOTE: pdfTeX 3.14159265-2.6-1.40.21 (TeX Live 2020/Debian), as used in the Docker
@@ -269,14 +280,12 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
     keeptex = True if "-tex" in set(sys.argv[1:]) else False
     quietmode = True if "-q" in set(sys.argv[1:]) else False
     onlystars = True if "-sky" in set(sys.argv[1:]) else False
+    squarebr = True if "-sbr" in set(sys.argv[1:]) else False
     if "-nmg" in set(sys.argv[1:]): config.moonimg = False  # only for debugging
     config.DPonly = True if "-dpo" in set(sys.argv[1:]) else False
     if "-old" in set(sys.argv[1:]): config.FANCYhd = False  # don't use the 'fancyhdr' package
-    forcepgsz = False
+
     if not("-a4" in set(sys.argv[1:]) and "-let" in set(sys.argv[1:])):
-        if "-a4" in set(sys.argv[1:]): forcepgsz = True
-        if "-let" in set(sys.argv[1:]): forcepgsz = True
-    if forcepgsz:
         if "-a4" in set(sys.argv[1:]): config.pgsz = "A4"
         if "-let" in set(sys.argv[1:]): config.pgsz = "Letter"
 
@@ -608,7 +617,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
                 search_stats()
                 if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
                 makePDF(listarg, fn)
-                tidy_up(fn, keeplog, keeptex)
+                tidy_up(fn)
                 if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
     ##        config.closeLOG()     # close log after the for-loop
 
@@ -637,7 +646,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             search_stats()
             if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
             makePDF(listarg, fn)
-            tidy_up(fn, keeplog, keeptex)
+            tidy_up(fn)
             if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
     ##        config.closeLOG()     # close log after the for-loop
 
@@ -671,7 +680,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             search_stats()
             if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
             makePDF(listarg, fn)
-            tidy_up(fn, keeplog, keeptex)
+            tidy_up(fn)
             if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
     ##        config.closeLOG()     # close log after the for-loop
 
@@ -692,7 +701,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
                 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                 if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
                 makePDF(listarg, fn)
-                tidy_up(fn, keeplog, keeptex)
+                tidy_up(fn)
                 if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
 
         elif s == '2' and entireMth:     # Sun Tables (for a month)
@@ -709,7 +718,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
             makePDF(listarg, fn)
-            tidy_up(fn, keeplog, keeptex)
+            tidy_up(fn)
             if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
 
         elif s == '2' and not entireYr and not entireMth:   # Sun Tables (for a few days)
@@ -731,7 +740,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
             makePDF(listarg, fn)
-            tidy_up(fn, keeplog, keeptex)
+            tidy_up(fn)
             if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
 
         elif s == '3' and entireYr:      # Event Time tables  (for a year/years)
@@ -755,7 +764,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
                 timer_end(start, 1)
                 if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
                 makePDF(listarg, fn)
-                tidy_up(fn, keeplog, keeptex)
+                tidy_up(fn)
                 if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
 
         elif s == '3' and entireMth:      # Event Time tables  (for a month)
@@ -775,7 +784,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             timer_end(start, 1)
             if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
             makePDF(listarg, fn)
-            tidy_up(fn, keeplog, keeptex)
+            tidy_up(fn)
             if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
 
         elif s == '3' and not entireYr and not entireMth:   # Event Time tables (for a few days)
@@ -799,7 +808,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             timer_end(start, 1)
             if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
             makePDF(listarg, fn)
-            tidy_up(fn, keeplog, keeptex)
+            tidy_up(fn)
             if config.dockerized: os.chdir(docker_main)     # reset working folder to code folder
 
         elif s == '4':  # Lunar Distance tables
@@ -824,7 +833,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
                     msg2 = "execution time = {:0.2f} seconds".format(stop-start)
                     print(msg2)
                     makePDF(listarg, fn)
-                    tidy_up(fn, keeplog, keeptex)
+                    tidy_up(fn)
             else:
                 start = time.time()
                 if entireMth:
@@ -850,7 +859,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
                 msg2 = "execution time = {:0.2f} seconds".format(stop-start)
                 print(msg2)
                 makePDF(listarg, fn)
-                tidy_up(fn, keeplog, keeptex)
+                tidy_up(fn)
 
         elif s == '5':  # Lunar Distance charts
             if entireMth:
@@ -877,9 +886,8 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             stop = time.time()
             msg2 = "\nexecution time = {:0.2f} seconds".format(stop-start)
             print(msg2)
-            msg = " creating {}".format(fn + ".pdf")
-            makePDF(listarg, fn, msg)
-            tidy_up(fn, keeplog, keeptex)
+            makePDF(listarg, fn)
+            tidy_up(fn)
 
         elif s == '6':  # Increments and Corrections tables
             msg = "\nCreating the Increments and Corrections tables"
@@ -893,7 +901,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             if config.dockerized: os.chdir(os.getcwd() + f_postfix)     # DOCKER ONLY
             makePDF(listarg, fn)
-            tidy_up(fn, keeplog, keeptex)
+            tidy_up(fn)
 
     else:
         print("Error! Choose 1, 2, 3, 4, 5 or 6")

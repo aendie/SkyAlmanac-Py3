@@ -180,16 +180,18 @@ Previously execution could hang when aborting a multiprocessing task (in nautica
 * Better support for Letter-sized pages.
 * Skyalmanac no longer requires the Ephem astronomical library.
 * Hipparcos data (*hip_main.dat*) and one ephemeris (*de421.bsp*) are included in the PyPI package.
+* UNIX filenames include parentheses unless option '-sbr' is specified
 * Command line options:
     * -v   ... 'verbose': to send pdfTeX output to the terminal
-	* -q   ... quiet mode for LD charts
-	* -sky ... stars only in LD charts
+    * -q   ... quiet mode for LD charts
+    * -sky ... stars only in LD charts
     * -log ... to keep the log file
     * -tex ... to keep the tex file
     * -old ... old formatting without the 'fancyhdr' package
     * -a4  ... A4 papersize
     * -let ... Letter papersize
     * -dpo ... data pages only
+    * -sbr ... square brackets in Unix filenames
 
 ## Requirements
 
