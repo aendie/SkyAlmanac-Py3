@@ -82,7 +82,7 @@ def NSdeg(deg, modern=False, hr=0, forceNS=False):
 def moontab(Date, dpp, strat):
     # generates LaTeX table for moon and Lunar Distance (traditional style)
 
-    tab = r'''\setlength{\tabcolsep}{5pt}  % default 6pt
+    tex = r'''\setlength{\tabcolsep}{5pt}  % default 6pt
 \noindent'''
     n = 0
     while n < dpp:      # maximum 3 days on a page
@@ -306,27 +306,39 @@ def moontab(Date, dpp, strat):
 
 # >>>>>>>>>>>> Format LaTeX table <<<<<<<<<<<<
 
+        # format day as an ordinal number
+        day = Date.day
+        mth = Date.month
+        if 4 <= day <= 20 or 24 <= day <= 30:
+            suffix = "th"
+        else:
+            suffix = ["st", "nd", "rd"][day % 10 - 1]
+        day_ord = r'''{}\textsuperscript{{{}}}'''.format(str(day), suffix)
+
+        # format date like "26th Oct"
+        day_mth = r'''Moon ({})'''.format(day_ord + Date.strftime(" %b"))
+
         if len(NMhours) == 24:      # if NewMoon all day, i.e. iCols == 0
             extracols = extracols + r'''r|'''   # add a fake column
 
-        tab = tab + r'''
+        tex += r'''
 \begin{{tabular}}[t]{{|c|rrrrr|{}}}'''.format(extracols)
 
-        tab = tab + r'''
-\multicolumn{1}{c}{\normalsize{h}} & \multicolumn{5}{c}{\normalsize{Moon}}'''
+        tex += r'''
+\multicolumn{{1}}{{c}}{{\normalsize{{h}}}} & \multicolumn{{5}}{{c}}{{\normalsize{{{}}}}}'''.format(day_mth)
 
         if iCols > 0:
-            tab = tab + r''' & \multicolumn{{{}}}{{c}}{{\normalsize{{Lunar Distance{}}}}}'''.format(iCols,LDtxt)
+            tex += r''' & \multicolumn{{{}}}{{c}}{{\normalsize{{Lunar Distance{}}}}}'''.format(iCols,LDtxt)
 
-        tab = tab + r'''\\
+        tex += r'''\\
 \hline
 \multicolumn{{1}}{{|c|}}{{\rule{{0pt}}{{2.6ex}}\textbf{{{}}}}} & \multicolumn{{1}}{{c}}{{\textbf{{GHA}}}} & \multicolumn{{1}}{{c}}{{\(\nu\)}} & \multicolumn{{1}}{{c}}{{\textbf{{Dec}}}} & \multicolumn{{1}}{{c}}{{\textit{{d}}}} & \multicolumn{{1}}{{c|}}{{\textbf{{HP}}}}'''.format(Date.strftime("%a"))
 
         for iC in range(iCols):
-            tab = tab + r''' & \multicolumn{{1}}{{c|}}{{\textbf{{{}}}}}'''.format(obj[iC])
+            tex += r''' & \multicolumn{{1}}{{c|}}{{\textbf{{{}}}}}'''.format(obj[iC])
         if len(NMhours) == 24:      # add fake column (iCols == 0)
-            tab = tab + r''' & \multicolumn{1}{c|}{}'''
-        tab = tab + r'''\\
+            tex += r''' & \multicolumn{1}{c|}{}'''
+        tex += r'''\\
 \hline\rule{0pt}{2.6ex}\noindent
 '''
 
@@ -368,32 +380,32 @@ def moontab(Date, dpp, strat):
             if h < 23 and (h+1)%6 == 0:
                 lineterminator = r'''\\[2Pt]
 '''
-            tab = tab + line + lineterminator
+            tex += line + lineterminator
             h += 1
 
         sdmm = moon_SD(Date)
         mp_upper = find_transit(Date, UpperLists[n], False)    # calculate moon upper transit
-        tab = tab + r'''\hline
-\rule{{0pt}}{{2.4ex}} & \multicolumn{{5}}{{c|}}{{SD = {}$'$ \quad Mer. pass. {}}}'''.format(sdmm,mp_upper)
+        tex += r'''\hline
+\rule{{0pt}}{{2.4ex}}\textbf{{{}}} & \multicolumn{{5}}{{c|}}{{SD = {}$'$ \quad Mer. pass. {}}}'''.format(day_ord,sdmm,mp_upper)
         if iCols > 0:
             if sunSDrqrd:
-                tab = tab + r''' & \multicolumn{{{}}}{{c|}}{{{}}}'''.format(iCols,sdstxt)
+                tex += r''' & \multicolumn{{{}}}{{c|}}{{{}}}'''.format(iCols,sdstxt)
             else:
-                tab = tab + r''' & \multicolumn{{{}}}{{c|}}{{}}'''.format(iCols)
+                tex += r''' & \multicolumn{{{}}}{{c|}}{{}}'''.format(iCols)
         if len(NMhours) == 24:      # add fake column (iCols == 0)
-            tab = tab + r''' & \multicolumn{1}{c|}{}'''
-        tab = tab + r'''\\
+            tex += r''' & \multicolumn{1}{c|}{}'''
+        tex += r'''\\
 \hline
 '''
         if n < 2:
             # add space between tables...
-            tab = tab + r'''\multicolumn{5}{c}{}\\[-1.5ex]
+            tex += r'''\multicolumn{5}{c}{}\\[-1.5ex]
 '''
         n += 1
         Date += timedelta(days=1)
-        tab = tab + r'''\end{tabular}
+        tex += r'''\end{tabular}
 \par\noindent    % put next table below here'''
-    return tab
+    return tex
 
 #----------------------
 #   page preparation
