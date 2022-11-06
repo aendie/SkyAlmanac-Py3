@@ -131,13 +131,13 @@ The PDF filenames have been revised (again):
 * NAtrad_\<starting date or month or year\>.pdf: for Nautical Almanacs in traditional style
 * STtrad_\<starting date or month or year\>.pdf: for Sun Tables in traditional style
 
-BUGFIX (solved here and in PyPI sfalmanac 1.6.1):  
+BUGFIX (solved here and in PyPI skyalmanac 1.6.1):  
 The first day in a Nautical Almanac did not initialize the moon state 'above or below horizon' when there was no Moonrise or Moonset at some latitudes on that day in Multiprocessing mode (only).
 
-BUGFIX (solved here and in PyPI sfalmanac 1.6.2):  
+BUGFIX (solved here and in PyPI skyalmanac 1.6.2):  
 The Moon Declination on the last hour of the day did not indicate 'N' or 'S' when it had just changed, i.e. since 22h. This rare case occurs, for example, on 14th Jun 2024 and 15th Oct 2024.
 
-BUGFIX (solved here and in PyPI sfalmanac 1.6.3):  
+BUGFIX (solved here and in PyPI skyalmanac 1.6.3):  
 Two import statements (essential for Linux and MacOS) were missing.
 
 **UPDATE: Apr 2022**
@@ -170,7 +170,7 @@ PATCH1: Sun SD added to Lunar Distance tables when appropriate
 
 The 'fancyhdr' LaTeX package is now used to format header and footer lines on a page. This is a more professional solution with added features. Footer lines now contain left-, center- and right-justified text.
 
-BUGFIX (solved here and in PyPI sfalmanac 1.9):
+BUGFIX (solved here and in PyPI skyalmanac 1.9):
 Previously execution could hang when aborting a multiprocessing task (in nautical.py or eventtables.py) on entering Ctrl-C to kill all processes.
 
 **UPDATE: Sep 2022**
@@ -196,6 +196,9 @@ Previously execution could hang when aborting a multiprocessing task (in nautica
 
 * UNIX filenames include parentheses unless option '-sbr' is specified
 * Date with ordinal number (e.g. 3rd Oct) added into Lunar Distance table
+
+BUGFIX (solved here and in PyPI skyalmanac 1.11.1):
+A Lunar Distance chart can now be created for 19 August 2038
 
 ## Requirements
 

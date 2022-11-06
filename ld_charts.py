@@ -717,29 +717,31 @@ def addMOON(newMoon, checkpos = False):
         if outofbounds_sha(sha): outofrange = True
         if outofbounds_dec(dec) != 0: outofrange = True
         #print(i, sha, dec, outofbounds_sha(sha), outofbounds_dec(dec))
-    if outofrange: return out, xyMoon00, xyMoon24
+    if not checkpos and outofrange: return out, xyMoon00, xyMoon24
 
-    for i in range(3):
-        sha = s[i]
-        dec = d[i]
-        if outofbounds_sha(sha): continue
-        if outofbounds_dec(dec) != 0: continue
-        if SHAleftofzero(sha):
-            sha = sha - 360     # NEW
-            s[i] = sha          # IMPORTANT
-        x = (x_o + sha) * sf / 10.0
-        y = dec * sf / 10.0
-        out += plotstar(x,y,1.0,'amaranth',0.6)
-        if i == 0:
-            xyMoon00[0] = x
-            xyMoon00[1] = y
-        if i == 2:
-            xyMoon24[0] = x
-            xyMoon24[1] = y
-        # print the associated time of day
-        x = (x_o + sha -0.4) * sf / 10.0
-        y = (dec + 1.5) * sf / 10.0
-        out += r"""
+    if not outofrange:
+        for i in range(3):
+            sha = s[i]
+            dec = d[i]
+            #if outofbounds_sha(sha): continue
+            #if outofbounds_dec(dec) != 0: continue
+            if SHAleftofzero(sha):
+                sha = sha - 360     # NEW
+                s[i] = sha          # IMPORTANT
+            # chart coordinates of Moon...
+            x = (x_o + sha) * sf / 10.0
+            y = dec * sf / 10.0
+            out += plotstar(x,y,1.0,'amaranth',0.6)
+            if i == 0:
+                xyMoon00[0] = x
+                xyMoon00[1] = y
+            if i == 2:
+                xyMoon24[0] = x
+                xyMoon24[1] = y
+            # chart coordinates of associated time of day (0h 12h 24h)...
+            x = (x_o + sha -0.4) * sf / 10.0
+            y = (dec + 1.5) * sf / 10.0
+            out += r"""
   \draw[color=%s] (%0.2f,%0.2f) node[font=\%s] {%s};""" %('black', x, y, star_fs, t[i])
 
     txt = "New Moon" if newMoon else "Moon"
@@ -749,6 +751,7 @@ def addMOON(newMoon, checkpos = False):
     ang = math.atan(dy/dx)
     rot = "%0.3f" %(ang*todegrees)
     txtsep = 4.5
+    # chart coordinates of 'Moon' text...
     x = (x_o + s[1] - (txtsep*math.sin(ang))) * sf / 10.0
     y = (d[1] + (txtsep*math.cos(ang))) * sf / 10.0
     out += r"""
@@ -834,7 +837,7 @@ def addPLANET(planet):
             break
 
     # check if moon is very close
-    xx, yy = addMOON(False, True)
+    xx, yy = addMOON(False, True)   # returns coordinates of "Moon" text
     if abs(xx - midX) < 0.7:
         x = (x_o + s[2] + (txtsep*math.sin(ang))) * sf / 10.0
         y = (d[2] - (txtsep*math.cos(ang))) * sf / 10.0
@@ -1214,7 +1217,7 @@ def Page1(tm1, bm1, lm1, rm1, parsep):
 
     tex += r'''
   \noindent
-  \textbf{Acknowledgements:} \newline The charts and LD tables are created with Skyfield (\url{https://rhodesmill.org/skyfield/}), thanks to Brandon Rhodes. The graphics are created with LaTeX using TikZ (\url{https://www.ctan.org/pkg/pgf}), thanks to Till Tantau and the team that maintain it. Kudos to the Python Software Foundation! Thanks also to Jorrit Visser for his Lunar Distance tables (\url{http://celnav.nl/}).\\[-6pt]
+  \textbf{Acknowledgements:} \newline The charts and LD tables are created with Skyfield (\url{https://rhodesmill.org/skyfield/}), thanks to Brandon Rhodes. The graphics are created with LaTeX using TikZ (\url{https://www.ctan.org/pkg/pgf}) version \pgfversion, thanks to Till Tantau and the team that maintain it. Kudos to the Python Software Foundation! Thanks also to Jorrit Visser for his Lunar Distance tables (\url{http://celnav.nl/}).\\[-6pt]
   \end{multicols}
   \noindent
   \textbf{Disclaimer:} These are computer generated tables - use them at your own risk. They replicate Lunar Distance algorithms with no guarantee of accuracy. They are intended to encourage people to use a sextant, be it as a hobby or as a backup when electronics fail.
@@ -1299,7 +1302,7 @@ def galactic_plane():
     xoff = x_o * plotscale
     mw  = []        # Milky Way plot list (first element)
     mw2 = []        # Milky Way plot list (second element)
-    tX = 0.0
+    tX = 0.0        # coordinates for "Galactic Plane" text
     tY = 0.0
 
     # find equatorial DEClination of galactic plane at left plot border (shamin)
@@ -1367,7 +1370,7 @@ def galactic_plane():
         if ldeg >= 360: ldeg -= 360
         n += 1
     
-    if DEBUG_gp: print("GP dec at SHA = {:7.3f} (~shamin) is {:7.3f}".format(sha2,dec2))      # <<<<<<<<<<<<<<<<<<<<<<<<<<
+    if DEBUG_gp: print("GP dec at SHA = {:7.3f} (~shamin) is {:7.3f}".format(sha2,dec2))
     decLEFT = dec2 if decmin <= dec2 <= decmax else None
 
     # <<<<<<<<<<<<<<<< find STARTING point of galactic plane curve...
@@ -1697,14 +1700,14 @@ def set_X_offset(txt = "\n"):
     # ---------- SET THE X-AXIS PLOT OFFSET ----------
 
     global x_o, shamin, sharng
-    x_o = 360 - shamin                          # SHA x_offset POSITIVE (for 170 <= shamin < 360)
+    x_o = 360 - shamin          # SHA x_offset POSITIVE (for 170 <= shamin < 360)
     # SHA 0° is within plot and not first SHA, but possibly the last (rightmost)
     #    i.e. SHAs < 360° are plotted
 
-    if 360 - shamin > sharng: x_o -= 360        # SHA x_offset NEGATIVE (for 0 < shamin < 170)
+    if x_o > sharng: x_o -= 360 # SHA x_offset NEGATIVE (for 0 < shamin < 170)
     # SHAs within plot range are all increasing (left to right) 
 
-    if shamin == 0: x_o = 0         # SHA 0° is first (leftmost) value
+    if shamin == 0: x_o = 0     # SHA 0° is first (leftmost) value
 
     if txt == None: return
 
@@ -2261,7 +2264,7 @@ ns_fs,-0.9*sf,2.67*sf)
                 ColourInUse[ObjCol] = True
 
             take24 = True if H0list[i].find("circ") == -1 else False
-            # Moon coordinates (at 00h or 24h)
+            # Moon coordinates (at 00h or 24h) for the LD line
             xyMoon = xyMoon24 if take24 else xyMoon00
             hh = 4 if take24 else 0    # 4 = 24h; 0 = 00h for Sun and planets
             tex += showLD(LDobj, xyMoon, LDcolour[ObjCol], hh, True)
@@ -2371,17 +2374,17 @@ def makeLDcharts(first_day, strat, daystoprocess, outfile, ts, onlystars, quietm
         DEClist = []
         t00 = ts.utc(d00.year, d00.month, d00.day, 0, 0, 0)    # update global variable
 
-        sha, dec = moonGHA(d00)
-        #print("Moon 00h sha = {}, dec = {}".format(sha[0], dec[0]))
-        #print("Moon 12h sha = {}, dec = {}".format(sha[1], dec[1]))
-        #print("Moon 24h sha = {}, dec = {}".format(sha[2], dec[2]))
+        shaMoon, decMoon = moonGHA(d00)
+        #print("Moon 00h sha = {}, dec = {}".format(shaMoon[0], decMoon[0]))
+        #print("Moon 12h sha = {}, dec = {}".format(shaMoon[1], decMoon[1]))
+        #print("Moon 24h sha = {}, dec = {}".format(shaMoon[2], decMoon[2]))
 
-        # the Moon still needs to be included on the chart ... in case all LD targets
-        #   are to one side (left, right, above or below)
-        SHAlist.append(sha[0])
-        SHAlist.append(sha[2])
-        DEClist.append(dec[0])
-        DEClist.append(dec[2])
+        # IMPORTANT: the Moon still needs to be included on the chart ...
+        #    in case all LD targets are to one side (left, right, above or below)
+        SHAlist.append(shaMoon[0])
+        SHAlist.append(shaMoon[2])
+        DEClist.append(decMoon[0])
+        DEClist.append(decMoon[2])
 
 #   ---------------- A: try with Moon centered and DEC -55 to + 55 ----------------
 
@@ -2389,7 +2392,7 @@ def makeLDcharts(first_day, strat, daystoprocess, outfile, ts, onlystars, quietm
             print("\n A tactic... SHA: Moon centered DEC: -55 to +55")
         # set defaults for X- and Y-axis ...
         sharng = 190
-        shalo = sha[0] - (sharng/2.0)
+        shalo = shaMoon[0] - (sharng/2.0)
         if shalo < 0: shalo += 360
         shamin = math.floor(shalo/5.0) * 5  # round to lower 5
         #shamax = math.ceil(shahi/5.0) * 5   # round to higher 5
@@ -2420,7 +2423,7 @@ def makeLDcharts(first_day, strat, daystoprocess, outfile, ts, onlystars, quietm
                 DEClist.append(dec)
                 u = outofbounds_dec(dec)
                 v = outsideplot(sha)
-                if DEBUG_m2: print("A {:13} sha= {:7.3f} v= {} x0= {}".format(objname+":",sha, v, x0))
+                if DEBUG_m2: print(" A {:13} sha= {:7.3f} v= {} x0= {}".format(objname+":",sha, v, x0))
                 if outofbounds_sha(sha):
                     if v == -1: oobLEFT += 1
                     if v == +1: oobRIGHT += 1
@@ -2435,8 +2438,8 @@ def makeLDcharts(first_day, strat, daystoprocess, outfile, ts, onlystars, quietm
         ##print(".LDlist = {}".format(LDlist))
         if not quietmode:
             print("   {} LD objects: {} within plot; {} LEFT; {} RIGHT; {} LOW; {} HIGH".format(len(LDlist),inbounds,oobLEFT,oobRIGHT,oobLOW,oobHIGH))
-            #print(" LD objects: SHA width= {:7.3f}  SHA_min={:7.3f}  SHA_max={:7.3f}".format(LDlist_Swth,LDlist_Smin,LDlist_Smax))
-            #print(" LD objects: DEC mid= {:7.3f}  DEC_min={:7.3f}  DEC_max={:7.3f}".format(LDlist_Dmid,LDlist_Dmin,LDlist_Dmax))
+            #print(" A LD objects: SHA width= {:7.3f}  SHA_min={:7.3f}  SHA_max={:7.3f}".format(LDlist_Swth,LDlist_Smin,LDlist_Smax))
+            #print(" A LD objects: DEC mid= {:7.3f}  DEC_min={:7.3f}  DEC_max={:7.3f}".format(LDlist_Dmid,LDlist_Dmin,LDlist_Dmax))
 
 #   ---------------- B: if all objects within plot (or New Moon), center DEC only   ----------------
 #   ---------------- B: else, try RIGHT-ALIGNED plot & centered DEC ----------------
@@ -2446,7 +2449,7 @@ def makeLDcharts(first_day, strat, daystoprocess, outfile, ts, onlystars, quietm
             winner = "B"
             if not quietmode:
                 print("\n B tactic... SHA: ok (all within plot) DEC: objects centered; +80 max; -80 min")
-            just = 0                # centered
+            just = 0                # justification: CENTERED
             excess = 190 - LDlist_Swth
             shalo = LDlist_Smin - excess/2
             if shalo < 0: shalo += 360
@@ -2458,7 +2461,7 @@ def makeLDcharts(first_day, strat, daystoprocess, outfile, ts, onlystars, quietm
             if LDlist_Swth < 190:       # center plot if SHA width under 190°
                 if not quietmode:
                     print("\n B tactic... SHA: objects centered DEC: objects top-aligned; +80 max; -80 min")
-                just = 0                # centered
+                just = 0                # justification: CENTERED
                 excess = 190 - LDlist_Swth
                 shalo = LDlist_Smin - excess/2
                 if shalo < 0: shalo += 360
@@ -2471,11 +2474,16 @@ def makeLDcharts(first_day, strat, daystoprocess, outfile, ts, onlystars, quietm
                 if not quietmode:
                     print("\n B tactic... SHA: objects right-aligned DEC: objects centered; +80 max; -80 min")
                 # RIGHT-ALIGNED: adjust the plot range to end with LDlist_smax...
-                just = +1               # RIGHT-ALIGNED
+                just = +1               # justification: RIGHT-ALIGNED
                 shahi = LDlist_Smax
                 shamax = math.ceil(shahi/5.0) * 5   # round to higher 5
                 shamin = shamax - sharng
                 if shamin < 0: shamin += 360
+                # ensure right-alignment includes the Moon at 24h !!!
+                while not validSHA(shamin,shaMoon[2],shamax):
+                    # decrement the range until it includes the Moon...
+                    shamax = shaadd(shamax,-5.0)
+                    shamin = shaadd(shamin,-5.0)
         set_X_offset(None if quietmode else "  try")    # --- SET THE X-AXIS PLOT OFFSET ---
 
         # adjust DEC range
@@ -2550,11 +2558,17 @@ def makeLDcharts(first_day, strat, daystoprocess, outfile, ts, onlystars, quietm
             if not quietmode:
                 print("\n C tactic... SHA: objects left-aligned DEC: objects centered")
             # LEFT-ALIGNED: adjust the plot range to begin with LDlist_smin...
-            just = -1                   # LEFT-ALIGNED
+            just = -1               # justification: LEFT-ALIGNED
             shalo = LDlist_Smin
             shamin = math.floor(shalo/5.0) * 5  # round to lower 5
             shamax = shamin + 190
             if shamax >= 360: shamax -= 360
+            # ensure left-alignment includes the Moon at 0h !!!
+            #        (19 Aug 2038 is critical)
+            while not validSHA(shamin,shaMoon[0],shamax):
+                # increment the range until it includes the Moon...
+                shamax = shaadd(shamax,+5.0)
+                shamin = shaadd(shamin,+5.0)
             set_X_offset(None if quietmode else "  try")  # --- SET THE X-AXIS PLOT OFFSET ---
 
             # adjust DEC range
