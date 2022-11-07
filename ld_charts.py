@@ -723,8 +723,8 @@ def addMOON(newMoon, checkpos = False):
         for i in range(3):
             sha = s[i]
             dec = d[i]
-            #if outofbounds_sha(sha): continue
-            #if outofbounds_dec(dec) != 0: continue
+            if outofbounds_sha(sha): continue
+            if outofbounds_dec(dec) != 0: continue
             if SHAleftofzero(sha):
                 sha = sha - 360     # NEW
                 s[i] = sha          # IMPORTANT
