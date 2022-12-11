@@ -200,6 +200,18 @@ Previously execution could hang when aborting a multiprocessing task (in nautica
 BUGFIX (solved here and in PyPI skyalmanac 1.11.2):
 A Lunar Distance chart can now be created for 19 August 2038
 
+**UPDATE: Dec 2022**
+
+BUGFIX (solved here and in PyPI skyalmanac 1.11.3):
+The Moon's hourly d-value now corresponds to the values in the official Nautical Almanac:
+* the d-value is unsigned
+* its value is the hourly difference of the ROUNDED Declinations
+
+In case you prefer the *previous* technique, set **d_valNA** in *config.py* to False.
+Previously the Moon's hourly d-value was:
+* negative if the next Declination is southerly; otherwise positive
+* the rounded difference of the EXACT hourly Declinations
+
 ## Requirements
 
 &emsp;Most of the computation is done by the free Skyfield library.  

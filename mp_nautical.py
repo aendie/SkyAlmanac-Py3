@@ -471,7 +471,9 @@ def mp_moonVD(d00, d, ts, earth, moon):           # used in sunmoontab(m)
     ra0 = pos0.apparent().radec(epoch='date')[0]
     dec0 = pos0.apparent().radec(epoch='date')[1]
     V0 = gha2deg(t0.gast, ra0.hours)
-    D0 = dec0.degrees
+    D0 = dec0.degrees * 60.0    # convert to minutes of arc
+    if config.d_valNA:
+        D0 = round(D0, 1)
 
 # OLD:  # ...then 24 values at hourly intervals from 23:30 onwards
 # OLD:  t = ts.ut1(d.year, d.month, d.day, hour_of_day, 30, 0)
@@ -490,8 +492,13 @@ def mp_moonVD(d00, d, ts, earth, moon):           # used in sunmoontab(m)
             Vdelta += 360
         Vdm = (Vdelta-(14.0+(19.0/60.0))) * 60	# subtract 14:19:00
         moonVm[i] = "{:0.1f}'".format(Vdm)
-        D1 = dec.degrees[i]
-        moonDm[i] = "{:0.1f}'".format((D1-D0) * 60)	# convert to minutes of arc
+        D1 = dec.degrees[i] * 60.0  # convert to minutes of arc
+        if config.d_valNA:
+            D1 = round(D1, 1)
+            Dvalue = abs(D1 - D0)
+        else:
+            Dvalue = D1 - D0
+        moonDm[i] = "{:0.1f}'".format(Dvalue)
         V0 = V1		# store current value as next previous value
         D0 = D1		# store current value as next previous value
     return moonVm, moonDm

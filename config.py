@@ -32,6 +32,15 @@ useIERS = True  # 'True' to download finals2000A.all; 'False' to use built-in UT
 ageIERS = 30    # download a new finals2000A.all version after 'ageIERS' days if useIERS=True
 MULTIpr = True  # 'True' enables multiprocessing; otherwise only 1 logical processor is used
 
+# Calculation mode for Moon's d-value:
+#   'True' to calculate the Moon's d-value as in the HMNAO Nautical Almanac:
+#     - as difference of ROUNDED Declinations
+#     - unsigned
+#   'False' to calculate the Moon's d-value as in Pyalmanac:
+#     - as rounded difference of EXACT Declinations
+#     - signed (negative if next Declination southerly; else positive)
+d_valNA = True
+
 # Lunar Distance strategy for selecting celestial objects:
 #   A   objects closest to the Moon
 #   B   objects with highest hourly Lunar Distance delta
