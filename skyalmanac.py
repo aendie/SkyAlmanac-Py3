@@ -255,7 +255,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             config.FANCYhd = True  # assume MiKTeX can handle the 'fancyhdr' package
 
     # command line arguments...
-    validargs = ['-v', '-q', '-log', '-tex', '-sky', '-old', '-a4', '-let', '-dpo', '-sbr', '-nmg', '-d1', '-d2', '-d3', '-d4']
+    validargs = ['-v', '-q', '-log', '-tex', '-sky', '-old', '-a4', '-let', '-nao', '-dtr', '-dpo', '-sbr', '-nmg', '-d1', '-d2', '-d3', '-d4']
     # (the 4 dummy arguments d1 d2 d3 d4 are specified in 'dockerfile')
     for i in list(range(1, len(sys.argv))):
         if sys.argv[i] not in validargs:
@@ -269,6 +269,8 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             print(" -old ... old formatting without the 'fancyhdr' package")
             print(" -a4  ... A4 papersize")
             print(" -let ... Letter papersize")
+            print(" -nao ... HMNAO style hourly Moon d-values")
+            print(" -dtr ... 'difference-then-round' style hourly Moon d-values")
             print(" -dpo ... data pages only")
             print(" -sbr ... square brackets in Unix filenames")
             sys.exit(0)
@@ -281,6 +283,9 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
     quietmode = True if "-q" in set(sys.argv[1:]) else False
     onlystars = True if "-sky" in set(sys.argv[1:]) else False
     squarebr = True if "-sbr" in set(sys.argv[1:]) else False
+    #
+    # !! CHANGES TO VARIABLES IN config.py ARE NOT MAINTAINED IN MULTIPROCESSING MODE !!
+    #
     if "-nmg" in set(sys.argv[1:]): config.moonimg = False  # only for debugging
     config.DPonly = True if "-dpo" in set(sys.argv[1:]) else False
     if "-old" in set(sys.argv[1:]): config.FANCYhd = False  # don't use the 'fancyhdr' package
@@ -288,6 +293,10 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
     if not("-a4" in set(sys.argv[1:]) and "-let" in set(sys.argv[1:])):
         if "-a4" in set(sys.argv[1:]): config.pgsz = "A4"
         if "-let" in set(sys.argv[1:]): config.pgsz = "Letter"
+
+    if not("-nao" in set(sys.argv[1:]) and "-dtr" in set(sys.argv[1:])):
+        if "-nao" in set(sys.argv[1:]): config.d_valNA = True
+        if "-dtr" in set(sys.argv[1:]): config.d_valNA = False
 
     d = datetime.utcnow().date()
     first_day = date(d.year, d.month, d.day)

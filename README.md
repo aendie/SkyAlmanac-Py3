@@ -202,7 +202,7 @@ A Lunar Distance chart can now be created for 19 August 2038
 
 **UPDATE: Dec 2022**
 
-BUGFIX (solved here and in PyPI skyalmanac 1.11.3):
+initial BUGFIX (in PyPI skyalmanac 1.11.3):
 The Moon's hourly d-value now corresponds to the values in the official Nautical Almanac:
 * the d-value is unsigned
 * its value is the hourly difference of the ROUNDED Declinations
@@ -211,6 +211,22 @@ In case you prefer the *previous* technique, set **d_valNA** in *config.py* to F
 Previously the Moon's hourly d-value was:
 * negative if the next Declination is southerly; otherwise positive
 * the rounded difference of the EXACT hourly Declinations
+
+second ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.11.4):
+New Command Line options:
+* -nao ... HMNAO style hourly Moon d-values
+* -dtr ... 'difference-then-round' style hourly Moon d-values
+The desired default can also be specified using **d_valNA** in *config.py*, which takes precedance when neither of the above Command Line options are specified.
+
+Using  '-dtr', the Moon's hourly d-value is calculated "difference-then-round":
+* the d-value is signed (negative if Declination is decreasing, i.e. away from the Earth's poles). This also applies to the d-values for the Sun and planets.
+* its value is the ROUNDED difference of the EXACT hourly Declinations
+* the hourly d-value steps are smooth - gradually increasing or decreasing 
+
+When using the "HMNAO Nautical Almanac"-compatible mode, e.g. with '-nao':
+* the d-values of Sun, planets and Moon are unsigned
+* the hourly Moon d-values are calculated as the difference of the ROUNDED Declinations (round-then-difference)
+* the hourly d-value steps are sometimes irregular
 
 ## Requirements
 

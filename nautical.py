@@ -639,9 +639,9 @@ def starstab(Date, ts):
     return out
 
 # >>>>>>>>>>>>>>>>>>>>>>>>
-def mp_sunmoon_worker(Date, ts, n):
+def mp_sunmoon_worker(Date, d_valNA, ts, n):
     # split the work by date into 3 separate days
-    sunmoondata = mp_sunmoon(Date, ts, n)      # ===>>> mp_nautical.py
+    sunmoondata = mp_sunmoon(Date, d_valNA, ts, n)      # ===>>> mp_nautical.py
     return sunmoondata
 
 def sunmoontab(Date, ts):
@@ -655,7 +655,7 @@ def sunmoontab(Date, ts):
 
     if config.MULTIpr and config.WINpf:
         # multiprocess sunmoontab values per "Date" simultaneously
-        partial_func = partial(mp_sunmoon_worker, Date, ts)
+        partial_func = partial(mp_sunmoon_worker, Date, config.d_valNA, ts)
 
         try:
             sunmoonlist = pool.map(partial_func, [nn for nn in range(3)], 1)
@@ -766,7 +766,7 @@ def sunmoontabm(Date, ts):
 
     if config.MULTIpr and config.WINpf:
         # multiprocess sunmoontab values per "Date" simultaneously
-        partial_func = partial(mp_sunmoon_worker, Date, ts)
+        partial_func = partial(mp_sunmoon_worker, Date, config.d_valNA, ts)
 
         try:
             sunmoonlist = pool.map(partial_func, [nn for nn in range(3)], 1)

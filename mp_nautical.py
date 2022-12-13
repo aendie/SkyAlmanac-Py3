@@ -30,7 +30,7 @@
 ###### Standard library imports ######
 from datetime import datetime, timedelta
 from time import time         # 00000 - stopwatch elements
-from math import degrees, atan, tan, pi
+from math import degrees, atan, tan, pi, copysign
 
 ###### Third party imports ######
 from skyfield.api import load
@@ -462,7 +462,7 @@ def mp_moonGHA(d, ts, earth, moon, round2seconds = False):  # used in sunmoontab
 
     return gham, decm, degm, HPm, GHAupper, GHAlower, ghaSoD, ghaEoD
 
-def mp_moonVD(d00, d, ts, earth, moon):           # used in sunmoontab(m)
+def mp_moonVD(d00, d, d_valNA, ts, earth, moon):           # used in sunmoontab(m)
 # OLD:  # first value required is from 23:30 on the previous day...
 # OLD:  t0 = ts.ut1(d00.year, d00.month, d00.day, 23, 30, 0)
     # first value required is from 00:00 on the current day...
@@ -472,7 +472,7 @@ def mp_moonVD(d00, d, ts, earth, moon):           # used in sunmoontab(m)
     dec0 = pos0.apparent().radec(epoch='date')[1]
     V0 = gha2deg(t0.gast, ra0.hours)
     D0 = dec0.degrees * 60.0    # convert to minutes of arc
-    if config.d_valNA:
+    if d_valNA:
         D0 = round(D0, 1)
 
 # OLD:  # ...then 24 values at hourly intervals from 23:30 onwards
@@ -493,18 +493,21 @@ def mp_moonVD(d00, d, ts, earth, moon):           # used in sunmoontab(m)
         Vdm = (Vdelta-(14.0+(19.0/60.0))) * 60	# subtract 14:19:00
         moonVm[i] = "{:0.1f}'".format(Vdm)
         D1 = dec.degrees[i] * 60.0  # convert to minutes of arc
-        if config.d_valNA:
+        if d_valNA:
             D1 = round(D1, 1)
             Dvalue = abs(D1 - D0)
+        elif copysign(1.0,D1) == copysign(1.0,D0):
+            Dvalue = abs(D1) - abs(D0)
         else:
-            Dvalue = D1 - D0
+            Dvalue = -abs(D1 - D0)
         moonDm[i] = "{:0.1f}'".format(Dvalue)
         V0 = V1		# store current value as next previous value
         D0 = D1		# store current value as next previous value
     return moonVm, moonDm
 
 # > > > > > > > > > > MULTIPROCESSING ENTRY POINT < < < < < < < < < <
-def mp_sunmoon(date, ts, n):
+def mp_sunmoon(date, d_valNA, ts, n):
+    # !! WE *MUST* PASS config.d_valNA AS ITS VALUE CAN BE CHANGED PROGRAMMATICALLY !!
 
     eph = load(config.ephemeris[config.ephndx][0])	# load chosen ephemeris
     earth   = eph['earth']
@@ -515,7 +518,7 @@ def mp_sunmoon(date, ts, n):
     d0 = d - timedelta(days=1)
     ghas, decs, degs = mp_sunGHA(d, ts, earth, sun)
     gham, decm, degm, HPm, GHAupper, GHAlower, ghaSoD, ghaEoD = mp_moonGHA(d, ts, earth, moon)
-    vmin, dmin = mp_moonVD(d0,d, ts, earth, moon)
+    vmin, dmin = mp_moonVD(d0,d,d_valNA,ts,earth,moon)
 
     #buildUPlists(n, ghaSoD, GHAupper, ghaEoD)
     #buildLOWlists(n, ghaSoD, GHAupper, ghaEoD)
@@ -891,6 +894,7 @@ def moonrise_no_set(date, lat, t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, 
 
 # > > > > > > > > > > MULTIPROCESSING ENTRY POINT < < < < < < < < < <
 # > > > > > > > DO NOT WRITE TO config.py  (It's a copy!) < < < < < <
+# > > > DO NOT READ FROM config.py IF IT's BEEN MODIFIED PROGRAMMATICALLY < < <
 
 def mp_moonrise_set(d, lat, mstate0, hemisph, ts):  # used by nautical.py in twilighttab (section 2)
     # - - - TIMES ARE ROUNDED TO MINUTES - - -

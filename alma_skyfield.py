@@ -483,18 +483,25 @@ def sunSD(d):               # used in sunmoontab(m)
     distance = position.apparent().radec(epoch='date')[2]
     dist_km = distance.km
 # OLD:  sds = degrees(atan(695500.0 / dist_km))   # radius of sun = 695500 km
-    sds = degrees(atan(695700.0 / dist_km))   # volumetric mean radius of sun = 695700 km
-    sdsm = "{:0.1f}".format(sds * 60)   # convert to minutes of arc
+    svmr  = degrees(atan(695700.0 / dist_km))   # volumetric mean radius of sun = 695700 km
+    sunVMRm = "{:0.1f}".format(svmr * 60)   # convert to minutes of arc
 
     t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(sun)
     dec0 = position0.apparent().radec(epoch='date')[1]
+    D0 = dec0.degrees * 60.0    # convert to minutes of arc
     t1= ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(sun)
     dec1 = position1.apparent().radec(epoch='date')[1]
-    ds = dec1.degrees - dec0.degrees
-    dsm = "{:0.1f}".format(ds * 60)    # convert to minutes of arc
-    return sdsm, dsm
+    D1 = dec1.degrees * 60.0    # convert to minutes of arc
+    if config.d_valNA:
+        Dvalue = abs(D1 - D0)
+    elif copysign(1.0,D1) == copysign(1.0,D0):
+        Dvalue = abs(D1) - abs(D0)
+    else:
+        Dvalue = -abs(D1 - D0)
+    sunDm = "{:0.1f}".format(Dvalue)
+    return sunVMRm, sunDm
 
 def moonSD(d):              # used in sunmoontab(m)
     # compute semi-diameter of moon (in minutes)
@@ -591,8 +598,10 @@ def moonVD(d00, d):           # used in sunmoontab(m)
         if config.d_valNA:
             D1 = round(D1, 1)
             Dvalue = abs(D1 - D0)
+        elif copysign(1.0,D1) == copysign(1.0,D0):
+            Dvalue = abs(D1) - abs(D0)
         else:
-            Dvalue = D1 - D0
+            Dvalue = -abs(D1 - D0)
         moonDm[i] = "{:0.1f}'".format(Dvalue)
         V0 = V1		# store current value as next previous value
         D0 = D1		# store current value as next previous value
@@ -676,20 +685,27 @@ def vdm_Venus(d):           # used in planetstab(m)
     position0 = earth.at(t0).observe(venus)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    D0 = dec0.degrees * 60.0    # convert to minutes of arc
     mag = "{:0.2f}".format(planetary_magnitude(position0))  # planetary magnitude
 
     t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(venus)
     ra1 = position1.apparent().radec(epoch='date')[0]	# RA
     dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    D1 = dec1.degrees * 60.0    # convert to minutes of arc
 
     sha0 = (t0.gast - ra0.hours) * 15
     sha1 = (t1.gast - ra1.hours) * 15
     sha  = norm(sha1 - sha0) - 15
     RAcorrm = "{:0.1f}".format(sha * 60)	# convert to minutes of arc
-    Dcorr = dec1.degrees - dec0.degrees
-    Dcorrm = "{:0.1f}".format(Dcorr * 60)	# convert to minutes of arc
-    return RAcorrm, Dcorrm, mag
+    if config.d_valNA:
+        Dvalue = abs(D1 - D0)
+    elif copysign(1.0,D1) == copysign(1.0,D0):
+        Dvalue = abs(D1) - abs(D0)
+    else:
+        Dvalue = -abs(D1 - D0)
+    venusDm = "{:0.1f}".format(Dvalue)
+    return RAcorrm, venusDm, mag
 
 def vdm_Mars(d):            # used in planetstab(m)
     # compute v (GHA correction), d (Declination correction)
@@ -698,20 +714,27 @@ def vdm_Mars(d):            # used in planetstab(m)
     position0 = earth.at(t0).observe(mars)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    D0 = dec0.degrees * 60.0    # convert to minutes of arc
     mag = "{:0.2f}".format(planetary_magnitude(position0))  # planetary magnitude
 
     t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(mars)
     ra1 = position1.apparent().radec(epoch='date')[0]	# RA
     dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    D1 = dec1.degrees * 60.0    # convert to minutes of arc
 
     sha0 = (t0.gast - ra0.hours) * 15
     sha1 = (t1.gast - ra1.hours) * 15
     sha  = norm(sha1 - sha0) - 15
     RAcorrm = "{:0.1f}".format(sha * 60)	# convert to minutes of arc
-    Dcorr = dec1.degrees - dec0.degrees
-    Dcorrm = "{:0.1f}".format(Dcorr * 60)	# convert to minutes of arc
-    return RAcorrm, Dcorrm, mag
+    if config.d_valNA:
+        Dvalue = abs(D1 - D0)
+    elif copysign(1.0,D1) == copysign(1.0,D0):
+        Dvalue = abs(D1) - abs(D0)
+    else:
+        Dvalue = -abs(D1 - D0)
+    marsDm = "{:0.1f}".format(Dvalue)
+    return RAcorrm, marsDm, mag
 
 def vdm_Jupiter(d):         # used in planetstab(m)
     # compute v (GHA correction), d (Declination correction), m (magnitude of planet)
@@ -719,20 +742,27 @@ def vdm_Jupiter(d):         # used in planetstab(m)
     position0 = earth.at(t0).observe(jupiter)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    D0 = dec0.degrees * 60.0    # convert to minutes of arc
     mag = "{:0.2f}".format(planetary_magnitude(position0))  # planetary magnitude
 
     t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(jupiter)
     ra1 = position1.apparent().radec(epoch='date')[0]	# RA
     dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    D1 = dec1.degrees * 60.0    # convert to minutes of arc
 
     sha0 = (t0.gast - ra0.hours) * 15
     sha1 = (t1.gast - ra1.hours) * 15
     sha  = norm(sha1 - sha0) - 15
     RAcorrm = "{:0.1f}".format(sha * 60)	# convert to minutes of arc
-    Dcorr = dec1.degrees - dec0.degrees
-    Dcorrm = "{:0.1f}".format(Dcorr * 60)	# convert to minutes of arc
-    return RAcorrm, Dcorrm, mag
+    if config.d_valNA:
+        Dvalue = abs(D1 - D0)
+    elif copysign(1.0,D1) == copysign(1.0,D0):
+        Dvalue = abs(D1) - abs(D0)
+    else:
+        Dvalue = -abs(D1 - D0)
+    jupDm = "{:0.1f}".format(Dvalue)
+    return RAcorrm, jupDm, mag
 
 def vdm_Saturn(d):          # used in planetstab(m)
     # compute v (GHA correction), d (Declination correction)
@@ -741,20 +771,27 @@ def vdm_Saturn(d):          # used in planetstab(m)
     position0 = earth.at(t0).observe(saturn)
     ra0 = position0.apparent().radec(epoch='date')[0]	# RA
     dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    D0 = dec0.degrees * 60.0    # convert to minutes of arc
     mag = "{:0.2f}".format(planetary_magnitude(position0))  # planetary magnitude
 
     t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(saturn)
     ra1 = position1.apparent().radec(epoch='date')[0]	# RA
     dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    D1 = dec1.degrees * 60.0    # convert to minutes of arc
 
     sha0 = (t0.gast - ra0.hours) * 15
     sha1 = (t1.gast - ra1.hours) * 15
     sha  = norm(sha1 - sha0) - 15
     RAcorrm = "{:0.1f}".format(sha * 60)	# convert to minutes of arc
-    Dcorr = dec1.degrees - dec0.degrees
-    Dcorrm = "{:0.1f}".format(Dcorr * 60)	# convert to minutes of arc
-    return RAcorrm, Dcorrm, mag
+    if config.d_valNA:
+        Dvalue = abs(D1 - D0)
+    elif copysign(1.0,D1) == copysign(1.0,D0):
+        Dvalue = abs(D1) - abs(D0)
+    else:
+        Dvalue = -abs(D1 - D0)
+    satDm = "{:0.1f}".format(Dvalue)
+    return RAcorrm, satDm, mag
 
 #-----------------------------------------
 #   Aries & planet transit calculations
