@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2022  Andrew Bauer
+#   Copyright (C) 2023  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -1950,7 +1950,7 @@ xmax*sf+sf/2.2,ymin*sf-sf/1.8)
     tex += r"""
 % text outside border lines
   \node[font=\{}] at ({:.3f},{:.3f}) {{SIDEREAL HOUR ANGLE}};
-  \node[font=\{}, anchor=east] at ({:.3f},{:.3f}) {{\textcopyright\enspace 2022 Andrew Bauer}};
+  \node[font=\{}, anchor=east] at ({:.3f},{:.3f}) {{\textcopyright\enspace 2023 Andrew Bauer}};
   \node[font=\{}] at ({:.3f},{:.3f}) {{\textbf{{LUNAR DISTANCE (SHA {}° to {}°)\quad{}}}}};
   \node[rotate=90,font=\{}] at ({:.3f},0.0) {{DECLINATION}};
   \node[rotate=90,font=\{}] at ({:.3f},{:.3f}) {{South}};

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2022  Andrew Bauer
+#   Copyright (C) 2023  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -219,6 +219,7 @@ def init_sf(spad):
         PredData = False    # True when Prediction data flagged
         PredEnd  = False    # True when Prediction data no longer flagged
 
+        iers = ""
         with open(dfIERS) as file:
             for line in file:
                 mjd = int(line[7:12])
@@ -250,6 +251,13 @@ def init_sf(spad):
                     else:
                         PredEnd = True
                         break
+
+        if iers == "":
+            print("Error: IERS Earth Orientation Parameters data file is incomplete...")
+            print("       most likely the download did not finish properly.")
+            print("       Please delete the 'finals2000A.all' data file and")
+            print("       rerun this program - it will be downloaded anew.")
+            sys.exit(0)
 
         # detect end of Prediction data even if file ends with c2 == "P" ...
         year = int(iers[0:2]) + 2000
@@ -459,8 +467,9 @@ def sunGHA(d):              # used in sunmoontab(m)
 
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(sun)
-    ra = position.apparent().radec(epoch='date')[0]
-    dec = position.apparent().radec(epoch='date')[1]
+    #ra = position.apparent().radec(epoch='date')[0]
+    #dec = position.apparent().radec(epoch='date')[1]
+    ra, dec, _ = position.apparent().radec(epoch='date')
 
     ghas = ['' for x in range(24)]
     decs = ['' for x in range(24)]
@@ -519,9 +528,10 @@ def moonGHA(d, round2seconds = False):  # used in sunmoontab(m) & equationtab (i
     # compute moon's GHA, DEC and HP per hour of day
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(moon)
-    ra = position.apparent().radec(epoch='date')[0]
-    dec = position.apparent().radec(epoch='date')[1]
-    distance = position.apparent().radec(epoch='date')[2]
+    #ra = position.apparent().radec(epoch='date')[0]
+    #dec = position.apparent().radec(epoch='date')[1]
+    #distance = position.apparent().radec(epoch='date')[2]
+    ra, dec, distance = position.apparent().radec(epoch='date')
 
     if round2seconds:
         # also compute moon's GHA at End of Day (23:59:59.5) and Start of Day (24 hours earlier)
@@ -571,8 +581,9 @@ def moonVD(d00, d):           # used in sunmoontab(m)
     # first value required is at 00:00 on the current day...
     t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     pos0 = earth.at(t0).observe(moon)
-    ra0 = pos0.apparent().radec(epoch='date')[0]
-    dec0 = pos0.apparent().radec(epoch='date')[1]
+    #ra0 = pos0.apparent().radec(epoch='date')[0]
+    #dec0 = pos0.apparent().radec(epoch='date')[1]
+    ra0, dec0, _ = pos0.apparent().radec(epoch='date')
     V0 = gha2deg(t0.gast, ra0.hours)
     D0 = dec0.degrees * 60.0    # convert to minutes of arc
     if config.d_valNA:
@@ -583,8 +594,9 @@ def moonVD(d00, d):           # used in sunmoontab(m)
     # ...then 24 values at hourly intervals from 00:00 onwards
     t = ts.ut1(d.year, d.month, d.day, next_hour_of_day, 0, 0)
     position = earth.at(t).observe(moon)
-    ra = position.apparent().radec(epoch='date')[0]
-    dec = position.apparent().radec(epoch='date')[1]
+    #ra = position.apparent().radec(epoch='date')[0]
+    #dec = position.apparent().radec(epoch='date')[1]
+    ra, dec, _ = position.apparent().radec(epoch='date')
 
     moonVm = ['' for x in range(24)]
     moonDm = ['' for x in range(24)]
@@ -614,8 +626,9 @@ def moonVD(d00, d):           # used in sunmoontab(m)
 def venusGHA(d):            # used in planetstab(m)
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(venus)
-    ra = position.apparent().radec(epoch='date')[0]
-    dec = position.apparent().radec(epoch='date')[1]
+    #ra = position.apparent().radec(epoch='date')[0]
+    #dec = position.apparent().radec(epoch='date')[1]
+    ra, dec, _ = position.apparent().radec(epoch='date')
 
     ghas = ['' for x in range(24)]
     decs = ['' for x in range(24)]
@@ -631,8 +644,9 @@ def venusGHA(d):            # used in planetstab(m)
 def marsGHA(d):             # used in planetstab(m)
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(mars)
-    ra = position.apparent().radec(epoch='date')[0]
-    dec = position.apparent().radec(epoch='date')[1]
+    #ra = position.apparent().radec(epoch='date')[0]
+    #dec = position.apparent().radec(epoch='date')[1]
+    ra, dec, _ = position.apparent().radec(epoch='date')
 
     ghas = ['' for x in range(24)]
     decs = ['' for x in range(24)]
@@ -648,8 +662,9 @@ def marsGHA(d):             # used in planetstab(m)
 def jupiterGHA(d):          # used in planetstab(m)
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(jupiter)
-    ra = position.apparent().radec(epoch='date')[0]
-    dec = position.apparent().radec(epoch='date')[1]
+    #ra = position.apparent().radec(epoch='date')[0]
+    #dec = position.apparent().radec(epoch='date')[1]
+    ra, dec, _ = position.apparent().radec(epoch='date')
 
     ghas = ['' for x in range(24)]
     decs = ['' for x in range(24)]
@@ -665,8 +680,9 @@ def jupiterGHA(d):          # used in planetstab(m)
 def saturnGHA(d):           # used in planetstab(m)
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(saturn)
-    ra = position.apparent().radec(epoch='date')[0]
-    dec = position.apparent().radec(epoch='date')[1]
+    #ra = position.apparent().radec(epoch='date')[0]
+    #dec = position.apparent().radec(epoch='date')[1]
+    ra, dec, _ = position.apparent().radec(epoch='date')
 
     ghas = ['' for x in range(24)]
     decs = ['' for x in range(24)]
@@ -683,15 +699,17 @@ def vdm_Venus(d):           # used in planetstab(m)
     # compute v (GHA correction), d (Declination correction), m (magnitude of planet)
     t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(venus)
-    ra0 = position0.apparent().radec(epoch='date')[0]	# RA
-    dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    #ra0 = position0.apparent().radec(epoch='date')[0]	# RA
+    #dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    ra0, dec0, _ = position0.apparent().radec(epoch='date')
     D0 = dec0.degrees * 60.0    # convert to minutes of arc
     mag = "{:0.2f}".format(planetary_magnitude(position0))  # planetary magnitude
 
     t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(venus)
-    ra1 = position1.apparent().radec(epoch='date')[0]	# RA
-    dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    #ra1 = position1.apparent().radec(epoch='date')[0]	# RA
+    #dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    ra1, dec1, _ = position1.apparent().radec(epoch='date')
     D1 = dec1.degrees * 60.0    # convert to minutes of arc
 
     sha0 = (t0.gast - ra0.hours) * 15
@@ -712,15 +730,17 @@ def vdm_Mars(d):            # used in planetstab(m)
     # NOTE: m (magnitude of planet) comes from alma_ephem.py
     t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(mars)
-    ra0 = position0.apparent().radec(epoch='date')[0]	# RA
-    dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    #ra0 = position0.apparent().radec(epoch='date')[0]	# RA
+    #dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    ra0, dec0, _ = position0.apparent().radec(epoch='date')
     D0 = dec0.degrees * 60.0    # convert to minutes of arc
     mag = "{:0.2f}".format(planetary_magnitude(position0))  # planetary magnitude
 
     t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(mars)
-    ra1 = position1.apparent().radec(epoch='date')[0]	# RA
-    dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    #ra1 = position1.apparent().radec(epoch='date')[0]	# RA
+    #dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    ra1, dec1, _ = position1.apparent().radec(epoch='date')
     D1 = dec1.degrees * 60.0    # convert to minutes of arc
 
     sha0 = (t0.gast - ra0.hours) * 15
@@ -740,15 +760,17 @@ def vdm_Jupiter(d):         # used in planetstab(m)
     # compute v (GHA correction), d (Declination correction), m (magnitude of planet)
     t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(jupiter)
-    ra0 = position0.apparent().radec(epoch='date')[0]	# RA
-    dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    #ra0 = position0.apparent().radec(epoch='date')[0]	# RA
+    #dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    ra0, dec0, _ = position0.apparent().radec(epoch='date')
     D0 = dec0.degrees * 60.0    # convert to minutes of arc
     mag = "{:0.2f}".format(planetary_magnitude(position0))  # planetary magnitude
 
     t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(jupiter)
-    ra1 = position1.apparent().radec(epoch='date')[0]	# RA
-    dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    #ra1 = position1.apparent().radec(epoch='date')[0]	# RA
+    #dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    ra1, dec1, _ = position1.apparent().radec(epoch='date')
     D1 = dec1.degrees * 60.0    # convert to minutes of arc
 
     sha0 = (t0.gast - ra0.hours) * 15
@@ -769,15 +791,17 @@ def vdm_Saturn(d):          # used in planetstab(m)
     # NOTE: m (magnitude of planet) comes from alma_ephem.py
     t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(saturn)
-    ra0 = position0.apparent().radec(epoch='date')[0]	# RA
-    dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    #ra0 = position0.apparent().radec(epoch='date')[0]	# RA
+    #dec0 = position0.apparent().radec(epoch='date')[1]	# declination
+    ra0, dec0, _ = position0.apparent().radec(epoch='date')
     D0 = dec0.degrees * 60.0    # convert to minutes of arc
     mag = "{:0.2f}".format(planetary_magnitude(position0))  # planetary magnitude
 
     t1 = ts.ut1(d.year, d.month, d.day, 1, 0, 0)
     position1 = earth.at(t1).observe(saturn)
-    ra1 = position1.apparent().radec(epoch='date')[0]	# RA
-    dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    #ra1 = position1.apparent().radec(epoch='date')[0]	# RA
+    #dec1 = position1.apparent().radec(epoch='date')[1]	# declination
+    ra1, dec1, _ = position1.apparent().radec(epoch='date')
     D1 = dec1.degrees * 60.0    # convert to minutes of arc
 
     sha0 = (t0.gast - ra0.hours) * 15
@@ -829,8 +853,9 @@ def planetstransit(d, round2seconds = False):      # used in starstab & meridian
 # Venus
     t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     position0 = earth.at(t0).observe(venus)
-    ra0 = position0.apparent().radec(epoch='date')[0]	# RA
-    vau = position0.apparent().radec(epoch='date')[2]	# distance
+    #ra0 = position0.apparent().radec(epoch='date')[0]	# RA
+    #vau = position0.apparent().radec(epoch='date')[2]	# distance
+    ra0, _, vau = position0.apparent().radec(epoch='date')
     vsha = fmtgha(0, ra0.hours)
     hpvenus = "{:0.1f}".format((tan(6371/(vau.au*149597870.7)))*60*180/pi)
 
@@ -849,8 +874,9 @@ def planetstransit(d, round2seconds = False):      # used in starstab & meridian
 
 # Mars
     position0 = earth.at(t0).observe(mars)
-    ra0 = position0.apparent().radec(epoch='date')[0]	# RA
-    mau = position0.apparent().radec(epoch='date')[2]	# distance
+    #ra0 = position0.apparent().radec(epoch='date')[0]	# RA
+    #mau = position0.apparent().radec(epoch='date')[2]	# distance
+    ra0, _, mau = position0.apparent().radec(epoch='date')
     marssha = fmtgha(0, ra0.hours)
     hpmars = "{:0.1f}".format((tan(6371/(mau.au*149597870.7)))*60*180/pi)
 

@@ -202,16 +202,6 @@ A Lunar Distance chart can now be created for 19 August 2038
 
 **UPDATE: Dec 2022**
 
-initial BUGFIX (in PyPI skyalmanac 1.11.3):
-The Moon's hourly d-value now corresponds to the values in the official Nautical Almanac:
-* the d-value is unsigned
-* its value is the hourly difference of the ROUNDED Declinations
-
-In case you prefer the *previous* technique, set **d_valNA** in *config.py* to False.
-Previously the Moon's hourly d-value was:
-* negative if the next Declination is southerly; otherwise positive
-* the rounded difference of the EXACT hourly Declinations
-
 second ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.11.4):
 New Command Line options:
 * -nao ... HMNAO style hourly Moon d-values
@@ -221,12 +211,19 @@ The desired default can also be specified using **d_valNA** in *config.py*, whic
 Using  '-dtr', the Moon's hourly d-value is calculated "difference-then-round":
 * the d-value is signed (negative if Declination is decreasing, i.e. away from the Earth's poles). This also applies to the d-values for the Sun and planets.
 * its value is the ROUNDED difference of the EXACT hourly Declinations
-* the hourly d-value steps are smooth - gradually increasing or decreasing 
+* the hourly d-value steps are smooth - gradually increasing or decreasing
 
 When using the "HMNAO Nautical Almanac"-compatible mode, e.g. with '-nao':
 * the d-values of Sun, planets and Moon are unsigned
 * the hourly Moon d-values are calculated as the difference of the ROUNDED Declinations (round-then-difference)
 * the hourly d-value steps are sometimes irregular
+
+**UPDATE: Apr 2023**
+
+ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.11.5):
+* unnecessary duplicate computations of apparent position are now eliminated.
+* the program crashed if the 'finals2000A.all' data file containing the IERS Earth Orientation Parameters downloaded only partially. This is now detected and an error message informs the user to delete the file and re-run the program as it will be downloaded anew.
+* creating the 'Increments and Corrections' tables with MiKTeX no longer requires extra memory.
 
 ## Requirements
 
@@ -234,7 +231,7 @@ When using the "HMNAO Nautical Almanac"-compatible mode, e.g. with '-nao':
 &emsp;Typesetting is done typically by MiKTeX or TeX Live.  
 &emsp;Here are the requirements/recommendations:
 
-* Python v3.4 or higher (v3.10.x is recommended)
+* Python v3.4 or higher (v3.11.x is recommended)
 * Skyfield >= 1.31 (the latest is recommended; see the Skyfield Changelog)
 * Pandas >= 1.0 (to decode the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
 * MiKTeX&ensp;or&ensp;TeX Live
@@ -250,17 +247,24 @@ When using the "HMNAO Nautical Almanac"-compatible mode, e.g. with '-nao':
 &emsp;If upgrading from an older version of Skyfield to 1.31 or higher, these files may be deleted:  
 &emsp;**deltat.data** and **deltat.preds**
 
-### INSTALLATION GUIDELINES on Windows 10:
+### INSTALLATION GUIDELINES on Windows 10 or 11:
+
+**It is unlikely that the performance improvement with multiprocessing requires specific virtualization settings enabled in the BIOS. (Intel Virtualization Technology or VMM support is not required.) Furthermore Windows 10 Home (without Hyper-V support) is sufficient - Windows 10 Pro/Enterprise/Education is not required. Also Windows 11 Home is sufficient.**
 
 &emsp;Tested on Windows 10 Pro, Version 21H2 with an AMD Ryzen 7 3700X 8-Core Processor  
+&emsp;A PDF reader is required, e.g. **Adobe Acrobat Reader DC**  
 
-&emsp;Install Python 3.10.6 (should be in the system environment variable PATH, e.g. )  
-&emsp;&ensp;**C:\\Python310\Scripts;C:\\Python310;** .....  
-&emsp;Install MiKTeX 22.7 from https://miktex.org/  
-&emsp;When MiKTeX first runs it will require installation of additional packages.  
+&emsp;Install Python 3.11.3 It should be in the system environment variable PATH, e.g.  
+&emsp;&ensp;**C:\\Python311\Scripts;C:\\Python311;** .....  
+&emsp;Install MiKTeX 22.10 from https://miktex.org/  
+&emsp;&emsp;**Run** basic-miktex-22.10-x64.exe **as administrator**  
+&emsp;&emsp;I prefer to install MiKTeX **for all users** on a private laptop  
+&emsp;&emsp;**Reboot the computer** to avoid the message:  
+&emsp;&emsp;"- - - Neither TeX Live nor MiKTeX is installed - - -"  
+&emsp;When MiKTeX first runs confirm the installation of additional packages.  
 &emsp;Run Command Prompt as Administrator, go to your Python folder and execute, e.g.:
 
-&emsp;**cd C:\\Python310**  
+&emsp;**cd C:\\Python311**  
 &emsp;**python.exe -m pip install --upgrade pip**  
 &emsp;... for a first install (it's preferable to install *wheel* first):  
 &emsp;**pip3 install wheel**  
@@ -282,7 +286,7 @@ When using the "HMNAO Nautical Almanac"-compatible mode, e.g. with '-nao':
 &emsp;and save the file. Problem solved. For more details go [here](https://tex.stackexchange.com/questions/438902/how-to-increase-memory-size-for-xelatex-in-miktex/438911#438911)
 
 
-### INSTALLATION GUIDELINES on Ubuntu 19.10 or 20.04:
+### INSTALLATION GUIDELINES on Ubuntu Desktop 19.10 or 20.04 or 22.04:
 
 &emsp;Ubuntu 18.04 and higher come with Python 3 preinstalled,  
 &emsp;however pip may need to be installed:  

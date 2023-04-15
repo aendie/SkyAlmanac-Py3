@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2022  Andrew Bauer
+#   Copyright (C) 2023  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -364,9 +364,10 @@ def moon_GHA(d):        # used in moontab
     # compute moon's GHA, DEC and HP per hour of day
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(moon)
-    ra = position.apparent().radec(epoch='date')[0]
-    dec = position.apparent().radec(epoch='date')[1]
-    distance = position.apparent().radec(epoch='date')[2]
+    #ra = position.apparent().radec(epoch='date')[0]
+    #dec = position.apparent().radec(epoch='date')[1]
+    #distance = position.apparent().radec(epoch='date')[2]
+    ra, dec, distance = position.apparent().radec(epoch='date')
 
     # also compute moon's GHA at End of Day (23:59:30) and Start of Day (24 hours earlier)
     tSoD = ts.ut1(d.year, d.month, d.day-1, 23, 59, 30)
@@ -407,16 +408,18 @@ def moon_VD(d0,d):           # used in moontab
     # first value required is at 00:00 on the current day...
     t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     pos0 = earth.at(t0).observe(moon)
-    ra0 = pos0.apparent().radec(epoch='date')[0]
-    dec0 = pos0.apparent().radec(epoch='date')[1]
+    #ra0 = pos0.apparent().radec(epoch='date')[0]
+    #dec0 = pos0.apparent().radec(epoch='date')[1]
+    ra0, dec0, _ = pos0.apparent().radec(epoch='date')
     V0 = gha2deg(t0.gast, ra0.hours)
     D0 = dec0.degrees
 
     # ...then 24 values at hourly intervals from 00:00 onwards
     t = ts.ut1(d.year, d.month, d.day, next_hour_of_day, 0, 0)
     position = earth.at(t).observe(moon)
-    ra  = position.apparent().radec(epoch='date')[0]
-    dec = position.apparent().radec(epoch='date')[1]
+    #ra  = position.apparent().radec(epoch='date')[0]
+    #dec = position.apparent().radec(epoch='date')[1]
+    ra, dec, _ = position.apparent().radec(epoch='date')
 
     moonVm = ['' for x in range(24)]
     moonDm = ['' for x in range(24)]
@@ -598,8 +601,9 @@ def sunGHA(d):              # used in addPLANET and showLD
     # compute sun's GHA and DEC per hour of day
     t = ts.ut1(d.year, d.month, d.day, hour_of_day5, 0, 0)
     position = earth.at(t).observe(sun)
-    ra   = position.apparent().radec(epoch='date')[0]
-    decR = position.apparent().radec(epoch='date')[1]
+    #ra   = position.apparent().radec(epoch='date')[0]
+    #decR = position.apparent().radec(epoch='date')[1]
+    ra, decR, _ = position.apparent().radec(epoch='date')
 
     sha = [None] * 5
     dec = [None] * 5
@@ -615,8 +619,9 @@ def moonGHA(d):             # used in getMOON, addMOON and Main
     # compute moon's GHA, DEC and HP per hour of day
     t = ts.ut1(d.year, d.month, d.day, hour_of_day3, 0, 0)
     position = earth.at(t).observe(moon)
-    ra   = position.apparent().radec(epoch='date')[0]
-    decR = position.apparent().radec(epoch='date')[1]
+    #ra   = position.apparent().radec(epoch='date')[0]
+    #decR = position.apparent().radec(epoch='date')[1]
+    ra, decR, _ = position.apparent().radec(epoch='date')
 
     sha = [None] * 3
     dec = [None] * 3
@@ -635,8 +640,9 @@ def moonGHA(d):             # used in getMOON, addMOON and Main
 def venusGHA(d):            # used in addPLANET and showLD
     t = ts.ut1(d.year, d.month, d.day, hour_of_day5, 0, 0)
     position = earth.at(t).observe(venus)
-    ra   = position.apparent().radec(epoch='date')[0]
-    decR = position.apparent().radec(epoch='date')[1]
+    #ra   = position.apparent().radec(epoch='date')[0]
+    #decR = position.apparent().radec(epoch='date')[1]
+    ra, decR, _ = position.apparent().radec(epoch='date')
 
     sha = [None] * 5
     dec = [None] * 5
@@ -651,8 +657,9 @@ def venusGHA(d):            # used in addPLANET and showLD
 def marsGHA(d):             # used in addPLANET and showLD
     t = ts.ut1(d.year, d.month, d.day, hour_of_day5, 0, 0)
     position = earth.at(t).observe(mars)
-    ra   = position.apparent().radec(epoch='date')[0]
-    decR = position.apparent().radec(epoch='date')[1]
+    #ra   = position.apparent().radec(epoch='date')[0]
+    #decR = position.apparent().radec(epoch='date')[1]
+    ra, decR, _ = position.apparent().radec(epoch='date')
 
     sha = [None] * 5
     dec = [None] * 5
@@ -667,8 +674,9 @@ def marsGHA(d):             # used in addPLANET and showLD
 def jupiterGHA(d):          # used in addPLANET and showLD
     t = ts.ut1(d.year, d.month, d.day, hour_of_day5, 0, 0)
     position = earth.at(t).observe(jupiter)
-    ra   = position.apparent().radec(epoch='date')[0]
-    decR = position.apparent().radec(epoch='date')[1]
+    #ra   = position.apparent().radec(epoch='date')[0]
+    #decR = position.apparent().radec(epoch='date')[1]
+    ra, decR, _ = position.apparent().radec(epoch='date')
 
     sha = [None] * 5
     dec = [None] * 5
@@ -683,8 +691,9 @@ def jupiterGHA(d):          # used in addPLANET and showLD
 def saturnGHA(d):           # used in addPLANET and showLD
     t = ts.ut1(d.year, d.month, d.day, hour_of_day5, 0, 0)
     position = earth.at(t).observe(saturn)
-    ra   = position.apparent().radec(epoch='date')[0]
-    decR = position.apparent().radec(epoch='date')[1]
+    #ra   = position.apparent().radec(epoch='date')[0]
+    #decR = position.apparent().radec(epoch='date')[1]
+    ra, decR, _ = position.apparent().radec(epoch='date')
 
     sha = [None] * 5
     dec = [None] * 5

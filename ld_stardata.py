@@ -3,7 +3,7 @@
 
 # star data for ld_charts.py (Lunar Distance chart)
 
-#   Copyright (C) 2022  Andrew Bauer
+#   Copyright (C) 2023  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by

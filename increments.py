@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 #   Copyright (C) 2014  Enno Rodegerdts
-#   Copyright (C) 2022  Andrew Bauer
+#   Copyright (C) 2023  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -109,7 +109,12 @@ def inctab(mmm):
         tab += line
         sec += 1
         
-    tab = tab + r'''\hline \end{tabular*}'''
+    tab += r'''\hline \end{tabular*}'''
+
+    if (mmm+1)%3 == 0:
+        tab += r'''
+\newpage'''
+
     return tab
 
 def allinctabs(colsep):
