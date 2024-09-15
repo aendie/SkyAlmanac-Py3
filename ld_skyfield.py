@@ -598,7 +598,7 @@ def sunSD(d):
 #-------------------------------------------------------------
 
 def sunGHA(d):              # used in addPLANET and showLD
-    # compute sun's GHA and DEC per hour of day
+    # compute sun's GHA and DEC at 0h, 6h, 12h, 18h, 24h
     t = ts.ut1(d.year, d.month, d.day, hour_of_day5, 0, 0)
     position = earth.at(t).observe(sun)
     #ra   = position.apparent().radec(epoch='date')[0]
@@ -616,7 +616,7 @@ def sunGHA(d):              # used in addPLANET and showLD
     return sha, dec
 
 def moonGHA(d):             # used in getMOON, addMOON and Main
-    # compute moon's GHA, DEC and HP per hour of day
+    # compute moon's GHA, DEC and HP at 0h, 12h, 24h
     t = ts.ut1(d.year, d.month, d.day, hour_of_day3, 0, 0)
     position = earth.at(t).observe(moon)
     #ra   = position.apparent().radec(epoch='date')[0]
@@ -638,6 +638,7 @@ def moonGHA(d):             # used in getMOON, addMOON and Main
 #------------------------------------------------------------------------------
 
 def venusGHA(d):            # used in addPLANET and showLD
+    # compute planet's GHA and DEC at 0h, 6h, 12h, 18h, 24h
     t = ts.ut1(d.year, d.month, d.day, hour_of_day5, 0, 0)
     position = earth.at(t).observe(venus)
     #ra   = position.apparent().radec(epoch='date')[0]
@@ -655,6 +656,7 @@ def venusGHA(d):            # used in addPLANET and showLD
     return sha, dec
 
 def marsGHA(d):             # used in addPLANET and showLD
+    # compute planet's GHA and DEC at 0h, 6h, 12h, 18h, 24h
     t = ts.ut1(d.year, d.month, d.day, hour_of_day5, 0, 0)
     position = earth.at(t).observe(mars)
     #ra   = position.apparent().radec(epoch='date')[0]
@@ -672,6 +674,7 @@ def marsGHA(d):             # used in addPLANET and showLD
     return sha, dec
 
 def jupiterGHA(d):          # used in addPLANET and showLD
+    # compute planet's GHA and DEC at 0h, 6h, 12h, 18h, 24h
     t = ts.ut1(d.year, d.month, d.day, hour_of_day5, 0, 0)
     position = earth.at(t).observe(jupiter)
     #ra   = position.apparent().radec(epoch='date')[0]
@@ -689,6 +692,7 @@ def jupiterGHA(d):          # used in addPLANET and showLD
     return sha, dec
 
 def saturnGHA(d):           # used in addPLANET and showLD
+    # compute planet's GHA and DEC at 0h, 6h, 12h, 18h, 24h
     t = ts.ut1(d.year, d.month, d.day, hour_of_day5, 0, 0)
     position = earth.at(t).observe(saturn)
     #ra   = position.apparent().radec(epoch='date')[0]

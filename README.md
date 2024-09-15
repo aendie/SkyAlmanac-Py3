@@ -225,14 +225,26 @@ ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.11.5):
 * the program crashed if the 'finals2000A.all' data file containing the IERS Earth Orientation Parameters downloaded only partially. This is now detected and an error message informs the user to delete the file and re-run the program as it will be downloaded anew.
 * creating the 'Increments and Corrections' tables with MiKTeX no longer requires extra memory.
 
+**UPDATE: Sep 2024**
+
+ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.12):
+* moonrise/moonset accuracy increased slightly
+* a symbol (4 slanting lines) indicates "twilight lasts all night" within the sun twilight tables
+Note: a missing moonrise or moonset are still indicated by two dots rather than the convention employed in the official Nautical Almanac by printing hours:minutes greater than 24:00, i.e. in the next day.
+
+Code modernised to use ...
+* the 'World Geodetic System 1984 Geoid' for latitude and longitude (if Skyfield >= 1.35)
+* the latest 'find_risings' & 'find_settings' Skyfield routines (if Skyfield >= 1.48) except for moonrise/moonset.
+
 ## Requirements
 
-&emsp;Most of the computation is done by the free Skyfield library.  
+&emsp;Most of the computation is done by the Skyfield astronomical library.  
 &emsp;Typesetting is done typically by MiKTeX or TeX Live.  
 &emsp;Here are the requirements/recommendations:
 
 * Python v3.4 or higher (v3.11.x is recommended)
 * Skyfield >= 1.31 (the latest is recommended; see the Skyfield Changelog)
+* numpy < 1.27.0 (a requirement from scipy 1.10.1)
 * Pandas >= 1.0 (to decode the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
 * MiKTeX&ensp;or&ensp;TeX Live
 

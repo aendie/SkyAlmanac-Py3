@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2023  Andrew Bauer
+#   Copyright (C) 2024  Andrew Bauer
 #   Copyright (C) 2014  Enno Rodegerdts
 
 #   This program is free software; you can redistribute it and/or modify
@@ -259,6 +259,14 @@ def double_events_found(m1, m2):
         if m2[i] != '--:--':
             dbl = True
     return dbl
+
+def twilight_symbol(oldtwi):
+    twi = []
+    for event in oldtwi:
+        if event == '--:--':
+            twi.append('\mytwilightsymbol{1.0ex}')
+        else: twi.append(event)
+    return twi
 
 # >>>>>>>>>>>>>>>>>>>>>>>>
 def mp_planetGHA_worker(Date, ts, obj):
@@ -895,19 +903,19 @@ moonvisible = [None] * 31       # moonvisible[0] up to moonvisible[30]
 def mp_twilight_worker(Date, ts, lat):
     #print(" mp_twilight_worker Start {}".format(lat))
     hemisph = 'N' if lat >= 0 else 'S'
-    twi = mp_twilight(Date, lat, hemisph, ts)       # ===>>> mp_nautical.py
+    twi = mp_twilight(Date, lat, ts)                # ===>>> mp_nautical.py
     #print(" mp_twilight_worker Finish {}".format(lat))
     return twi      # return list for all latitudes
 
 def mp_moonlight_worker(Date, ts, lat, mstate):
     #print(" mp_moonlight_worker Start  {}".format(lat))
     hemisph = 'N' if lat >= 0 else 'S'
-    ml = mp_moonrise_set(Date, lat, mstate, hemisph, ts)    # ===>>> mp_nautical.py
+    ml = mp_moonrise_set(Date, lat, mstate, ts)     # ===>>> mp_nautical.py
     #print(" mp_moonlight_worker Finish {}".format(lat))
     return ml       # return list for all latitudes
 
 def twilighttab(Date, ts):
-    # returns the twilight and moonrise tables, finally EoT data
+    # returns the sun twilight and moonrise/moonset tables, finally EoT data
 
     if config.MULTIpr:
         # multiprocess twilight values for "Date+1" per latitude simultaneously
@@ -949,7 +957,7 @@ def twilighttab(Date, ts):
             del listmoon[k][-1]
         #print("listmoon = {}".format(listmoon))
 
-# Twilight tables ...........................................
+# Sun Twilight tables ...........................................
     #lat = [72,70,68,66,64,62,60,58,56,54,52,50,45,40,35,30,20,10,0, -10,-20,-30,-35,-40,-45,-50,-52,-54,-56,-58,-60]
     latNS = [72, 70, 58, 40, 10, -10, -50, -60]
     # OLD: \begin{tabular*}{0.45\textwidth}[t]{@{\extracolsep{\fill}}|r|ccc|ccc|}
@@ -1012,7 +1020,8 @@ def twilighttab(Date, ts):
             twi = listoftwi[j-5]
         else:
             # day+1 to calculate for the second day (three days are printed on one page)
-            twi = twilight(Date+timedelta(days=1), lat, hemisph)
+            twi = twilight(Date+timedelta(days=1), lat)
+        twi = twilight_symbol(twi)
 
         line = r'''\textbf{{{}}}'''.format(hsph) + " " + r'''{}$^\circ$'''.format(abs(lat))
         line = line + r''' & {} & {} & {} & {} & {} & {} \\
@@ -1067,7 +1076,7 @@ def twilighttab(Date, ts):
             moon = listmoon[j-5][0]
             moon2 = listmoon[j-5][1]
         else:
-            moon, moon2 = moonrise_set(Date,lat,hemisph)
+            moon, moon2 = moonrise_set(Date,lat)
 
         if not(double_events_found(moon,moon2)):
             tab = tab + r'''\textbf{{{}}}'''.format(hsph) + " " + r'''{}$^\circ$'''.format(abs(lat))
@@ -1672,6 +1681,11 @@ def makeNAnew(first_day, dtp, ts):
 %\showboxdepth=50    % use for logging
 %\DeclareUnicodeCharacter{00B0}{\ensuremath{{}^\circ}}
 \setlength\fboxsep{1.5pt}       % ONLY used by \colorbox in alma_skyfield.py
+\newcommand{\mytwilightsymbol}[1]{\tikz[baseline=-0.8ex]{
+\draw[] (0.0,-0.9*#1) -- (0.6*#1,0.9*#1);
+\draw[] (#1,-0.9*#1) -- (1.6*#1,0.9*#1);
+\draw[] (2.0*#1,-0.9*#1) -- (2.6*#1,0.9*#1);
+\draw[] (3.0*#1,-0.9*#1) -- (3.6*#1,0.9*#1);}}
 \begin{document}'''
 
     if not config.DPonly:
@@ -1862,6 +1876,11 @@ def makeNAold(first_day, dtp, ts):
 %\showboxdepth=50    % use for logging
 %\DeclareUnicodeCharacter{00B0}{\ensuremath{{}^\circ}}
 \setlength\fboxsep{1.5pt}       % ONLY used by \colorbox in alma_skyfield.py
+\newcommand{\mytwilightsymbol}[1]{\tikz[baseline=-0.8ex]{
+\draw[] (0.0,-0.9*#1) -- (0.6*#1,0.9*#1);
+\draw[] (#1,-0.9*#1) -- (1.6*#1,0.9*#1);
+\draw[] (2.0*#1,-0.9*#1) -- (2.6*#1,0.9*#1);
+\draw[] (3.0*#1,-0.9*#1) -- (3.6*#1,0.9*#1);}}
 \begin{document}'''
 
     if not config.DPonly:

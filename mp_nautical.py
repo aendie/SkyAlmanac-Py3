@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2023  Andrew Bauer
+#   Copyright (C) 2024  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -28,13 +28,15 @@
 # ----------------------------------------------------------------------------------
 
 ###### Standard library imports ######
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from time import time         # 00000 - stopwatch elements
 from math import degrees, atan, tan, pi, copysign
+#import sys			# sys.exit() does not work here
 
 ###### Third party imports ######
+from skyfield import VERSION
 from skyfield.api import load
-from skyfield.api import Topos, Star
+from skyfield.api import Topos, Star, wgs84, N, S, E, W     # Topos is deprecated in Skyfield v1.35!
 from skyfield import almanac
 from skyfield.nutationlib import iau2000b
 #from skyfield.data import hipparcos
@@ -53,6 +55,18 @@ degree_sign= u'\N{DEGREE SIGN}'
 #----------------------
 #   internal methods
 #----------------------
+
+def compareVersion(versions1, version2):
+    #versions1 = [int(v) for v in version1.split(".")]
+    versions2 = [int(v) for v in version2.split(".")]
+    for i in range(max(len(versions1),len(versions2))):
+        v1 = versions1[i] if i < len(versions1) else 0
+        v2 = versions2[i] if i < len(versions2) else 0
+        if v1 > v2:
+            return 1
+        elif v1 < v2:
+            return -1
+    return 0
 
 def GHAcolong(gha):
     # return the colongitude, e.g. 270° returns 90°
@@ -99,13 +113,116 @@ def fmtgha(gst, ra):
         sha = sha + 360
     return fmtdeg(sha)
 
-def time2text(t, round2seconds):
-    if round2seconds:
+def time2text(t, with_seconds):
+    if with_seconds:
         return t.ut1_strftime('%H:%M:%S')
     else:
         return t.ut1_strftime('%H:%M')
 
-def rise_set(t, y, lats, ts, round2seconds = False):
+def next_rise_set(rise, sett, yR, yS):
+    ndxR = 0 if len(rise) > 0 else 10
+    ndxS = 0 if len(sett) > 0 else 10
+    pickRISE = None         # no idea if RISE or SET comes first and is valid
+    prev_dt = datetime.min.replace(tzinfo=timezone.utc)     # closest to datetime zero
+    currentstate = None
+
+    while ndxR < len(rise) or ndxS < len(sett):
+        if pickRISE is None:        # establish if RISE or SET to be chosen (initialize pickRISE)
+            RISEok = SETTok = False
+            if ndxR < len(rise): RISEok = True
+            if ndxS < len(sett): SETTok = True
+            if RISEok and not SETTok: pickRISE = True
+            if SETTok and not RISEok: pickRISE = False
+            if RISEok and SETTok:
+                pickRISE = True if rise[ndxR] < sett[ndxS] else False           # Skyfield >= 1.48 rqrd
+            if not RISEok and not SETTok: ndxR += 1; ndxS += 1
+            continue      # avoid 't.utc_datetime()' below as 't' unknown
+        elif pickRISE:
+            t = rise[ndxR]
+            if yR[ndxR]: currentstate = False; break
+            ndxR += 1
+            pickRISE = not pickRISE     # flip RISE to SET & vice-versa
+        else:
+            t = sett[ndxS]
+            if yS[ndxS]: currentstate = True; break
+            ndxS += 1
+            pickRISE = not pickRISE     # flip RISE to SET & vice-versa
+
+        dt = t.utc_datetime()
+        if prev_dt > dt: print("Event time sequence ERROR on {} in mp_nautical.next_rise_set".format(dt.strftime("%d-%m-%Y")))
+        prev_dt = dt
+
+    return currentstate
+
+def fmt_rise_set(rise, sett, yR, yS, txt, with_seconds=False):
+    # note: yR and yS must be passed here as it is not possible to .pop() a False time from the Time object.
+    # note: if yR or yS returns [], it is interpreted as False. However the time would also be [].
+    ndxR = 0 if len(rise) > 0 else 10
+    ndxS = 0 if len(sett) > 0 else 10
+    pickRISE = None         # no idea if RISE or SET comes first and is valid
+    
+    prev_dt = datetime.min.replace(tzinfo=timezone.utc)     # closest to datetime zero
+    r = s = 0
+    Rtxt = ['--:--', '--:--'] #if not with_seconds else ['--:--:--', '--:--:--']
+    Stxt = ['--:--', '--:--'] #if not with_seconds else ['--:--:--', '--:--:--']
+    finalstate = None   # True if above horizon; False if below horizon; None if unknown
+
+    while ndxR < len(rise) or ndxS < len(sett):
+        if pickRISE is None:        # establish if RISE or SET to be chosen (initialize pickRISE)
+            RISEok = SETTok = False
+            if ndxR < len(rise): RISEok = True
+            if ndxS < len(sett): SETTok = True
+            if RISEok and not SETTok: pickRISE = True
+            if SETTok and not RISEok: pickRISE = False
+            if RISEok and SETTok:
+                pickRISE = True if rise[ndxR] < sett[ndxS] else False           # Skyfield >= 1.48 rqrd
+            if not RISEok and not SETTok: ndxR += 1; ndxS += 1
+            continue      # avoid 't.utc_datetime()' below as 't' unknown
+        elif pickRISE:
+            if ndxR < len(rise):
+                t = rise[ndxR]
+                if yR[ndxR]:
+                    Rtxt[r] = time2text(t, with_seconds)
+                    r += 1; finalstate = True
+                ndxR += 1
+            pickRISE = not pickRISE     # flip RISE to SET & vice-versa
+        else:
+            if ndxS < len(sett):
+                t = sett[ndxS]
+                if yS[ndxS]:
+                    Stxt[s] = time2text(t, with_seconds)
+                    s += 1; finalstate = False
+                ndxS += 1
+            pickRISE = not pickRISE     # flip RISE to SET & vice-versa
+
+        dt = t.utc_datetime()
+        if prev_dt > dt: print("Event time sequence ERROR on {} in mp_nautical.fmt_rise_set".format(dt.strftime("%d-%m-%Y")))
+        prev_dt = dt
+
+    return Rtxt[0], Stxt[0], Rtxt[1], Stxt[1], finalstate
+
+def fmt_transits(t, lats, with_seconds = False):
+    # analyse the return values from the 'find_transits' method...
+    # get planet transit times (if any) rounded to nearest minute
+    transit1 = '--:--'
+    transit2 = '--:--'
+    if len(t) == 1:         # this happens most often
+        t0 = t[0]
+        # get the UT1 time rounded to minutes OR seconds ...
+        transit1 = time2text(t0, with_seconds)
+    else:
+        if len(t) == 2:		# this happens very rarely
+            t0 = t[0]; t1 = t[1]
+            # get the UT1 time rounded to minutes OR seconds ...
+            transit1 = time2text(t0, with_seconds)
+            transit2 = time2text(t1, with_seconds)
+        elif len(t) > 2:
+            # this should never get here!
+            rise_set_error(0,lats,t[0])
+
+    return transit1, transit2
+
+def rise_set(t, y, lats, with_seconds = False):    # 'ts' removed (Aug 2024 simplification)
     # analyse the return values from the 'find_discrete' method...
     # get sun/moon rise/set values (if any) rounded to nearest minute
     rise = '--:--'
@@ -115,70 +232,73 @@ def rise_set(t, y, lats, ts, round2seconds = False):
     # 'finalstate' is True if above horizon; False if below horizon; None if unknown
     finalstate = None
     if len(t) == 2:		# this happens most often
-        dt0 = t[0].utc_datetime()
-        sec0 = dt0.second + int(dt0.microsecond)/1000000.
-        t0 = ts.ut1(dt0.year, dt0.month, dt0.day, dt0.hour, dt0.minute, sec0)
-        dt1 = t[1].utc_datetime()
-        sec1 = dt1.second + int(dt1.microsecond)/1000000.
-        t1 = ts.ut1(dt1.year, dt1.month, dt1.day, dt1.hour, dt1.minute, sec1)
+        t0 = t[0]; t1 = t[1]        # Aug 2024 simplification
+        # dt0 = t[0].utc_datetime()
+        # sec0 = dt0.second + int(dt0.microsecond)/1000000.
+        # t0 = ts.ut1(dt0.year, dt0.month, dt0.day, dt0.hour, dt0.minute, sec0)
+        # dt1 = t[1].utc_datetime()
+        # sec1 = dt1.second + int(dt1.microsecond)/1000000.
+        # t1 = ts.ut1(dt1.year, dt1.month, dt1.day, dt1.hour, dt1.minute, sec1)
         if y[0] and not(y[1]):
             # get the UT1 time rounded to minutes OR seconds ...
-            rise = time2text(t0, round2seconds)
-            sett = time2text(t1, round2seconds)
+            rise = time2text(t0, with_seconds)
+            sett = time2text(t1, with_seconds)
             finalstate = False
         else:
             if not(y[0]) and y[1]:
                 # get the UT1 time rounded to minutes OR seconds ...
-                sett = time2text(t0, round2seconds)
-                rise = time2text(t1, round2seconds)
+                sett = time2text(t0, with_seconds)
+                rise = time2text(t1, with_seconds)
                 finalstate = True
             else:
                 # this should never get here!
-                rise_set_error(y,lats,ts.utc(t[0].utc_datetime()))
+                rise_set_error(y,lats,t[0])     # Aug 2024 simplification
     else:
         if len(t) == 1:		# this happens ocassionally
-            dt0 = t[0].utc_datetime()
-            sec0 = dt0.second + int(dt0.microsecond)/1000000.
-            t0 = ts.ut1(dt0.year, dt0.month, dt0.day, dt0.hour, dt0.minute, sec0)
+            t0 = t[0]               # Aug 2024 simplification
+            # dt0 = t[0].utc_datetime()
+            # sec0 = dt0.second + int(dt0.microsecond)/1000000.
+            # t0 = ts.ut1(dt0.year, dt0.month, dt0.day, dt0.hour, dt0.minute, sec0)
             if y[0]:
                 # get the UT1 time rounded to minutes OR seconds ...
-                rise = time2text(t0, round2seconds)
+                rise = time2text(t0, with_seconds)
                 finalstate = True
             else:
                 # get the UT1 time rounded to minutes OR seconds ...
-                sett = time2text(t0, round2seconds)
+                sett = time2text(t0, with_seconds)
                 finalstate = False
         else:
             if len(t) == 3:		# this happens rarely (in high latitudes mid-year)
-                dt0 = t[0].utc_datetime()
-                sec0 = dt0.second + int(dt0.microsecond)/1000000.
-                t0 = ts.ut1(dt0.year, dt0.month, dt0.day, dt0.hour, dt0.minute, sec0)
-                dt1 = t[1].utc_datetime()
-                sec1 = dt1.second + int(dt1.microsecond)/1000000.
-                t1 = ts.ut1(dt1.year, dt1.month, dt1.day, dt1.hour, dt1.minute, sec1)
-                dt2 = t[2].utc_datetime()
-                sec2 = dt2.second + int(dt2.microsecond)/1000000.
-                t2 = ts.ut1(dt2.year, dt2.month, dt2.day, dt2.hour, dt2.minute, sec2)
+                t0 = t[0]; t1 = t[1]; t2 = t[2]     # Aug 2024 simplification
+                # dt0 = t[0].utc_datetime()
+                # sec0 = dt0.second + int(dt0.microsecond)/1000000.
+                # t0 = ts.ut1(dt0.year, dt0.month, dt0.day, dt0.hour, dt0.minute, sec0)
+                # dt1 = t[1].utc_datetime()
+                # sec1 = dt1.second + int(dt1.microsecond)/1000000.
+                # t1 = ts.ut1(dt1.year, dt1.month, dt1.day, dt1.hour, dt1.minute, sec1)
+                # dt2 = t[2].utc_datetime()
+                # sec2 = dt2.second + int(dt2.microsecond)/1000000.
+                # t2 = ts.ut1(dt2.year, dt2.month, dt2.day, dt2.hour, dt2.minute, sec2)
                 if y[0] and not(y[1]) and y[2]:
                     # get the UT1 time rounded to minutes OR seconds ...
-                    rise = time2text(t0, round2seconds)
-                    sett = time2text(t1, round2seconds)
-                    ris2 = time2text(t2, round2seconds)
+                    rise = time2text(t0, with_seconds)
+                    sett = time2text(t1, with_seconds)
+                    ris2 = time2text(t2, with_seconds)
                     finalstate = True
                 else:
                     if not(y[0]) and y[1] and not(y[2]):
                         # get the UT1 time rounded to minutes OR seconds ...
-                        sett = time2text(t0, round2seconds)
-                        rise = time2text(t1, round2seconds)
-                        set2 = time2text(t2, round2seconds)
+                        sett = time2text(t0, with_seconds)
+                        rise = time2text(t1, with_seconds)
+                        set2 = time2text(t2, with_seconds)
                         finalstate = False
                     else:
                         # this should never get here!
-                        rise_set_error(y,lats,ts.utc(t[0].utc_datetime()))
+                        rise_set_error(y,lats,t[0])     # Aug 2024 simplification
             else:
                 if len(t) > 3:
                     # this should never get here!
-                    rise_set_error(y,lats,ts.utc(t[0].utc_datetime()))
+                    rise_set_error(y,lats,t[0])     # Aug 2024 simplification
 
     return rise, sett, ris2, set2, finalstate
 
@@ -206,7 +326,7 @@ def rise_set_error(y, lats, t0):
 #   Aries, Venus, Mars, Jupiter & Saturn calculations
 #-------------------------------------------------------
 
-def mp_ariesGHA(d, ts):            # used in planetstab(m)
+def mp_ariesGHA(d, ts):                         # used in nautical.planetstab(m)
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
 
     ghas = ['' for x in range(24)]
@@ -214,7 +334,7 @@ def mp_ariesGHA(d, ts):            # used in planetstab(m)
         ghas[i] = fmtgha(t[i].gast, 0)
     return ghas
 
-def mp_venusGHA(d, ts, earth, venus):            # used in planetstab(m)
+def mp_venusGHA(d, ts, earth, venus):           # used in nautical.planetstab(m)
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(venus)
     ra = position.apparent().radec(epoch='date')[0]
@@ -231,7 +351,7 @@ def mp_venusGHA(d, ts, earth, venus):            # used in planetstab(m)
     #    print(i, ghas[i])
     return ghas, decs, degs
 
-def mp_marsGHA(d, ts, earth, mars):             # used in planetstab(m)
+def mp_marsGHA(d, ts, earth, mars):             # used in nautical.planetstab(m)
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(mars)
     ra = position.apparent().radec(epoch='date')[0]
@@ -248,7 +368,7 @@ def mp_marsGHA(d, ts, earth, mars):             # used in planetstab(m)
     #    print(i, ghas[i])
     return ghas, decs, degs
 
-def mp_jupiterGHA(d, ts, earth, jupiter):          # used in planetstab(m)
+def mp_jupiterGHA(d, ts, earth, jupiter):       # used in nautical.planetstab(m)
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(jupiter)
     ra = position.apparent().radec(epoch='date')[0]
@@ -265,7 +385,7 @@ def mp_jupiterGHA(d, ts, earth, jupiter):          # used in planetstab(m)
     #    print(i, ghas[i])
     return ghas, decs, degs
 
-def mp_saturnGHA(d, ts, earth, saturn):           # used in planetstab(m)
+def mp_saturnGHA(d, ts, earth, saturn):         # used in nautical.planetstab(m)
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(saturn)
     ra = position.apparent().radec(epoch='date')[0]
@@ -287,7 +407,7 @@ def mp_saturnGHA(d, ts, earth, saturn):           # used in planetstab(m)
 #---------------------------------------
 
 # > > > > > > > > > > MULTIPROCESSING ENTRY POINT < < < < < < < < < <
-def mp_planetGHA(d, ts, obj):  # used in planetstab
+def mp_planetGHA(d, ts, obj):                   # used in nautical.planetstab
 
     out = [None, None, None]  # return [planet_sha, planet_transit] + processing time
     eph = load(config.ephemeris[config.ephndx][0])	# load chosen ephemeris
@@ -316,7 +436,7 @@ def mp_planetGHA(d, ts, obj):  # used in planetstab
     return out
 
 # > > > > > > > > > > MULTIPROCESSING ENTRY POINT < < < < < < < < < <
-def mp_planetstransit(d, ts, obj, round2seconds = False):  # used in starstab & meridiantab (in eventtables.py)
+def mp_planetstransit(d, ts, obj, with_seconds = False):  # used in nautical.starstab
     # returns SHA and Meridian Passage for the navigational planets
 
     out = [None, None, None]  # return [planet_sha, planet_transit] + processing time
@@ -330,6 +450,13 @@ def mp_planetstransit(d, ts, obj, round2seconds = False):  # used in starstab & 
             planet = eph['mars barycenter']
         else:
             planet = eph['mars']
+    lattxt = u'{} 0{} E transit'.format(obj, degree_sign)
+    if compareVersion(VERSION, "1.35") >= 0:
+        lats = 0.0     # default latitude (any will do)
+        topos = wgs84.latlon(lats, 0.0 * E, elevation_m=0.0)
+        observer = earth + topos
+    else:
+        topos = Topos(latNS, "0.0 E")   # Topos is deprecated in Skyfield v1.35!
 
     # calculate planet SHA
     tfr = ts.ut1(d.year, d.month, d.day, 0, 0, 0)       # search from
@@ -340,11 +467,15 @@ def mp_planetstransit(d, ts, obj, round2seconds = False):  # used in starstab & 
     # calculate planet transit
     d1 = d + timedelta(days=1)
     tto = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)    # search to
-    start00 = time()                    # 00000
-    transit_time, y = almanac.find_discrete(tfr, tto, planet_transit(earth, planet))
-    time00 = time()-start00             # 00000
-    lats = u'{} 0{} E transit'.format(obj, degree_sign)
-    out[1] = rise_set(transit_time,y,lats,ts, round2seconds = False)[0]  # planet_transit
+    start00 = time()                        # 00000
+    if compareVersion(VERSION, "1.47") < 0:
+        transit_time, y = almanac.find_discrete(tfr, tto, planet_transit(earth, planet))
+        time00 = time()-start00             # 00000
+        out[1] = rise_set(transit_time,y,lattxt,with_seconds = False)[0]  # planet_transit
+    else:
+        transit_time = almanac.find_transits(observer, planet, tfr, tto)
+        time00 = time()-start00             # 00000
+        out[1] = fmt_transits(transit_time,lattxt,with_seconds)[0]  # planet_transit
 
     out[2] = time00     # append processing time to list
     return out
@@ -366,7 +497,7 @@ def planet_transit(earth, planet_name):
     is_planet_transit_at.rough_period = 0.1  # search increment hint
     return is_planet_transit_at
 
-def hor_parallax(d, ts):      # used in starstab (in eventtables.py)
+def hor_parallax(d, ts):      # used in nautical.starstab
 
     eph = load(config.ephemeris[config.ephndx][0])	# load chosen ephemeris
     earth = eph['earth']
@@ -393,7 +524,7 @@ def hor_parallax(d, ts):      # used in starstab (in eventtables.py)
 #   Sun and Moon calculations
 #-------------------------------
 
-def mp_sunGHA(d, ts, earth, sun):              # used in sunmoontab(m)
+def mp_sunGHA(d, ts, earth, sun):              # used in nautical.sunmoontab(m)
     # compute sun's GHA and DEC per hour of day
 
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
@@ -412,7 +543,7 @@ def mp_sunGHA(d, ts, earth, sun):              # used in sunmoontab(m)
     # degs has been added for the suntab function
     return ghas,decs,degs
 
-def mp_moonGHA(d, ts, earth, moon, round2seconds = False):  # used in sunmoontab(m) & equationtab (in eventtables.py)
+def mp_moonGHA(d, ts, earth, moon, with_seconds = False):  # used in nautical.sunmoontab(m) & eventtables.equationtab
     # compute moon's GHA, DEC and HP per hour of day
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(moon)
@@ -420,7 +551,7 @@ def mp_moonGHA(d, ts, earth, moon, round2seconds = False):  # used in sunmoontab
     dec = position.apparent().radec(epoch='date')[1]
     distance = position.apparent().radec(epoch='date')[2]
 
-    if round2seconds:
+    if with_seconds:
         # also compute moon's GHA at End of Day (23:59:59.5) and Start of Day (24 hours earlier)
         tSoD = ts.ut1(d.year, d.month, d.day-1, 23, 59, 59.5)
         tEoD = ts.ut1(d.year, d.month, d.day, 23, 59, 59.5)
@@ -462,7 +593,7 @@ def mp_moonGHA(d, ts, earth, moon, round2seconds = False):  # used in sunmoontab
 
     return gham, decm, degm, HPm, GHAupper, GHAlower, ghaSoD, ghaEoD
 
-def mp_moonVD(d00, d, d_valNA, ts, earth, moon):           # used in sunmoontab(m)
+def mp_moonVD(d00, d, d_valNA, ts, earth, moon):           # used in nautical.sunmoontab(m)
 # OLD:  # first value required is from 23:30 on the previous day...
 # OLD:  t0 = ts.ut1(d00.year, d00.month, d00.day, 23, 30, 0)
     # first value required is from 00:00 on the current day...
@@ -531,7 +662,7 @@ def mp_sunmoon(date, d_valNA, ts, n):
 #-----------------------
 
 # > > > > > > > > > > MULTIPROCESSING ENTRY POINT < < < < < < < < < <
-def mp_stellar_info(d, ts, df, n):        # used in starstab
+def mp_stellar_info(d, ts, df, n):        # used in nautical.starstab
     # returns a list of lists with name, SHA and Dec all navigational stars for epoch of date.
 
     # load the Hipparcos catalog as a 118,218 row Pandas dataframe.
@@ -641,28 +772,34 @@ Scheat,113881
 Markab,113963
 """
 
-#--------------------
-#   TWILIGHT table
-#--------------------
+#------------------------
+#   SUN TWILIGHT table
+#------------------------
 
 # > > > > > > > > > > MULTIPROCESSING ENTRY POINT < < < < < < < < < <
-def mp_twilight(d, lat, hemisph, ts, round2seconds = False):  # used in twilighttab (section 1)
+def mp_twilight(d, lat, ts, with_seconds = False):     # used in nautical.twilighttab (section 1)
     # Returns for given date and latitude(in full degrees):
     # naut. and civil twilight (before sunrise), sunrise, meridian passage, sunset, civil and nautical twilight (after sunset).
     # NOTE: 'twilight' is only called for every third day in the Nautical Almanac...
     #       ...therefore daily tracking of the sun state is not possible.
 
-    time00 = 0.0                        # 00000
+    time00 = 0.0                            # 00000
     eph = load(config.ephemeris[config.ephndx][0])	# load chosen ephemeris
     earth   = eph['earth']
     sun     = eph['sun']
 
     out = [None,None,None,None,None,None,None]  # 6 data items + processing time
-    lats = "{:3.1f} {}".format(abs(lat), hemisph)
-    locn = Topos(lats, "0.0 E")
+    hemisph = 'N' if lat >= 0 else 'S'
+    latNS = "{:3.1f} {}".format(abs(lat), hemisph)
+    if compareVersion(VERSION, "1.35") >= 0:
+        topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
+        observer = earth + topos
+    else:
+        topos = Topos(latNS, "0.0 E")   # Topos is deprecated in Skyfield v1.35!
+
     dt = datetime(d.year, d.month, d.day, 0, 0, 0)
 
-    if round2seconds:
+    if with_seconds:
         dt -= timedelta(seconds=0.5)    # search from 0.5 seconds before midnight
     else:
         dt -= timedelta(seconds=30)     # search from 30 seconds before midnight
@@ -672,10 +809,18 @@ def mp_twilight(d, lat, hemisph, ts, round2seconds = False):  # used in twilight
     abhd = False                                # above/below horizon display NOT enabled
 
     # Sunrise/Sunset...
-    start00 = time()                    # 00000
-    actual, y = almanac.find_discrete(t0, t1, daylength(earth, sun, locn, 0.8333))
-    time00 += time()-start00            # 00000
-    out[2], out[3], r2, s2, fs = rise_set(actual,y,lats,ts,round2seconds)
+    start00 = time()                        # 00000
+    horizon = 0.8333        # degrees below horizon
+    if compareVersion(VERSION, "1.48") < 0:
+        actual, y = almanac.find_discrete(t0, t1, f_sun(earth, sun, topos, horizon))
+        time00 += time()-start00            # 00000
+        out[2], out[3], r2, s2, fs = rise_set(actual,y,latNS,with_seconds)
+    else:
+        sunrise, yR = almanac.find_risings(observer, sun, t0, t1, -horizon)
+        sunset,  yS = almanac.find_settings(observer, sun, t0, t1, -horizon)
+        time00 += time()-start00            # 00000
+        out[2], out[3], r2, s2, fs = fmt_rise_set(sunrise,sunset,yR,yS,latNS,with_seconds)
+
     if out[2] == '--:--' and out[3] == '--:--':	# if neither sunrise nor sunset...
         abhd = True                             # enable above/below horizon display
         yn = midnightsun(d, hemisph)
@@ -683,20 +828,36 @@ def mp_twilight(d, lat, hemisph, ts, round2seconds = False):  # used in twilight
         out[3] = yn
 
     # Civil Twilight...
-    start00 = time()                    # 00000
-    civil, y = almanac.find_discrete(t0, t1, daylength(earth, sun, locn, 6.0))
-    time00 += time()-start00            # 00000
-    out[1], out[4], r2, s2, fs = rise_set(civil,y,lats,ts,round2seconds)
+    horizon = 6.0           # degrees below horizon
+    start00 = time()                        # 00000
+    if compareVersion(VERSION, "1.48") < 0:
+        civil, y = almanac.find_discrete(t0, t1, f_sun(earth, sun, topos, horizon))
+        time00 += time()-start00            # 00000
+        out[1], out[4], r2, s2, fs = rise_set(civil,y,latNS,with_seconds)
+    else:
+        sunrise, yR = almanac.find_risings(observer, sun, t0, t1, -horizon)
+        sunset,  yS = almanac.find_settings(observer, sun, t0, t1, -horizon)
+        time00 += time()-start00            # 00000
+        out[1], out[4], r2, s2, fs = fmt_rise_set(sunrise,sunset,yR,yS,latNS,with_seconds)
+
     if abhd and out[1] == '--:--' and out[4] == '--:--':	# if neither begin nor end...
         yn = midnightsun(d, hemisph)
         out[1] = yn
         out[4] = yn
 
     # Nautical Twilight...
-    start00 = time()                    # 00000
-    naut, y = almanac.find_discrete(t0, t1, daylength(earth, sun, locn, 12.0))
-    time00 += time()-start00            # 00000
-    out[0], out[5], r2, s2, fs = rise_set(naut,y,lats,ts,round2seconds)
+    horizon = 12.0          # degrees below horizon
+    start00 = time()                        # 00000
+    if compareVersion(VERSION, "1.48") < 0:
+        naut, y = almanac.find_discrete(t0, t1, f_sun(earth, sun, topos, horizon))
+        time00 += time()-start00            # 00000
+        out[0], out[5], r2, s2, fs = rise_set(naut,y,latNS,with_seconds)
+    else:
+        sunrise, yR = almanac.find_risings(observer, sun, t0, t1, -horizon)
+        sunset,  yS = almanac.find_settings(observer, sun, t0, t1, -horizon)
+        time00 += time()-start00            # 00000
+        out[0], out[5], r2, s2, fs = fmt_rise_set(sunrise,sunset,yR,yS,latNS,with_seconds)
+
     if abhd and out[0] == '--:--' and out[5] == '--:--':	# if neither begin nor end...
         yn = midnightsun(d, hemisph)
         out[0] = yn
@@ -721,8 +882,8 @@ def midnightsun(d, hemisph):
         out = r'''\rule{12Pt}{4Pt}'''
     return out
 
-def daylength(earth, sun, topos, degBelowHorizon):
-    # Build a function of time that returns the daylength.
+def f_sun(earth, sun, topos, degBelowHorizon):
+    # Build a function of time that returns the sun above/below horizon state.
     topos_at = (earth + topos).at
 
     def is_sun_up_at(t):
@@ -733,24 +894,31 @@ def daylength(earth, sun, topos, degBelowHorizon):
         # Return `True` if the sun has risen by time `t`.
         return topos_at(t).observe(sun).apparent().altaz()[0].degrees > -degBelowHorizon
 
-    is_sun_up_at.rough_period = 0.5  # twice a day
+    #is_sun_up_at.rough_period = 0.5         # 24 samples per day (deprecated)
+    is_sun_up_at.step_days = 0.041666667    # = 1.0 / 24.0 (24 samples per day)
     return is_sun_up_at
 
 #-------------------------
 #   MOONRISE/-SET table
 #-------------------------
 
-def getmoonstate(dt, lat, hemisph, ts, earth, moon):
+def getmoonstate(dt, lat, horizon, ts, earth, moon):
     # populate the moon state (visible or not) for the specified date & latitude
     # note: the first parameter 'dt' is already a datetime 30 seconds before midnight
     # note: getmoonstate is called when there is neither a moonrise nor a moonset on 'dt'
 
-    time00 = 0.0                        # 00000
+    time00 = 0.0                            # 00000
     Hseeks = 0
-    lats = '{:3.1f} {}'.format(abs(lat), hemisph)
-    locn = Topos(lats, '0.0 E')
+    hemisph = 'N' if lat >= 0 else 'S'
+    latNS = '{:3.1f} {}'.format(abs(lat), hemisph)
+    if compareVersion(VERSION, "1.35") >= 0:
+        topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
+        observer = earth + topos
+    else:
+        topos = Topos(latNS, "0.0 E")   # Topos is deprecated in Skyfield v1.35!
+
     t0 = ts.ut1(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
-    horizon = 0.8333
+    #horizon = 0.8333
 
     # search for the next moonrise or moonset (returned in moonrise[0] and y[0])
     mstate = None
@@ -759,14 +927,18 @@ def getmoonstate(dt, lat, hemisph, ts, earth, moon):
         t0 = ts.ut1(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
         dt += timedelta(days=1)
         t9 = ts.ut1(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
-        start00 = time()                # 00000
-        moonrise, y = almanac.find_discrete(t0, t9, moonday(earth, moon, locn, horizon))
-        time00 += time()-start00        # 00000
-        if len(moonrise) > 0:
-            if y[0]:
-                mstate = False
-            else:
-                mstate = True
+        start00 = time()                    # 00000
+        if True or compareVersion(VERSION, "1.48") < 0:
+            moonrise, y = almanac.find_discrete(t0, t9, f_moon(earth, moon, topos, horizon))
+            time00 += time()-start00        # 00000
+            if len(moonrise) > 0:
+                mstate = False if y[0] else True
+        else:   # !!! DO NOT USE WITH Skyfield 1.48 !!! (see Skyfield Issue #998)
+            moonrise, yR = almanac.find_risings(observer, moon, t0, t9, -horizon)
+            moonset,  yS = almanac.find_settings(observer, moon, t0, t9, -horizon)
+            time00 = time()-start00         # 00000
+            mstate = next_rise_set(moonrise,moonset,yR,yS)
+
     return mstate, time00, Hseeks
 
 def getHorizon(t, earth, moon):
@@ -790,43 +962,56 @@ def moonstate(mstate):
         out = r'''\rule{12Pt}{4Pt}'''
     return out
 
-#def seek_moonset(prday, t9, t9noon, t0, nxday, t1, t1noon, t2, i, lats, ts, earth, moon):
-def seek_moonset(t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, moon):
+def seek_moonset(t9, t9noon, t0, t1, t1noon, t2, lat, ts, earth, moon):
     # for the specified date & latitude ...
     # return -1 if there is NO MOONSET yesterday
     # return +1 if there is NO MOONSET tomorrow
     # return  0 if there was a moonset yesterday and will be a moonset tomorrow
     # note: this is called when there is only a moonrise on the specified date+latitude
 
-    time00 = 0.0                        # 00000
+    time00 = 0.0                            # 00000
     Hseeks = 1
     m_set_t = 0     # normal case: assume moonsets yesterday & tomorrow
+    hemisph = 'N' if lat >= 0 else 'S'
+    latNS = "{:3.1f} {}".format(abs(lat), hemisph)
+    if compareVersion(VERSION, "1.35") >= 0:
+        topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
+        observer = earth + topos
+    else:
+        topos = Topos(latNS, "0.0 E")   # Topos is deprecated in Skyfield v1.35!
 
-    locn = Topos(lats, "0.0 E")
     horizon = getHorizon(t1noon, earth, moon)
-    start00 = time()                    # 00000
-    moonrise, y = almanac.find_discrete(t1, t2, moonday(earth, moon, locn, horizon))
-    time00 += time()-start00            # 00000
-    rise, sett, ris2, set2, fs = rise_set(moonrise,y,lats,ts)
+    start00 = time()                        # 00000
+    if True or compareVersion(VERSION, "1.48") < 0:
+        moonrise, y = almanac.find_discrete(t1, t2, f_moon(earth, moon, topos, horizon))
+        time00 += time()-start00            # 00000
+        rise, sett, ris2, set2, fs = rise_set(moonrise,y,latNS)
+    else:   # !!! DO NOT USE WITH Skyfield 1.48 !!! (see Skyfield Issue #998)
+        moonset, yS = almanac.find_settings(observer, moon, t1, t2, -horizon)
+        time00 = time()-start00             # 00000
+        rise, sett, ris2, set2, fs = fmt_rise_set([],moonset[:1],[],yS,latNS)
 
     if sett == '--:--':
         m_set_t = +1    # if no moonset detected - it is after tomorrow
     else:
         Hseeks += 1
-        locn = Topos(lats, "0.0 E")
         horizon = getHorizon(t9noon, earth, moon)
-        start00 = time()                # 00000
-        moonrise, y = almanac.find_discrete(t9, t0, moonday(earth, moon, locn, horizon))
-        time00 += time()-start00        # 00000
-        rise, sett, ris2, set2, fs = rise_set(moonrise,y,lats,ts)
+        start00 = time()                    # 00000
+        if True or compareVersion(VERSION, "1.48") < 0:
+            moonrise, y = almanac.find_discrete(t9, t0, f_moon(earth, moon, topos, horizon))
+            time00 += time()-start00        # 00000
+            rise, sett, ris2, set2, fs = rise_set(moonrise,y,latNS)
+        else:   # !!! DO NOT USE WITH Skyfield 1.48 !!! (see Skyfield Issue #998)
+            moonset, yS = almanac.find_settings(observer, moon, t9, t0, -horizon)
+            time00 = time()-start00         # 00000
+            rise, sett, ris2, set2, fs = fmt_rise_set([],moonset[:1],[],yS,latNS)
 
         if sett == '--:--':
             m_set_t = -1    # if no moonset detected - it is before yesterday
 
     return m_set_t, time00, Hseeks
 
-#def seek_moonrise(prday, t9, t9noon, t0, nxday, t1, t1noon, t2, i, lats, ts, earth, moon):
-def seek_moonrise(t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, moon):
+def seek_moonrise(t9, t9noon, t0, t1, t1noon, t2, lat, ts, earth, moon):
     # for the specified date & latitude ...
     # return -1 if there is NO MOONRISE yesterday
     # return +1 if there is NO MOONRISE tomorrow
@@ -836,35 +1021,49 @@ def seek_moonrise(t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, moon):
     time00 = 0.0                        # 00000
     Hseeks = 1
     m_rise_t = 0    # normal case: assume moonrise yesterday & tomorrow
+    hemisph = 'N' if lat >= 0 else 'S'
+    latNS = "{:3.1f} {}".format(abs(lat), hemisph)
+    if compareVersion(VERSION, "1.35") >= 0:
+        topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
+        observer = earth + topos
+    else:
+        topos = Topos(latNS, "0.0 E")   # Topos is deprecated in Skyfield v1.35!
 
-    locn = Topos(lats, "0.0 E")
     horizon = getHorizon(t1noon, earth, moon)
-    start00 = time()                    # 00000
-    moonrise, y = almanac.find_discrete(t1, t2, moonday(earth, moon, locn, horizon))
-    time00 += time()-start00            # 00000
-    rise, sett, ris2, set2, fs = rise_set(moonrise,y,lats,ts)
+    start00 = time()                        # 00000
+    if True or compareVersion(VERSION, "1.48") < 0:
+        moonrise, y = almanac.find_discrete(t1, t2, f_moon(earth, moon, topos, horizon))
+        time00 += time()-start00            # 00000
+        rise, sett, ris2, set2, fs = rise_set(moonrise,y,latNS)
+    else:   # !!! DO NOT USE WITH Skyfield 1.48 !!! (see Skyfield Issue #998)
+        moonrise, yR = almanac.find_risings(observer, moon, t1, t2, -horizon)
+        time00 = time()-start00             # 00000
+        rise, sett, ris2, set2, fs = fmt_rise_set(moonrise[:1],[],yR,[],latNS)
 
     if rise == '--:--':
         m_rise_t = +1    # if no moonrise detected - it is after tomorrow
     else:
         Hseeks += 1
-        locn = Topos(lats, "0.0 E")
         horizon = getHorizon(t9noon, earth, moon)
-        start00 = time()                # 00000
-        moonrise, y = almanac.find_discrete(t9, t0, moonday(earth, moon, locn, horizon))
-        time00 += time()-start00        # 00000
-        rise, sett, ris2, set2, fs = rise_set(moonrise,y,lats,ts)
+        start00 = time()                    # 00000
+        if True or compareVersion(VERSION, "1.48") < 0:
+            moonrise, y = almanac.find_discrete(t9, t0, f_moon(earth, moon, topos, horizon))
+            time00 += time()-start00        # 00000
+            rise, sett, ris2, set2, fs = rise_set(moonrise,y,latNS)
+        else:   # !!! DO NOT USE WITH Skyfield 1.48 !!! (see Skyfield Issue #998)
+            moonrise, yR = almanac.find_risings(observer, moon, t9, t0, -horizon)
+            time00 = time()-start00         # 00000
+            rise, sett, ris2, set2, fs = fmt_rise_set(moonrise[:1],[],yR,[],latNS)
 
         if rise == '--:--':
             m_rise_t = -1    # if no moonrise detected - it is before yesterday
 
     return m_rise_t, time00, Hseeks
 
-#def moonset_no_rise(date, lat, prday, t9, t9noon, t0, nxday, t1, t1noon, t2, i, lats, ts, earth, moon):
-def moonset_no_rise(date, lat, t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, moon):
+def moonset_no_rise(date, lat, t9, t9noon, t0, t1, t1noon, t2, ts, earth, moon):
     # if moonset but no moonrise...
     msg = ""
-    n, t00, Hseeks = seek_moonrise(t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, moon)
+    n, t00, Hseeks = seek_moonrise(t9, t9noon, t0, t1, t1noon, t2, lat, ts, earth, moon)
     if n == 1:
         out = moonstate(False)      # moonrise "below horizon"
         ##msg = "below horizon (start)"
@@ -876,11 +1075,10 @@ def moonset_no_rise(date, lat, t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, 
         out = r'''\raisebox{0.24ex}{\boldmath$\cdot\cdot$~\boldmath$\cdot\cdot$}'''
     return out, t00, Hseeks
 
-#def moonrise_no_set(date, lat, prday, t9, t9noon, t0, nxday, t1, t1noon, t2, i, lats, ts, earth, moon):
-def moonrise_no_set(date, lat, t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, moon):
+def moonrise_no_set(date, lat, t9, t9noon, t0, t1, t1noon, t2, ts, earth, moon):
     # if moonrise but no moonset...
     msg = ""
-    n, t00, Hseeks = seek_moonset(t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, moon)
+    n, t00, Hseeks = seek_moonset(t9, t9noon, t0, t1, t1noon, t2, lat, ts, earth, moon)
     if n == 1:
         out = moonstate(True)       # moonset "above horizon"
         ##msg = "above horizon (start)"
@@ -896,7 +1094,7 @@ def moonrise_no_set(date, lat, t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, 
 # > > > > > > > DO NOT WRITE TO config.py  (It's a copy!) < < < < < <
 # > > > DO NOT READ FROM config.py IF IT's BEEN MODIFIED PROGRAMMATICALLY < < <
 
-def mp_moonrise_set(d, lat, mstate0, hemisph, ts):  # used by nautical.py in twilighttab (section 2)
+def mp_moonrise_set(d, lat, mstate0, ts):   # used in nautical.twilighttab (section 2)
     # - - - TIMES ARE ROUNDED TO MINUTES - - -
     # returns moonrise and moonset for the given dates and latitude:
     # rise day 1, rise day 2, rise day 3, set day 1, set day 2, set day 3
@@ -914,8 +1112,14 @@ def mp_moonrise_set(d, lat, mstate0, hemisph, ts):  # used by nautical.py in twi
     ev1 = ['--:--','--:--','--:--','--:--','--:--','--:--']	# first event
     ev2 = ['--:--','--:--','--:--','--:--','--:--','--:--']	# second event on same day (rare)
 
-    lats = "{:3.1f} {}".format(abs(lat), hemisph)
-    locn = Topos(lats, "0.0 E")
+    hemisph = 'N' if lat >= 0 else 'S'
+    latNS = "{:3.1f} {}".format(abs(lat), hemisph)
+    if compareVersion(VERSION, "1.35") >= 0:
+        topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
+        observer = earth + topos
+    else:
+        topos = Topos(latNS, "0.0 E")   # Topos is deprecated in Skyfield v1.35!
+
     dt = datetime(d.year, d.month, d.day, 0, 0, 0)
     dt -= timedelta(seconds=30)     # search from 30 seconds before midnight
 
@@ -948,12 +1152,17 @@ def mp_moonrise_set(d, lat, mstate0, hemisph, ts):  # used by nautical.py in twi
 
     iH = 0
     Mseeks += 1
-    locn = Topos(lats, "0.0 E")
-    horizon = getHorizon(t0noon, earth, moon)
-    start00 = time()                    # 00000
-    moonrise, y = almanac.find_discrete(t0, t1, moonday(earth, moon, locn, horizon))
-    time00 += time()-start00            # 00000
-    ev1[0], ev1[3], ev2[0], ev2[3], mstate1 = rise_set(moonrise,y,lats,ts)
+    horizon = getHorizon(t0noon, earth, moon)   # 0.8307988 on 16-08-2024
+    start00 = time()                        # 00000
+    if True or compareVersion(VERSION, "1.48") < 0:
+        moonrise, y = almanac.find_discrete(t0, t1, f_moon(earth, moon, topos, horizon))
+        time00 += time()-start00            # 00000
+        ev1[0], ev1[3], ev2[0], ev2[3], mstate1 = rise_set(moonrise,y,latNS)
+    else:   # !!! DO NOT USE WITH Skyfield 1.48 !!! (see Skyfield Issue #998)
+        moonrise, yR = almanac.find_risings(observer, moon, t0, t1, -horizon)
+        moonset,  yS = almanac.find_settings(observer, moon, t0, t1, -horizon)
+        time00 = time()-start00             # 00000
+        ev1[0], ev1[3], ev2[0], ev2[3], mstate1 = fmt_rise_set(moonrise,moonset,yR,yS,latNS)
 
     if ev1[0] == '--:--' and ev1[3] == '--:--':	# if neither moonrise nor moonset...
         Mseeks -= 1
@@ -961,30 +1170,35 @@ def mp_moonrise_set(d, lat, mstate0, hemisph, ts):  # used by nautical.py in twi
             if mstate0 != None:
                 mstate1 = mstate0        # get the last known moon state
             else:   # must search for the moon state...
-                mstate1, t00, iH = getmoonstate(dt, lat, hemisph, ts, earth, moon)	# ...get moon state if unknown
-                timeAB += t00                   # 00000
+                mstate1, t00, iH = getmoonstate(dt, lat, horizon, ts, earth, moon)	# ...get moon state if unknown
+                timeAB += t00               # 00000
         ev1[0] = moonstate(mstate1)
         ev1[3] = moonstate(mstate1)
 
     elif ev1[0] == '--:--' and ev1[3] != '--:--':	# if moonset but no moonrise...
-        ev1[0], t00, iH = moonset_no_rise(d, lat, t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, moon)
-        timeAB += t00                   # 00000
+        ev1[0], t00, iH = moonset_no_rise(d, lat, t9, t9noon, t0, t1, t1noon, t2, ts, earth, moon)
+        timeAB += t00                       # 00000
 
     elif ev1[0] != '--:--' and ev1[3] == '--:--':	# if moonrise but no moonset...
-        ev1[3], t00, iH = moonrise_no_set(d, lat, t9, t9noon, t0, t1, t1noon, t2, lats, ts, earth, moon)
-        timeAB += t00                   # 00000
+        ev1[3], t00, iH = moonrise_no_set(d, lat, t9, t9noon, t0, t1, t1noon, t2, ts, earth, moon)
+        timeAB += t00                       # 00000
     Hseeks += iH
 #-----------------------------------------------------------
     # Moonrise/Moonset on 2nd. day ...
 
     iH = 0
     Mseeks += 1
-    locn = Topos(lats, "0.0 E")
     horizon = getHorizon(t1noon, earth, moon)
-    start00 = time()                    # 00000
-    moonrise, y = almanac.find_discrete(t1, t2, moonday(earth, moon, locn, horizon))
-    time00 += time()-start00            # 00000
-    ev1[1], ev1[4], ev2[1], ev2[4], mstate2 = rise_set(moonrise,y,lats,ts)
+    start00 = time()                        # 00000
+    if True or compareVersion(VERSION, "1.48") < 0:
+        moonrise, y = almanac.find_discrete(t1, t2, f_moon(earth, moon, topos, horizon))
+        time00 += time()-start00            # 00000
+        ev1[1], ev1[4], ev2[1], ev2[4], mstate2 = rise_set(moonrise,y,latNS)
+    else:   # !!! DO NOT USE WITH Skyfield 1.48 !!! (see Skyfield Issue #998)
+        moonrise, yR = almanac.find_risings(observer, moon, t1, t2, -horizon)
+        moonset,  yS = almanac.find_settings(observer, moon, t1, t2, -horizon)
+        time00 = time()-start00             # 00000
+        ev1[1], ev1[4], ev2[1], ev2[4], mstate2 = fmt_rise_set(moonrise,moonset,yR,yS,latNS)
 
     if ev1[1] == '--:--' and ev1[4] == '--:--':	# if neither moonrise nor moonset...
         Mseeks -= 1
@@ -992,30 +1206,35 @@ def mp_moonrise_set(d, lat, mstate0, hemisph, ts):  # used by nautical.py in twi
             if mstate1 != None:
                 mstate2 = mstate1        # get the last known moon state
             else:   # must search for the moon state...
-                mstate2, t00, iH = getmoonstate(dt+timedelta(days=1), lat, hemisph, ts, earth, moon)	# ...get moon state if unknown
-                timeAB += t00                   # 00000
+                mstate2, t00, iH = getmoonstate(dt+timedelta(days=1), lat, horizon, ts, earth, moon)	# ...get moon state if unknown
+                timeAB += t00               # 00000
         ev1[1] = moonstate(mstate2)
         ev1[4] = moonstate(mstate2)
 
     elif ev1[1] == '--:--' and ev1[4] != '--:--':	# if moonset but no moonrise...
-        ev1[1], t00, iH = moonset_no_rise(d1, lat, t0, t0noon, t1, t2, t2noon, t3, lats, ts, earth, moon)
-        timeAB += t00                   # 00000
+        ev1[1], t00, iH = moonset_no_rise(d1, lat, t0, t0noon, t1, t2, t2noon, t3, ts, earth, moon)
+        timeAB += t00                       # 00000
 
     elif ev1[1] != '--:--' and ev1[4] == '--:--':	# if moonrise but no moonset...
-        ev1[4], t00, iH = moonrise_no_set(d1, lat, t0, t0noon, t1, t2, t2noon, t3, lats, ts, earth, moon)
-        timeAB += t00                   # 00000
+        ev1[4], t00, iH = moonrise_no_set(d1, lat, t0, t0noon, t1, t2, t2noon, t3, ts, earth, moon)
+        timeAB += t00                       # 00000
     Hseeks += iH
 #-----------------------------------------------------------
     # Moonrise/Moonset on 3rd. day ...
 
     iH = 0
     Mseeks += 1
-    locn = Topos(lats, "0.0 E")
     horizon = getHorizon(t2noon, earth, moon)
-    start00 = time()                    # 00000
-    moonrise, y = almanac.find_discrete(t2, t3, moonday(earth, moon, locn, horizon))
-    time00 += time()-start00            # 00000
-    ev1[2], ev1[5], ev2[2], ev2[5], mstate3 = rise_set(moonrise,y,lats,ts)
+    start00 = time()                        # 00000
+    if True or compareVersion(VERSION, "1.48") < 0:
+        moonrise, y = almanac.find_discrete(t2, t3, f_moon(earth, moon, topos, horizon))
+        time00 += time()-start00            # 00000
+        ev1[2], ev1[5], ev2[2], ev2[5], mstate3 = rise_set(moonrise,y,latNS)
+    else:   # !!! DO NOT USE WITH Skyfield 1.48 !!! (see Skyfield Issue #998)
+        moonrise, yR = almanac.find_risings(observer, moon, t2, t3, -horizon)
+        moonset,  yS = almanac.find_settings(observer, moon, t2, t3, -horizon)
+        time00 = time()-start00             # 00000
+        ev1[2], ev1[5], ev2[2], ev2[5], mstate3 = fmt_rise_set(moonrise,moonset,yR,yS,latNS)
 
     if ev1[2] == '--:--' and ev1[5] == '--:--':	# if neither moonrise nor moonset...
         Mseeks -= 1
@@ -1023,18 +1242,18 @@ def mp_moonrise_set(d, lat, mstate0, hemisph, ts):  # used by nautical.py in twi
             if mstate2 != None:
                 mstate3 = mstate2        # get the last known moon state
             else:   # must search for the moon state...
-                mstate3, t00, iH = getmoonstate(dt+timedelta(days=2), lat, hemisph, ts, earth, moon)	# ...get moon state if unknown
-                timeAB += t00                   # 00000
+                mstate3, t00, iH = getmoonstate(dt+timedelta(days=2), lat, horizon, ts, earth, moon)	# ...get moon state if unknown
+                timeAB += t00               # 00000
         ev1[2] = moonstate(mstate3)
         ev1[5] = moonstate(mstate3)
 
     elif ev1[2] == '--:--' and ev1[5] != '--:--':	# if moonset but no moonrise...
-        ev1[2], t00, iH = moonset_no_rise(d2, lat, t1, t1noon, t2, t3, t3noon, t4, lats, ts, earth, moon)
-        timeAB += t00                   # 00000
+        ev1[2], t00, iH = moonset_no_rise(d2, lat, t1, t1noon, t2, t3, t3noon, t4, ts, earth, moon)
+        timeAB += t00                       # 00000
 
     elif ev1[2] != '--:--' and ev1[5] == '--:--':	# if moonrise but no moonset...
-        ev1[5], t00, iH = moonrise_no_set(d2, lat, t1, t1noon, t2, t3, t3noon, t4, lats, ts, earth, moon)
-        timeAB += t00                   # 00000
+        ev1[5], t00, iH = moonrise_no_set(d2, lat, t1, t1noon, t2, t3, t3noon, t4, ts, earth, moon)
+        timeAB += t00                       # 00000
     Hseeks += iH
 #-----------------------------------------------------------
 
@@ -1045,8 +1264,8 @@ def mp_moonrise_set(d, lat, mstate0, hemisph, ts):  # used by nautical.py in twi
     out[3] = (Mseeks, Hseeks, mstate3)     # count of (moonrise/set seeks) + (horizon seeks) + moon state
     return out
 
-def moonday(earth, moon, topos, degBelowHorizon):
-    # Build a function of time that returns the "moonlight daylength".
+def f_moon(earth, moon, topos, degBelowHorizon):
+    # Build a function of time that returns the moon above/below horizon state.
     topos_at = (earth + topos).at
 
     def is_moon_up_at(t):
@@ -1057,5 +1276,6 @@ def moonday(earth, moon, topos, degBelowHorizon):
         # Return `True` if the moon has risen by time `t`.
         return topos_at(t).observe(moon).apparent().altaz()[0].degrees > -degBelowHorizon
 
-    is_moon_up_at.rough_period = 0.5  # twice a day
+    #is_moon_up_at.rough_period = 0.5        # 24 samples per day (deprecated)
+    is_moon_up_at.step_days = 0.000694444   # = 1.0 / 24.0 / 60.0 (once per minute)
     return is_moon_up_at

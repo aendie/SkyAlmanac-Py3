@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2023  Andrew Bauer
+#   Copyright (C) 2024  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -102,23 +102,30 @@ def double_events_found(m1, m2):
             dbl = True
     return dbl
 
+def twilight_symbol(oldtwi):
+    twi = []
+    for event in oldtwi:
+        if event == '--:--':
+            twi.append('\mytwilightsymbol{1.0ex}')
+        else: twi.append(event)
+    return twi
+
 # >>>>>>>>>>>>>>>>>>>>>>>>
 def mp_twilight_worker(Date, ts, lat):
     #print(" mp_twilight_worker Start {}".format(lat))
     hemisph = 'N' if lat >= 0 else 'S'
-    twi = mp_twilight(Date, lat, hemisph, ts, True) # ===>>> mp_eventtables.py
+    twi = mp_twilight(Date, lat, ts, True) # ===>>> mp_eventtables.py
     #print(" mp_twilight_worker Finish {}".format(lat))
     return twi      # return list for all latitudes
 
 def mp_moonlight_worker(Date, ts, lat):
     #print(" mp_moonlight_worker Start  {}".format(lat))
-    hemisph = 'N' if lat >= 0 else 'S'
-    ml = mp_moonrise_set(Date, lat, hemisph, ts)    # ===>>> mp_eventtables.py
+    ml = mp_moonrise_set(Date, lat, ts)    # ===>>> mp_eventtables.py
     #print(" mp_moonlight_worker Finish {}".format(lat))
     return ml       # return list for all latitudes
 
 def twilighttab(Date, ts):
-    # returns the twilight and moonrise tables
+    # returns the sun twilight and moonrise/moonset tables
 
     if config.MULTIpr:
         # multiprocess twilight values per latitude simultaneously
@@ -165,7 +172,7 @@ def twilighttab(Date, ts):
             del listmoon[k][-1]
         #print("listmoon = {}".format(listmoon))
 
-# Twilight tables ...........................................
+# Sun Twilight tables ...........................................
     #lat = [72,70,68,66,64,62,60,58,56,54,52,50,45,40,35,30,20,10,0, -10,-20,-30,-35,-40,-45,-50,-52,-54,-56,-58,-60]
     latNS = [72, 70, 58, 40, 10, -10, -50, -60]
 #    tab = r'''\begin{tabular*}{0.72\textwidth}[t]{@{\extracolsep{\fill}}|r|ccc|ccc|cc|}
@@ -215,7 +222,8 @@ def twilighttab(Date, ts):
             moon2 = listmoon[j-5][1]
         else:
             twi = twilight(Date, lat, hemisph, True)
-            moon, moon2 = moonrise_set2(Date, lat, hemisph)
+            moon, moon2 = moonrise_set2(Date, lat)
+        twi = twilight_symbol(twi)
 
         if not(double_events_found(moon,moon2)):
             line = r'''\textbf{{{}}}'''.format(hs) + r''' {}$^\circ$'''.format(abs(lat))
@@ -681,6 +689,11 @@ def makeEVnew(first_day, dtp, ts):
 %\showboxdepth=50    % use for logging
 %\DeclareUnicodeCharacter{00B0}{\ensuremath{{}^\circ}}
 \setlength\fboxsep{1.5pt}       % ONLY used by \colorbox in alma_skyfield.py
+\newcommand{\mytwilightsymbol}[1]{\tikz[baseline=-0.8ex]{
+\draw[] (0.0,-0.9*#1) -- (0.6*#1,0.9*#1);
+\draw[] (#1,-0.9*#1) -- (1.6*#1,0.9*#1);
+\draw[] (2.0*#1,-0.9*#1) -- (2.6*#1,0.9*#1);
+\draw[] (3.0*#1,-0.9*#1) -- (3.6*#1,0.9*#1);}}
 \begin{document}
 \pagestyle{frontpage}'''
 
@@ -824,6 +837,11 @@ def makeEVold(first_day, dtp, ts):
 %\showboxdepth=50    % use for logging
 %\DeclareUnicodeCharacter{00B0}{\ensuremath{{}^\circ}}
 \setlength\fboxsep{1.5pt}       % ONLY used by \colorbox in alma_skyfield.py
+\newcommand{\mytwilightsymbol}[1]{\tikz[baseline=-0.8ex]{
+\draw[] (0.0,-0.9*#1) -- (0.6*#1,0.9*#1);
+\draw[] (#1,-0.9*#1) -- (1.6*#1,0.9*#1);
+\draw[] (2.0*#1,-0.9*#1) -- (2.6*#1,0.9*#1);
+\draw[] (3.0*#1,-0.9*#1) -- (3.6*#1,0.9*#1);}}
 \begin{document}'''
 
     if not config.DPonly:

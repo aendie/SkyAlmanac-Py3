@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-#   Copyright (C) 2023  Andrew Bauer
+#   Copyright (C) 2024  Andrew Bauer
 #   Copyright (C) 2014  Enno Rodegerdts
 
 #   This program is free software; you can redistribute it and/or modify
@@ -36,16 +36,17 @@ config.CPUcores = cpu_count()
 # NOTE: Multiprocessing on Windows using 'spawn' requires all variables modified
 #       and stored in config.py to be re-calculated for every spawned process!
 # NOTE: multiprocessing is supported in modules: nautical, eventtables
+#       Hence these can only be imported *after* we know if '-sp' is specified
 from alma_skyfield import init_sf
 from ld_skyfield import ld_init_sf
-from nautical import almanac            # multiprocessing supported
+#from nautical import almanac            # multiprocessing supported
 from suntables import sunalmanac
-from eventtables import makeEVtables    # multiprocessing supported
+#from eventtables import makeEVtables    # multiprocessing supported
 from ld_tables import makeLDtables
 from ld_charts import makeLDcharts
 from increments import makelatex
 
-#   Some modules in skyalmanac have been ported from the original source code ...
+#   Some modules in Skyalmanac have been ported from the original source code ...
 #   this may explain why sections of code are not consolidated. Furthermore two
 #   separate Skyfield modules are used with obvious repetition of code. This
 #   simplifies porting from the original code for development and testing.
@@ -255,7 +256,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             config.FANCYhd = True  # assume MiKTeX can handle the 'fancyhdr' package
 
     # command line arguments...
-    validargs = ['-v', '-q', '-log', '-tex', '-sky', '-old', '-a4', '-let', '-nao', '-dtr', '-dpo', '-sbr', '-nmg', '-d1', '-d2', '-d3', '-d4']
+    validargs = ['-v', '-q', '-log', '-tex', '-sky', '-old', '-a4', '-let', '-nao', '-dtr', '-dpo', '-sbr', '-sp', '-nmg', '-d1', '-d2', '-d3', '-d4']
     # (the 4 dummy arguments d1 d2 d3 d4 are specified in 'dockerfile')
     for i in list(range(1, len(sys.argv))):
         if sys.argv[i] not in validargs:
@@ -273,6 +274,7 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
             print(" -dtr ... 'difference-then-round' style hourly Moon d-values")
             print(" -dpo ... data pages only")
             print(" -sbr ... square brackets in Unix filenames")
+            print(" -sp  ... execute in single-processing mode (slower)")
             sys.exit(0)
 
     # NOTE: pdfTeX 3.14159265-2.6-1.40.21 (TeX Live 2020/Debian), as used in the Docker
@@ -284,11 +286,19 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
     onlystars = True if "-sky" in set(sys.argv[1:]) else False
     squarebr = True if "-sbr" in set(sys.argv[1:]) else False
     #
-    # !! CHANGES TO VARIABLES IN config.py ARE NOT MAINTAINED IN MULTIPROCESSING MODE !!
+    # !! CHANGES TO VARIABLES IN config.py ARE NOT MAINTAINED WHEN MULTIPROCESSING !!
     #
     if "-nmg" in set(sys.argv[1:]): config.moonimg = False  # only for debugging
     config.DPonly = True if "-dpo" in set(sys.argv[1:]) else False
     if "-old" in set(sys.argv[1:]): config.FANCYhd = False  # don't use the 'fancyhdr' package
+
+    if "-sp" in set(sys.argv[1:]):
+        config.MULTIpr = False
+
+    # NOTE: multiprocessing is supported in modules: nautical, eventtables
+    #       Hence these can only be imported *after* we know if '-sp' is specified
+    from nautical import almanac            # multiprocessing supported
+    from eventtables import makeEVtables    # multiprocessing supported
 
     if not("-a4" in set(sys.argv[1:]) and "-let" in set(sys.argv[1:])):
         if "-a4" in set(sys.argv[1:]): config.pgsz = "A4"
