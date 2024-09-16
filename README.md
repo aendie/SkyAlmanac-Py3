@@ -232,7 +232,7 @@ ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.12):
 * a symbol (4 slanting lines) indicates "twilight lasts all night" within the sun twilight tables
 Note: a missing moonrise or moonset are still indicated by four dots rather than the convention employed in the official Nautical Almanac by printing hours:minutes greater than 24:00, i.e. in the next day.
 
-Code modernised to use ...
+Some code improvements including code that depends on the Skyfield version installed, e.g. use of ...
 * the 'World Geodetic System 1984 Geoid' for latitude and longitude (if Skyfield >= 1.35)
 * the latest 'find_risings' & 'find_settings' Skyfield routines (if Skyfield >= 1.48) except for moonrise/moonset.
 
