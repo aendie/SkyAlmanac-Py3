@@ -221,7 +221,7 @@ def twilighttab(Date, ts):
             moon = listmoon[j-5][0]
             moon2 = listmoon[j-5][1]
         else:
-            twi = twilight(Date, lat, hemisph, True)
+            twi = twilight(Date, lat, True)
             moon, moon2 = moonrise_set2(Date, lat)
         twi = twilight_symbol(twi)
 

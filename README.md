@@ -227,7 +227,7 @@ ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.11.5):
 
 **UPDATE: Sep 2024**
 
-ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.12):
+ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.12.1):
 * moonrise/moonset accuracy increased slightly
 * a symbol (4 slanting lines) indicates "twilight lasts all night" within the sun twilight tables  
 Note: a missing moonrise or moonset are still indicated by a pair of two dots rather than the convention employed in the official Nautical Almanac by printing hours:minutes greater than 24:00, i.e. in the next day.
