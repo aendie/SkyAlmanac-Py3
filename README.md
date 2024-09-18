@@ -229,8 +229,11 @@ ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.11.5):
 
 ENHANCEMENT/BUGFIX (solved here and in PyPI skyalmanac 1.12):
 * moonrise/moonset accuracy increased slightly
-* a symbol (4 slanting lines) indicates "twilight lasts all night" within the sun twilight tables
-Note: a missing moonrise or moonset are still indicated by four dots rather than the convention employed in the official Nautical Almanac by printing hours:minutes greater than 24:00, i.e. in the next day.
+* a symbol (4 slanting lines) indicates "twilight lasts all night" within the sun twilight tables  
+Note: a missing moonrise or moonset are still indicated by a pair of two dots rather than the convention employed in the official Nautical Almanac by printing hours:minutes greater than 24:00, i.e. in the next day.
+* A new command line option has been added to inhibit multi-processing on a single run:
+    * -sp  ... single-processing  
+Note: The results must be identical in both cases. Changing 'MULTIpr' from True to False in config.py enforces single-processing for all future runs.
 
 Some code improvements including code that depends on the Skyfield version installed, e.g. use of ...
 * the 'World Geodetic System 1984 Geoid' for latitude and longitude (if Skyfield >= 1.35)
