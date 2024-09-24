@@ -248,7 +248,8 @@ Some code improvements including code that depends on the Skyfield version insta
 * Python v3.4 or higher (v3.11.x is recommended)
 * Skyfield >= 1.31 (the latest is recommended; see the Skyfield Changelog)
 * numpy < 2.0.0 (only for Skyfield < 1.48)
-* Pandas >= 1.0 (to decode the Hipparcos catalog; tested: 1.0.3 and 1.1.4)
+* Pandas >= 1.0 (to decode the Hipparcos star catalog)
+* Pandas >= 2.2.2 (if numpy version >= 2.0.0; otherwise numpy 1.26.4 is required)
 * MiKTeX&ensp;or&ensp;TeX Live
 
 ## Files required in the execution folder:
