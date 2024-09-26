@@ -58,16 +58,23 @@ hour_of_day = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
 next_hour_of_day = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
 degree_sign= u'\N{DEGREE SIGN}'
 
-def compareVersion(versions1, version2):
-    #versions1 = [int(v) for v in version1.split(".")]
+def SkyfieldVersion(version2):      # compare Skyfield version to version2
+    versions2 = [int(v) for v in version2.split(".")]
+    for i in range(max(len(VERSION),len(versions2))):
+        v1 = VERSION[i]   if i < len(VERSION)   else 0
+        v2 = versions2[i] if i < len(versions2) else 0
+        if   v1 > v2: return 1
+        elif v1 < v2: return -1
+    return 0
+
+def compareVersion(version1, version2):
+    versions1 = [int(v) for v in version1.split(".")]
     versions2 = [int(v) for v in version2.split(".")]
     for i in range(max(len(versions1),len(versions2))):
         v1 = versions1[i] if i < len(versions1) else 0
         v2 = versions2[i] if i < len(versions2) else 0
-        if v1 > v2:
-            return 1
-        elif v1 < v2:
-            return -1
+        if   v1 > v2: return 1
+        elif v1 < v2: return -1
     return 0
 
 def isConnected():
@@ -170,7 +177,7 @@ def init_sf(spad):
     config.txtIERSEOP = ""
 
     if config.useIERS:
-        if compareVersion(VERSION, "1.31") >= 0:
+        if SkyfieldVersion("1.31") >= 0:
             if os.path.isfile(dfIERS):
                 if load.days_old(EOPdf) > float(config.ageIERS):
                     if isConnected():
@@ -361,7 +368,7 @@ def time2text(t, with_seconds, debug=False):
         return t.ut1_strftime('%H:%M:%S')
     else:
         return t.ut1_strftime('%H:%M')
-        
+
 def next_rise_set(rise, sett, yR, yS):
     ndxR = 0 if len(rise) > 0 else 10
     ndxS = 0 if len(sett) > 0 else 10
@@ -957,7 +964,7 @@ def planetstransit(d, with_seconds = False):        # used in nautical.starstab 
     t0 = ts.ut1(d.year, d.month, d.day, 0, 0, 0)
     t1 = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)
 
-    if compareVersion(VERSION, "1.48") >= 0:
+    if SkyfieldVersion("1.48") >= 0:
         topos = wgs84.latlon(0.0 * N, 0.0 * E, elevation_m=0.0) # default latitude 0°N (any will do)
         observer = earth + topos
 
@@ -975,7 +982,7 @@ def planetstransit(d, with_seconds = False):        # used in nautical.starstab 
 
     # calculate planet transit
     start00 = Time.time()                       # 00000
-    if compareVersion(VERSION, "1.48") < 0:
+    if SkyfieldVersion("1.48") < 0:
         transit_time, y = almanac.find_discrete(t0, t1, planet_transit(venus))
         config.stopwatch += Time.time()-start00 # 00000
         vtrans = rise_set(transit_time,y,u'Venus   0{} E transit'.format(degree_sign),with_seconds)[0]
@@ -996,7 +1003,7 @@ def planetstransit(d, with_seconds = False):        # used in nautical.starstab 
 
     # calculate planet transit
     start00 = Time.time()                       # 00000
-    if compareVersion(VERSION, "1.48") < 0:
+    if SkyfieldVersion("1.48") < 0:
         transit_time, y = almanac.find_discrete(t0, t1, planet_transit(mars))
         config.stopwatch += Time.time()-start00 # 00000
         marstrans = rise_set(transit_time,y,u'Mars    0{} E transit'.format(degree_sign),with_seconds)[0]
@@ -1014,7 +1021,7 @@ def planetstransit(d, with_seconds = False):        # used in nautical.starstab 
 
     # calculate planet transit
     start00 = Time.time()                       # 00000
-    if compareVersion(VERSION, "1.48") < 0:
+    if SkyfieldVersion("1.48") < 0:
         transit_time, y = almanac.find_discrete(t0, t1, planet_transit(jupiter))
         config.stopwatch += Time.time()-start00 # 00000
         jtrans = rise_set(transit_time,y,u'Jupiter 0{} E transit'.format(degree_sign),with_seconds)[0]
@@ -1032,7 +1039,7 @@ def planetstransit(d, with_seconds = False):        # used in nautical.starstab 
 
     # calculate planet transit
     start00 = Time.time()                       # 00000
-    if compareVersion(VERSION, "1.48") < 0:
+    if SkyfieldVersion("1.48") < 0:
         transit_time, y = almanac.find_discrete(t0, t1, planet_transit(saturn))
         config.stopwatch += Time.time()-start00 # 00000
         sattrans = rise_set(transit_time,y,u'Saturn  0{} E transit'.format(degree_sign),with_seconds)[0]
@@ -1159,7 +1166,7 @@ Markab,113963
 #   SUN TWILIGHT table
 #------------------------
 
-def twilight(d, lat, with_seconds = False):    # used in nautical.twilighttab (section 1)
+def twilight(d, lat, with_seconds = False):     # used in nautical.twilighttab (section 1)
     # Returns for given date and latitude(in full degrees):
     # naut. and civil twilight (before sunrise), sunrise, meridian passage, sunset, civil and nautical twilight (after sunset).
     # NOTE: 'twilight' is only called for every third day in the Full Almanac...
@@ -1169,7 +1176,7 @@ def twilight(d, lat, with_seconds = False):    # used in nautical.twilighttab (s
     hemisph = 'N' if lat >= 0 else 'S'
     latNS = "{:3.1f} {}".format(abs(lat), hemisph)
     dt = datetime(d.year, d.month, d.day, 0, 0, 0)
-    if compareVersion(VERSION, "1.35") >= 0:
+    if SkyfieldVersion("1.35") >= 0:
         topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
         observer = earth + topos
     else:
@@ -1186,7 +1193,7 @@ def twilight(d, lat, with_seconds = False):    # used in nautical.twilighttab (s
 
     # Sunrise/Sunset...
     start00 = Time.time()                       # 00000
-    if compareVersion(VERSION, "1.48") < 0:
+    if SkyfieldVersion("1.48") < 0:
         actual, y = almanac.find_discrete(t0, t1, f_sun(topos, 0.8333))
         config.stopwatch += Time.time()-start00 # 00000
         out[2], out[3], r2, s2, fs = rise_set(actual,y,latNS,with_seconds)
@@ -1204,7 +1211,7 @@ def twilight(d, lat, with_seconds = False):    # used in nautical.twilighttab (s
 
     # Civil Twilight...
     start00 = Time.time()                       # 00000
-    if compareVersion(VERSION, "1.48") < 0:
+    if SkyfieldVersion("1.48") < 0:
         civil, y = almanac.find_discrete(t0, t1, f_sun(topos, 6.0))
         config.stopwatch += Time.time()-start00 # 00000
         out[1], out[4], r2, s2, fs = rise_set(civil,y,latNS,with_seconds)
@@ -1221,7 +1228,7 @@ def twilight(d, lat, with_seconds = False):    # used in nautical.twilighttab (s
 
     # Nautical Twilight...
     start00 = Time.time()                       # 00000
-    if compareVersion(VERSION, "1.48") < 0:
+    if SkyfieldVersion("1.48") < 0:
         naut, y = almanac.find_discrete(t0, t1, f_sun(topos, 12.0))
         config.stopwatch += Time.time()-start00 # 00000
         out[0], out[5], r2, s2, fs = rise_set(naut,y,latNS,with_seconds)
@@ -1322,7 +1329,7 @@ def fetchMoonData(d, tFrom, tNoon, tTo, i, lat, hFlag = False, with_seconds=Fals
 
     hemisph = 'N' if lat >= 0 else 'S'
     latNS = "{:3.1f} {}".format(abs(lat), hemisph)
-    if compareVersion(VERSION, "1.35") >= 0:
+    if SkyfieldVersion("1.35") >= 0:
         topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
         observer = earth + topos
     else:
@@ -1361,7 +1368,7 @@ def fetchMoonData(d, tFrom, tNoon, tTo, i, lat, hFlag = False, with_seconds=Fals
 
         horizon = getHorizon(tNoon)         # 0.8307988 on 16-08-2024
         start00 = Time.time()               # 00000
-        if True or compareVersion(VERSION, "1.48") < 0:
+        if True or SkyfieldVersion("1.48") < 0:
             moonrise, y = almanac.find_discrete(tFrom, tTo, f_moon(topos, horizon))
             time00 = Time.time()-start00    # 00000
             rise, sett, ris2, set2, fs = rise_set(moonrise,y,latNS,with_seconds)
@@ -1576,7 +1583,7 @@ def getmoonstate(dt, lat, horizon):
     i = 1 + config.lat.index(lat)   # index 0 is reserved to enable an explicit setting
     hemisph = 'N' if lat >= 0 else 'S'
     latNS = '{:3.1f} {}'.format(abs(lat), hemisph)
-    if compareVersion(VERSION, "1.35") >= 0:
+    if SkyfieldVersion("1.35") >= 0:
         topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)     # at elevation zero
         observer = earth + topos
     else:
@@ -1591,7 +1598,7 @@ def getmoonstate(dt, lat, horizon):
         dt += timedelta(days=1)
         t9 = ts.ut1(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
         start00 = Time.time()               # 00000
-        if True or compareVersion(VERSION, "1.48") < 0:
+        if True or SkyfieldVersion("1.48") < 0:
             moonrise, y = almanac.find_discrete(t0, t9, f_moon(topos, horizon))
             config.stopwatch2 += Time.time()-start00 # 00000
     #        for n in range(len(moonrise)):

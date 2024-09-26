@@ -51,6 +51,16 @@ from increments import makelatex
 #   separate Skyfield modules are used with obvious repetition of code. This
 #   simplifies porting from the original code for development and testing.
 
+def compareVersion(version1, version2):     # compare two versions
+    versions1 = [int(v) for v in version1.split(".")]
+    versions2 = [int(v) for v in version2.split(".")]
+    for i in range(max(len(versions1),len(versions2))):
+        v1 = versions1[i] if i < len(versions1) else 0
+        v2 = versions2[i] if i < len(versions2) else 0
+        if   v1 > v2: return 1
+        elif v1 < v2: return -1
+    return 0
+
 def toUnix(fn):
     # replacing parentheses with square brackets in Ubuntu works, but is not required.
     if squarebr and (config.LINUXpf or config.MACOSpf):
@@ -226,9 +236,34 @@ def checkCoreCount():       # only called when config.MULTIpr == True
 ###### Main Program ######
 
 if __name__ == '__main__':      # required for Windows multiprocessing compatibility
+                                # i.e. don't execute if imported as a child process
     if sys.version_info[0] < 3:
         print("This runs only with Python 3")
         sys.exit(0)
+
+    # check if pandas version is compatible with numpy
+    # (this is required to prevent a crash in "df = hipparcos.load_dataframe(f)")
+    n = sys.version.find(" ")
+    py_ver = sys.version[:n]        # python version
+    
+    if compareVersion(py_ver,"3.8") >= 0:
+        from importlib.metadata import version          # for Python >= 3.8
+        pandas_ver = version('pandas')
+        np_ver = version('numpy')
+
+        if compareVersion(np_ver,"2.0.0") >= 0:         # if numpy >= 2.0.0
+            if compareVersion(pandas_ver, "2.2.2") < 0: # if pandas < 2.2.2
+                print("ISSUE: pandas version {} is incompatible with numpy {}".format(pandas_ver, np_ver))
+                print("       upgrade pandas to >= 2.2.2 or downgrade numpy to <= 1.26.4")
+                sys.exit(0)
+    else:   # if Python < 3.8
+        import numpy as np
+        try:
+            import pandas
+        except ValueError:
+            print("ISSUE: pandas version is incompatible with numpy {}".format(np.__version__))
+            print("       upgrade pandas to >= 2.2.2 or downgrade numpy to <= 1.26.4")
+            sys.exit(0)
 
     # check if TeX Live is compatible with the 'fancyhdr' package...
     process = os.popen("tex --version")

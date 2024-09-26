@@ -234,6 +234,7 @@ Note: a missing moonrise or moonset are still indicated by a pair of two dots ra
 * A new command line option has been added to inhibit multi-processing on a single run:
     * -sp  ... single-processing  
 Note: The results must be identical in both cases. Changing 'MULTIpr' from True to False in config.py enforces single-processing for all future runs. Multiprocessing is only used for Nautical Almanac and Event tables.
+* skyalmanac 1.12.3 checks if the pandas version is compatible with the installed numpy version
 
 Some code improvements including code that depends on the Skyfield version installed, e.g. use of ...
 * the 'World Geodetic System 1984 Geoid' for latitude and longitude (if Skyfield >= 1.35)

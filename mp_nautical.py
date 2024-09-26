@@ -56,16 +56,13 @@ degree_sign= u'\N{DEGREE SIGN}'
 #   internal methods
 #----------------------
 
-def compareVersion(versions1, version2):
-    #versions1 = [int(v) for v in version1.split(".")]
+def SkyfieldVersion(version2):      # compare Skyfield version to version2
     versions2 = [int(v) for v in version2.split(".")]
-    for i in range(max(len(versions1),len(versions2))):
-        v1 = versions1[i] if i < len(versions1) else 0
+    for i in range(max(len(VERSION),len(versions2))):
+        v1 = VERSION[i]   if i < len(VERSION)   else 0
         v2 = versions2[i] if i < len(versions2) else 0
-        if v1 > v2:
-            return 1
-        elif v1 < v2:
-            return -1
+        if   v1 > v2: return 1
+        elif v1 < v2: return -1
     return 0
 
 def GHAcolong(gha):
@@ -222,7 +219,7 @@ def fmt_transits(t, lats, with_seconds = False):
 
     return transit1, transit2
 
-def rise_set(t, y, lats, with_seconds = False):    # 'ts' removed (Aug 2024 simplification)
+def rise_set(t, y, lats, with_seconds = False):     # 'ts' removed (Aug 2024 simplification)
     # analyse the return values from the 'find_discrete' method...
     # get sun/moon rise/set values (if any) rounded to nearest minute
     rise = '--:--'
@@ -436,7 +433,8 @@ def mp_planetGHA(d, ts, obj):                   # used in nautical.planetstab
     return out
 
 # > > > > > > > > > > MULTIPROCESSING ENTRY POINT < < < < < < < < < <
-def mp_planetstransit(d, ts, obj, with_seconds = False):  # used in nautical.starstab
+# used in nautical.starstab & eventtables.mp_planets_worker
+def mp_planetstransit(d, ts, obj, with_seconds = False):
     # returns SHA and Meridian Passage for the navigational planets
 
     out = [None, None, None]  # return [planet_sha, planet_transit] + processing time
@@ -451,7 +449,7 @@ def mp_planetstransit(d, ts, obj, with_seconds = False):  # used in nautical.sta
         else:
             planet = eph['mars']
     lattxt = u'{} 0{} E transit'.format(obj, degree_sign)
-    if compareVersion(VERSION, "1.35") >= 0:
+    if SkyfieldVersion("1.35") >= 0:
         lats = 0.0     # default latitude (any will do)
         topos = wgs84.latlon(lats, 0.0 * E, elevation_m=0.0)
         observer = earth + topos
@@ -468,7 +466,7 @@ def mp_planetstransit(d, ts, obj, with_seconds = False):  # used in nautical.sta
     d1 = d + timedelta(days=1)
     tto = ts.ut1(d1.year, d1.month, d1.day, 0, 0, 0)    # search to
     start00 = time()                        # 00000
-    if compareVersion(VERSION, "1.47") < 0:
+    if SkyfieldVersion("1.47") < 0:
         transit_time, y = almanac.find_discrete(tfr, tto, planet_transit(earth, planet))
         time00 = time()-start00             # 00000
         out[1] = rise_set(transit_time,y,lattxt,with_seconds = False)[0]  # planet_transit
@@ -543,7 +541,8 @@ def mp_sunGHA(d, ts, earth, sun):              # used in nautical.sunmoontab(m)
     # degs has been added for the suntab function
     return ghas,decs,degs
 
-def mp_moonGHA(d, ts, earth, moon, with_seconds = False):  # used in nautical.sunmoontab(m) & eventtables.equationtab
+# used in nautical.sunmoontab(m) & eventtables.equationtab
+def mp_moonGHA(d, ts, earth, moon, with_seconds = False):
     # compute moon's GHA, DEC and HP per hour of day
     t = ts.ut1(d.year, d.month, d.day, hour_of_day, 0, 0)
     position = earth.at(t).observe(moon)
@@ -791,7 +790,7 @@ def mp_twilight(d, lat, ts, with_seconds = False):     # used in nautical.twilig
     out = [None,None,None,None,None,None,None]  # 6 data items + processing time
     hemisph = 'N' if lat >= 0 else 'S'
     latNS = "{:3.1f} {}".format(abs(lat), hemisph)
-    if compareVersion(VERSION, "1.35") >= 0:
+    if SkyfieldVersion("1.35") >= 0:
         topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
         observer = earth + topos
     else:
@@ -811,7 +810,7 @@ def mp_twilight(d, lat, ts, with_seconds = False):     # used in nautical.twilig
     # Sunrise/Sunset...
     start00 = time()                        # 00000
     horizon = 0.8333        # degrees below horizon
-    if compareVersion(VERSION, "1.48") < 0:
+    if SkyfieldVersion("1.48") < 0:
         actual, y = almanac.find_discrete(t0, t1, f_sun(earth, sun, topos, horizon))
         time00 += time()-start00            # 00000
         out[2], out[3], r2, s2, fs = rise_set(actual,y,latNS,with_seconds)
@@ -830,7 +829,7 @@ def mp_twilight(d, lat, ts, with_seconds = False):     # used in nautical.twilig
     # Civil Twilight...
     horizon = 6.0           # degrees below horizon
     start00 = time()                        # 00000
-    if compareVersion(VERSION, "1.48") < 0:
+    if SkyfieldVersion("1.48") < 0:
         civil, y = almanac.find_discrete(t0, t1, f_sun(earth, sun, topos, horizon))
         time00 += time()-start00            # 00000
         out[1], out[4], r2, s2, fs = rise_set(civil,y,latNS,with_seconds)
@@ -848,7 +847,7 @@ def mp_twilight(d, lat, ts, with_seconds = False):     # used in nautical.twilig
     # Nautical Twilight...
     horizon = 12.0          # degrees below horizon
     start00 = time()                        # 00000
-    if compareVersion(VERSION, "1.48") < 0:
+    if SkyfieldVersion("1.48") < 0:
         naut, y = almanac.find_discrete(t0, t1, f_sun(earth, sun, topos, horizon))
         time00 += time()-start00            # 00000
         out[0], out[5], r2, s2, fs = rise_set(naut,y,latNS,with_seconds)
@@ -911,7 +910,7 @@ def getmoonstate(dt, lat, horizon, ts, earth, moon):
     Hseeks = 0
     hemisph = 'N' if lat >= 0 else 'S'
     latNS = '{:3.1f} {}'.format(abs(lat), hemisph)
-    if compareVersion(VERSION, "1.35") >= 0:
+    if SkyfieldVersion("1.35") >= 0:
         topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
         observer = earth + topos
     else:
@@ -928,7 +927,7 @@ def getmoonstate(dt, lat, horizon, ts, earth, moon):
         dt += timedelta(days=1)
         t9 = ts.ut1(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
         start00 = time()                    # 00000
-        if True or compareVersion(VERSION, "1.48") < 0:
+        if True or SkyfieldVersion("1.48") < 0:
             moonrise, y = almanac.find_discrete(t0, t9, f_moon(earth, moon, topos, horizon))
             time00 += time()-start00        # 00000
             if len(moonrise) > 0:
@@ -974,7 +973,7 @@ def seek_moonset(t9, t9noon, t0, t1, t1noon, t2, lat, ts, earth, moon):
     m_set_t = 0     # normal case: assume moonsets yesterday & tomorrow
     hemisph = 'N' if lat >= 0 else 'S'
     latNS = "{:3.1f} {}".format(abs(lat), hemisph)
-    if compareVersion(VERSION, "1.35") >= 0:
+    if SkyfieldVersion("1.35") >= 0:
         topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
         observer = earth + topos
     else:
@@ -982,7 +981,7 @@ def seek_moonset(t9, t9noon, t0, t1, t1noon, t2, lat, ts, earth, moon):
 
     horizon = getHorizon(t1noon, earth, moon)
     start00 = time()                        # 00000
-    if True or compareVersion(VERSION, "1.48") < 0:
+    if True or SkyfieldVersion("1.48") < 0:
         moonrise, y = almanac.find_discrete(t1, t2, f_moon(earth, moon, topos, horizon))
         time00 += time()-start00            # 00000
         rise, sett, ris2, set2, fs = rise_set(moonrise,y,latNS)
@@ -997,7 +996,7 @@ def seek_moonset(t9, t9noon, t0, t1, t1noon, t2, lat, ts, earth, moon):
         Hseeks += 1
         horizon = getHorizon(t9noon, earth, moon)
         start00 = time()                    # 00000
-        if True or compareVersion(VERSION, "1.48") < 0:
+        if True or SkyfieldVersion("1.48") < 0:
             moonrise, y = almanac.find_discrete(t9, t0, f_moon(earth, moon, topos, horizon))
             time00 += time()-start00        # 00000
             rise, sett, ris2, set2, fs = rise_set(moonrise,y,latNS)
@@ -1023,7 +1022,7 @@ def seek_moonrise(t9, t9noon, t0, t1, t1noon, t2, lat, ts, earth, moon):
     m_rise_t = 0    # normal case: assume moonrise yesterday & tomorrow
     hemisph = 'N' if lat >= 0 else 'S'
     latNS = "{:3.1f} {}".format(abs(lat), hemisph)
-    if compareVersion(VERSION, "1.35") >= 0:
+    if SkyfieldVersion("1.35") >= 0:
         topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
         observer = earth + topos
     else:
@@ -1031,7 +1030,7 @@ def seek_moonrise(t9, t9noon, t0, t1, t1noon, t2, lat, ts, earth, moon):
 
     horizon = getHorizon(t1noon, earth, moon)
     start00 = time()                        # 00000
-    if True or compareVersion(VERSION, "1.48") < 0:
+    if True or SkyfieldVersion("1.48") < 0:
         moonrise, y = almanac.find_discrete(t1, t2, f_moon(earth, moon, topos, horizon))
         time00 += time()-start00            # 00000
         rise, sett, ris2, set2, fs = rise_set(moonrise,y,latNS)
@@ -1046,7 +1045,7 @@ def seek_moonrise(t9, t9noon, t0, t1, t1noon, t2, lat, ts, earth, moon):
         Hseeks += 1
         horizon = getHorizon(t9noon, earth, moon)
         start00 = time()                    # 00000
-        if True or compareVersion(VERSION, "1.48") < 0:
+        if True or SkyfieldVersion("1.48") < 0:
             moonrise, y = almanac.find_discrete(t9, t0, f_moon(earth, moon, topos, horizon))
             time00 += time()-start00        # 00000
             rise, sett, ris2, set2, fs = rise_set(moonrise,y,latNS)
@@ -1114,7 +1113,7 @@ def mp_moonrise_set(d, lat, mstate0, ts):   # used in nautical.twilighttab (sect
 
     hemisph = 'N' if lat >= 0 else 'S'
     latNS = "{:3.1f} {}".format(abs(lat), hemisph)
-    if compareVersion(VERSION, "1.35") >= 0:
+    if SkyfieldVersion("1.35") >= 0:
         topos = wgs84.latlon(lat, 0.0 * E, elevation_m=0.0)
         observer = earth + topos
     else:
@@ -1154,7 +1153,7 @@ def mp_moonrise_set(d, lat, mstate0, ts):   # used in nautical.twilighttab (sect
     Mseeks += 1
     horizon = getHorizon(t0noon, earth, moon)   # 0.8307988 on 16-08-2024
     start00 = time()                        # 00000
-    if True or compareVersion(VERSION, "1.48") < 0:
+    if True or SkyfieldVersion("1.48") < 0:
         moonrise, y = almanac.find_discrete(t0, t1, f_moon(earth, moon, topos, horizon))
         time00 += time()-start00            # 00000
         ev1[0], ev1[3], ev2[0], ev2[3], mstate1 = rise_set(moonrise,y,latNS)
@@ -1190,7 +1189,7 @@ def mp_moonrise_set(d, lat, mstate0, ts):   # used in nautical.twilighttab (sect
     Mseeks += 1
     horizon = getHorizon(t1noon, earth, moon)
     start00 = time()                        # 00000
-    if True or compareVersion(VERSION, "1.48") < 0:
+    if True or SkyfieldVersion("1.48") < 0:
         moonrise, y = almanac.find_discrete(t1, t2, f_moon(earth, moon, topos, horizon))
         time00 += time()-start00            # 00000
         ev1[1], ev1[4], ev2[1], ev2[4], mstate2 = rise_set(moonrise,y,latNS)
@@ -1226,7 +1225,7 @@ def mp_moonrise_set(d, lat, mstate0, ts):   # used in nautical.twilighttab (sect
     Mseeks += 1
     horizon = getHorizon(t2noon, earth, moon)
     start00 = time()                        # 00000
-    if True or compareVersion(VERSION, "1.48") < 0:
+    if True or SkyfieldVersion("1.48") < 0:
         moonrise, y = almanac.find_discrete(t2, t3, f_moon(earth, moon, topos, horizon))
         time00 += time()-start00            # 00000
         ev1[2], ev1[5], ev2[2], ev2[5], mstate3 = rise_set(moonrise,y,latNS)
