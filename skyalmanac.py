@@ -22,7 +22,7 @@ import os
 import sys, site
 import time
 from sysconfig import get_path  # new in python 3.2
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from multiprocessing import cpu_count
 
 ###### Local application imports ######
@@ -73,7 +73,8 @@ def toUNIX(fn):
         if True:
             fn = "'" + fn + "'"
         else:
-            fn = fn.replace("(","\(").replace(")","\)")
+            # Python 3 requires a raw string to avoid a syntax warning on the following line...
+            fn = fn.replace("(",r"\(").replace(")",r"\)")
     return fn
 
 def deletePDF(filename):
@@ -343,7 +344,11 @@ if __name__ == '__main__':      # required for Windows multiprocessing compatibi
         if "-nao" in set(sys.argv[1:]): config.d_valNA = True
         if "-dtr" in set(sys.argv[1:]): config.d_valNA = False
 
-    d = datetime.utcnow().date()
+    if compareVersion(py_ver,"3.11") >= 0:
+        # Python >= 3.13 now requires timezone-aware datetimes
+        d = datetime.now(timezone.utc).date()   # 'datetime.UTC' only added in version 3.11
+    else:
+        d = datetime.utcnow().date()            # deprecated since Python 3.12
     first_day = date(d.year, d.month, d.day)
     yy = "%s" % d.year
 

@@ -240,6 +240,12 @@ Some code improvements including code that depends on the Skyfield version insta
 * the 'World Geodetic System 1984 Geoid' for latitude and longitude (if Skyfield >= 1.35)
 * the latest 'find_risings' & 'find_settings' Skyfield routines (if Skyfield >= 1.48) except for moonrise/moonset.
 
+**UPDATE: Nov 2024**
+BUGFIX (solved here and in PyPI skyalmanac 1.12.4):  
+(These are technical issues that emerge with newer versions of Python)  
+* A Python DeprecationWarning requires timezone-aware objects to represent datetimes in UTC
+* A Python SyntaxWarning is averted by use of a raw string in a string literal
+
 ## Requirements
 
 &emsp;Most of the computation is done by the Skyfield astronomical library.  
