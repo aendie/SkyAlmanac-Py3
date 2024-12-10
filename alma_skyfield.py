@@ -67,7 +67,7 @@ def SkyfieldVersion(version2):      # compare Skyfield version to version2
         elif v1 < v2: return -1
     return 0
 
-def compareVersion(version1, version2):
+def compareVersion(version1, version2):     # compare two versions
     versions1 = [int(v) for v in version1.split(".")]
     versions2 = [int(v) for v in version2.split(".")]
     for i in range(max(len(versions1),len(versions2))):
@@ -344,13 +344,14 @@ def fmtdeg(deg, fixedwidth=1):
         di += 1
         if di == 360:
             di = 0
+    # Python 3 requires a raw string to avoid a syntax warning on 3 of the following lines...
     if fixedwidth == 2:
-        gm = "{}{:02d}$^\circ${:04.1f}".format(theminus,di,mf)
+        gm = r"{}{:02d}$^\circ${:04.1f}".format(theminus,di,mf)
     else:
         if fixedwidth == 3:
-            gm = "{}{:03d}$^\circ${:04.1f}".format(theminus,di,mf)
+            gm = r"{}{:03d}$^\circ${:04.1f}".format(theminus,di,mf)
         else:
-            gm = "{}{}$^\circ${:04.1f}".format(theminus,di,mf)
+            gm = r"{}{}$^\circ${:04.1f}".format(theminus,di,mf)
     return gm
 
 def time2text(t, with_seconds, debug=False):
