@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2023  Andrew Bauer
+#   Copyright (C) 2024  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@ import ld_stardata
 #   Module initialization
 #---------------------------
 
-urlIERS = "ftp://ftp.iers.org/products/eop/rapid/standard/"
-urlUSNO = "https://maia.usno.navy.mil/ser7/"        # alternate location
+urlIERS   = "ftp://ftp.iers.org/products/eop/rapid/standard/"
+urlUSNO   = "https://maia.usno.navy.mil/ser7/"      # alternate location
 urlDCIERS = "https://datacenter.iers.org/data/9/"   # alternate location
 
 hour_of_day3 = [0, 12, 24]
@@ -56,17 +56,26 @@ next_hour_of_day = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1
 hour_of_day26 = [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
 degree_sign= u'\N{DEGREE SIGN}'
 
-def compareVersion(versions1, version2):
-    #versions1 = [int(v) for v in version1.split(".")]
+def SkyfieldVersion(version2):      # compare Skyfield version to version2
     versions2 = [int(v) for v in version2.split(".")]
-    for i in range(max(len(versions1),len(versions2))):
-        v1 = versions1[i] if i < len(versions1) else 0
+    for i in range(max(len(VERSION),len(versions2))):
+        v1 = VERSION[i]   if i < len(VERSION)   else 0
         v2 = versions2[i] if i < len(versions2) else 0
-        if v1 > v2:
-            return 1
-        elif v1 < v2:
-            return -1
+        if   v1 > v2: return 1
+        elif v1 < v2: return -1
     return 0
+
+# def compareVersion(version1, version2):
+    # versions1 = [int(v) for v in version1.split(".")]
+    # versions2 = [int(v) for v in version2.split(".")]
+    # for i in range(max(len(versions1),len(versions2))):
+        # v1 = versions1[i] if i < len(versions1) else 0
+        # v2 = versions2[i] if i < len(versions2) else 0
+        # if v1 > v2:
+            # return 1
+        # elif v1 < v2:
+            # return -1
+    # return 0
 
 def isConnected():
     try:
@@ -167,7 +176,7 @@ def ld_init_sf(spad):
     config.txtIERSEOP = ""
 
     if config.useIERS:
-        if compareVersion(VERSION, "1.31") >= 0:
+        if SkyfieldVersion("1.31") >= 0:
             if os.path.isfile(dfIERS):
                 if load.days_old(EOPdf) > float(config.ageIERS):
                     if isConnected():
@@ -326,13 +335,14 @@ def fmtdeg(deg, fixedwidth=1):
         di += 1
         if di == 360:
             di = 0
+    # Python 3 requires a raw string to avoid a syntax warning on 3 of the following lines...
     if fixedwidth == 2:
-        gm = "{}{:02d}$^\circ${:04.1f}".format(theminus,di,mf)
+        gm = r"{}{:02d}$^\circ${:04.1f}".format(theminus,di,mf)
     else:
         if fixedwidth == 3:
-            gm = "{}{:03d}$^\circ${:04.1f}".format(theminus,di,mf)
+            gm = r"{}{:03d}$^\circ${:04.1f}".format(theminus,di,mf)
         else:
-            gm = "{}{}$^\circ${:04.1f}".format(theminus,di,mf)
+            gm = r"{}{}$^\circ${:04.1f}".format(theminus,di,mf)
     return gm
 
 #-------------------------------------------------
@@ -884,7 +894,7 @@ def ld_planets(d):          # used in ld_tables.moontab, ld_charts.LDstrategy
                         continue
 
             if ld >= 120.0:
-                ld_pm[i] = "ld $\geq$ 120"
+                ld_pm[i] = r"ld $\geq$ 120"
                 continue
 
             ra_diff = diff_ra(ra_m.hours[i+2], ra_p.hours[i+2])   # RA difference sun/planet-moon
