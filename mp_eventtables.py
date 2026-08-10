@@ -35,10 +35,9 @@ from math import degrees, atan
 #import sys			# sys.exit() does not work here
 
 ###### Third party imports ######
-from skyfield import VERSION
 from skyfield.api import load
 from skyfield.api import Topos, Star, wgs84, N, S, E, W     # Topos is deprecated in Skyfield v1.35!
-from skyfield import almanac
+from skyfield import VERSION, almanac
 from skyfield.nutationlib import iau2000b
 #from skyfield.data import hipparcos
 
@@ -224,7 +223,7 @@ def fmt_transits(t, lats, with_seconds = False):
 
     return transit1, transit2
 
-def rise_set(t, y, lats, with_seconds = False):    # 'ts' removed (Aug 2024 simplification)
+def rise_set(t, y, lats, with_seconds = False):     # 'ts' removed (Aug 2024 simplification)
     # analyse the return values from the 'find_discrete' method...
     # get sun/moon rise/set values (if any) rounded to nearest minute
     rise = '--:--'

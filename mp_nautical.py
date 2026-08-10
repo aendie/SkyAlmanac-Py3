@@ -34,10 +34,9 @@ from math import degrees, atan, tan, pi, copysign
 #import sys			# sys.exit() does not work here
 
 ###### Third party imports ######
-from skyfield import VERSION
 from skyfield.api import load
 from skyfield.api import Topos, Star, wgs84, N, S, E, W     # Topos is deprecated in Skyfield v1.35!
-from skyfield import almanac
+from skyfield import VERSION, almanac
 from skyfield.nutationlib import iau2000b
 #from skyfield.data import hipparcos
 
