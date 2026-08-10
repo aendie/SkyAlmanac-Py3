@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2024  Andrew Bauer
+#   Copyright (C) 2026  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -95,12 +95,12 @@ def fmtdeg(deg, fixedwidth=1):
         if di == 360:
             di = 0
     if fixedwidth == 2:
-        gm = "{}{:02d}$^\circ${:04.1f}".format(theminus,di,mf)
+        gm = "{}{:02d}$^\\circ${:04.1f}".format(theminus,di,mf)
     else:
         if fixedwidth == 3:
-            gm = "{}{:03d}$^\circ${:04.1f}".format(theminus,di,mf)
+            gm = "{}{:03d}$^\\circ${:04.1f}".format(theminus,di,mf)
         else:
-            gm = "{}{}$^\circ${:04.1f}".format(theminus,di,mf)
+            gm = "{}{}$^\\circ${:04.1f}".format(theminus,di,mf)
     return gm
 
 def fmtgha(gst, ra):
@@ -134,26 +134,31 @@ def next_rise_set(rise, sett, yR, yS):
                 pickRISE = True if rise[ndxR] < sett[ndxS] else False           # Skyfield >= 1.48 rqrd
             if not RISEok and not SETTok: ndxR += 1; ndxS += 1
             continue      # avoid 't.utc_datetime()' below as 't' unknown
+
         elif pickRISE:
             t = rise[ndxR]
-            if yR[ndxR]: currentstate = False; break
+            valid = yR[ndxR]
+            if valid: currentstate = False; break
             ndxR += 1
             pickRISE = not pickRISE     # flip RISE to SET & vice-versa
         else:
             t = sett[ndxS]
-            if yS[ndxS]: currentstate = True; break
+            valid = yS[ndxS]
+            if valid: currentstate = True; break
             ndxS += 1
             pickRISE = not pickRISE     # flip RISE to SET & vice-versa
 
-        dt = t.utc_datetime()
-        if prev_dt > dt: print("Event time sequence ERROR on {} in mp_nautical.next_rise_set".format(dt.strftime("%d-%m-%Y")))
-        prev_dt = dt
+        if valid:
+            dt = t.utc_datetime()
+            if prev_dt > dt: print("Event time sequence ERROR on {} in mp_nautical.next_rise_set".format(dt.strftime("%d-%m-%Y")))
+            prev_dt = dt
 
     return currentstate
 
 def fmt_rise_set(rise, sett, yR, yS, txt, with_seconds=False):
     # note: yR and yS must be passed here as it is not possible to .pop() a False time from the Time object.
     # note: if yR or yS returns [], it is interpreted as False. However the time would also be [].
+    # maximum 2 RISE and 2 SET times are returned !
     ndxR = 0 if len(rise) > 0 else 10
     ndxS = 0 if len(sett) > 0 else 10
     pickRISE = None         # no idea if RISE or SET comes first and is valid
@@ -175,10 +180,12 @@ def fmt_rise_set(rise, sett, yR, yS, txt, with_seconds=False):
                 pickRISE = True if rise[ndxR] < sett[ndxS] else False           # Skyfield >= 1.48 rqrd
             if not RISEok and not SETTok: ndxR += 1; ndxS += 1
             continue      # avoid 't.utc_datetime()' below as 't' unknown
+
         elif pickRISE:
             if ndxR < len(rise):
                 t = rise[ndxR]
-                if yR[ndxR]:
+                valid = yR[ndxR]
+                if valid:
                     Rtxt[r] = time2text(t, with_seconds)
                     r += 1; finalstate = True
                 ndxR += 1
@@ -186,15 +193,17 @@ def fmt_rise_set(rise, sett, yR, yS, txt, with_seconds=False):
         else:
             if ndxS < len(sett):
                 t = sett[ndxS]
-                if yS[ndxS]:
+                valid = yS[ndxS]
+                if valid:
                     Stxt[s] = time2text(t, with_seconds)
                     s += 1; finalstate = False
                 ndxS += 1
             pickRISE = not pickRISE     # flip RISE to SET & vice-versa
 
-        dt = t.utc_datetime()
-        if prev_dt > dt: print("Event time sequence ERROR on {} in mp_nautical.fmt_rise_set".format(dt.strftime("%d-%m-%Y")))
-        prev_dt = dt
+        if valid:
+            dt = t.utc_datetime()
+            if prev_dt > dt: print("Event time sequence ERROR on {} in mp_nautical.fmt_rise_set".format(dt.strftime("%d-%m-%Y")))
+            prev_dt = dt
 
     return Rtxt[0], Stxt[0], Rtxt[1], Stxt[1], finalstate
 

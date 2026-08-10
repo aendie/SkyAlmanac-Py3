@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2024  Andrew Bauer
+#   Copyright (C) 2026  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ def twilight_symbol(oldtwi):
     twi = []
     for event in oldtwi:
         if event == '--:--':
-            twi.append('\mytwilightsymbol{1.0ex}')
+            twi.append('\\mytwilightsymbol{1.0ex}')
         else: twi.append(event)
     return twi
 

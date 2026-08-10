@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2024  Andrew Bauer
+#   Copyright (C) 2026  Andrew Bauer
 #   Copyright (C) 2014  Enno Rodegerdts
 
 #   This program is free software; you can redistribute it and/or modify
@@ -264,7 +264,7 @@ def twilight_symbol(oldtwi):
     twi = []
     for event in oldtwi:
         if event == '--:--':
-            twi.append('\mytwilightsymbol{1.0ex}')
+            twi.append('\\mytwilightsymbol{1.0ex}')
         else: twi.append(event)
     return twi
 
@@ -583,7 +583,7 @@ def starstab(Date, ts):
     for i in range(3):
         dt = Date + timedelta(days=i)
         datestr = r'''{} {} {}'''.format(dt.strftime("%b"), dt.strftime("%d"), dt.strftime("%a"))
-        m = m + '''\hline
+        m = m + '''\\hline
 '''
         if config.tbls == "m":
             m = m + r'''& & \multicolumn{{1}}{{r|}}{{}}\\[-2.0ex]
@@ -1119,7 +1119,7 @@ def twilighttab(Date, ts):
         phase = moonphase(d1)       # moon phase (0:new to π:full to 2π:new)
         age2, pct2 = moonage(d2, d3)
         ages = '{}-{}'.format(age0,age2)
-        pcts = '{}-{}\%'.format(pct0,pct2)
+        pcts = '{}-{}\\%'.format(pct0,pct2)
 
         if config.tbls == "m":
             tab = tab + r'''\hline
@@ -1242,8 +1242,8 @@ def doublepage(Date, page1, ts):
     leftindent = ""
     rightindent = ""
     if config.tbls == "m":
-        leftindent = "\quad"
-        rightindent = "\hphantom{\quad}"
+        leftindent = "\\quad"
+        rightindent = "\\hphantom{\\quad}"
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     if config.FANCYhd:

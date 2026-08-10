@@ -77,10 +77,6 @@ The additional calculations required are compensated with a transient Moon Data 
 
 Correction to Sun Data: "Sun continually above/below horizon" now shown if it applies to both Sunrise and Sunset, or *additionally* to both Civil Twilight Start & End; or *additionally* to both Astronomical Twilight Start & End, i.e. as two, four or six events per day and latitude. This brings it in line with Nautical Almanacs.
 
-&emsp;:smiley:&ensp;Skyalmanac is now available on DockerHub [here](https://hub.docker.com/repository/docker/aendie/skyalmanac).&ensp;:smiley:
-
-The DockerHub image contains a Linux-based OS, TeX Live, the application code, and third party Python imports (including the astronomical libraries). It can be executed "in a container" on Windows 10 Pro, macOS or a Linux-based OS.
-
 **UPDATE: Jun 2021**
 
 This version introduces multiprocessing and thus a gain in performance. Single-processing is also a selectable option, if required. Testing has been successfully performed on Windows 10 and Ubuntu 20.04 LTS. (No testing can be performed on Mac OS.) Compared to single-processing ...
@@ -247,6 +243,16 @@ BUGFIX (solved here and in PyPI skyalmanac 1.12.5):
 * A Python DeprecationWarning requires timezone-aware objects to represent datetimes in UTC
 * A Python SyntaxWarning is averted by use of a raw string in a string literal
 
+**UPDATE: Aug 2026**
+
+BUGFIX (solved here and in PyPI skyalmanac 1.13):  
+* the following error messages have been fixed:
+* &emsp"Event time sequence ERROR on dd-mm-yyyy in mp_eventtables_fmt_rise_set"
+* &emsp"Event time sequence ERROR on dd-mm-yyyy in mp_nautical_fmt_rise_set"
+* &emsp"Event time sequence ERROR on dd-mm-yyyy in alma_skyfield.next_rise_set"
+* 23 Syntax Deprecation Warnings detected by Python 3.13.14 have been fixed
+** Note that Skyfield version 1.55 is required as a minimum to avert other issues**
+
 ## Requirements
 
 &emsp;Most of the computation is done by the Skyfield astronomical library.  
@@ -254,7 +260,7 @@ BUGFIX (solved here and in PyPI skyalmanac 1.12.5):
 &emsp;Here are the requirements/recommendations:
 
 * Python v3.4 or higher (v3.12 minimum is recommended)
-* Skyfield >= 1.49 (the latest is recommended; see the Skyfield Changelog)
+* Skyfield >= 1.55 (the latest is recommended; see the Skyfield Changelog)
 * numpy < 2.0.0 (only for Skyfield < 1.48)
 * Pandas >= 1.0 (to decode the Hipparcos star catalog)
 * Pandas >= 2.2.2 (if numpy version >= 2.0.0; otherwise numpy 1.26.4 is required)
@@ -310,7 +316,7 @@ BUGFIX (solved here and in PyPI skyalmanac 1.12.5):
 &emsp;and save the file. Problem solved. For more details go [here](https://tex.stackexchange.com/questions/438902/how-to-increase-memory-size-for-xelatex-in-miktex/438911#438911)
 
 
-### INSTALLATION GUIDELINES on Ubuntu Desktop 19.10 or 20.04 or 22.04:
+### INSTALLATION GUIDELINES on Ubuntu Desktop 19.10 or 20.04, 22.04, 24.04 or 26.04:
 
 &emsp;Ubuntu 18.04 and higher come with Python 3 preinstalled,  
 &emsp;however pip may need to be installed:  
@@ -350,7 +356,7 @@ BUGFIX (solved here and in PyPI skyalmanac 1.12.5):
 &emsp;If this command fails, your Mac asks you if you would like to install the header files.  
 &emsp;Do so - you do not need to install the full IDE - and try again.
 
-&emsp;Install TeX/LaTeX from http://www.tug.org/mactex/
+&emsp;Install TeX/LaTeX from https://tug.org/mactex/
 
 &emsp;Now you are almost ready. Put the Skyalmanac files in any directory and start with:  
 &emsp;**python skyalmanac**  

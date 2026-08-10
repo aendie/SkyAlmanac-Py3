@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 #   Copyright (C) 2014  Enno Rodegerdts
-#   Copyright (C) 2023  Andrew Bauer
+#   Copyright (C) 2026  Andrew Bauer
 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ def degmin(deg):
         di += 1
         if di == 360:
             di = 0
-    gm = "{}{}$^\circ${:04.1f}".format(theminus,di,mf)
+    gm = "{}{}$^\\circ${:04.1f}".format(theminus,di,mf)
     return gm
 
 def decdeg(d,mmm):
@@ -105,7 +105,7 @@ def inctab(mmm):
    
     sec = 0
     while sec < 60:
-        line = "{} & {} & {} & {} & {} - {} & {} - {} & {} - {} \\\ \n".format(sec,suninc(mmm,sec),ariesinc(mmm,sec),mooninc(mmm,sec),str(round(0.1*sec,1)),vcorr(mmm,0.1*sec),str(round(6+0.1*sec,1)),vcorr(mmm,6+0.1*sec),str(round(12+0.1*sec,1)),vcorr(mmm,12+0.1*sec))
+        line = "{} & {} & {} & {} & {} - {} & {} - {} & {} - {} \\\\\n".format(sec,suninc(mmm,sec),ariesinc(mmm,sec),mooninc(mmm,sec),str(round(0.1*sec,1)),vcorr(mmm,0.1*sec),str(round(6+0.1*sec,1)),vcorr(mmm,6+0.1*sec),str(round(12+0.1*sec,1)),vcorr(mmm,12+0.1*sec))
         tab += line
         sec += 1
         
@@ -153,7 +153,7 @@ def diptab():
     \hline
 '''
     while meter < 25.5:
-        line = "{} &  {:.1f} & {:.1f}\\\ \n".format(meter, dip(meter), meter/0.3084)
+        line = "{} &  {:.1f} & {:.1f}\\\\\n".format(meter, dip(meter), meter/0.3084)
         tab = tab + line
         meter += 0.5
     tab = tab + r'''\hline
@@ -177,15 +177,15 @@ def refractab():
     \hline
 '''
     while ho < 20:
-        line = "{}$^\circ$ &  {:.1f}\\\ \n".format(ho, refrac(ho))
+        line = "{}$^\\circ$ &  {:.1f}\\\\\n".format(ho, refrac(ho))
         tab = tab + line
         ho += 0.5
     while ho < 40:
-        line = "{}$^\circ$ &  {:.1f}\\\ \n".format(ho, refrac(ho))
+        line = "{}$^\\circ$ &  {:.1f}\\\\\n".format(ho, refrac(ho))
         tab = tab + line
         ho += 1
     while ho < 90:
-        line = "{}$^\circ$ &  {:.1f}\\\ \n".format(ho, refrac(ho))
+        line = "{}$^\\circ$ &  {:.1f}\\\\\n".format(ho, refrac(ho))
         tab = tab + line
         ho += 5
     tab = tab + r'''\hline
@@ -212,7 +212,7 @@ def parallaxtab():
     while d<90:
         line += r"& \multicolumn{{1}}{{>{{\hspace{{-4pt}}}}c<{{\hspace{{-4pt}}}}|}}{{\textbf{{{}-{}$^\circ$}}}}".format(d, d+5)
         d+= 5
-    line += " \\\ \n \\hline"
+    line += " \\\\\n \\hline"
     tab += line
 
     while Hdeg < 5 :
@@ -222,7 +222,7 @@ def parallaxtab():
         while dd < 90:
             line += r"& \multicolumn{{1}}{{l}}{{\textbf{{{}$^\circ$}}}}".format(dd)
             dd += 5
-        line += "\\vline \\\ \n"
+        line += "\\vline \\\\\n"
         tab = tab + line
         Hmin=0
         while Hmin < 60:
@@ -231,7 +231,7 @@ def parallaxtab():
             while dd < 90:
                 line += " & {:.1f} ".format(parallax(HP,dd,Hmin))
                 dd += 5
-            line += "\\\ \n"
+            line += "\\\\\n"
             tab = tab + line
             Hmin += 10	
         Hdeg += 1
@@ -247,7 +247,7 @@ def parallaxtab():
         while d<90:
             line += "& {:.1f} ".format(parallax(hp, d, 30) - parallax(54, d, 30))
             d += 5
-        line += "\\\ \n"
+        line += "\\\\\n"
         tab += line
         hp += 0.3
 	
@@ -274,7 +274,7 @@ def venparallax():
         while hp < 0.7:
             line += "& {:.1f} ".format(parallax(hp, Hdeg, 0))
             hp += 0.1
-        line += "\\\ \n"
+        line += "\\\\\n"
         tab += line
         Hdeg += 10		
     tab = tab + r'''\hline
