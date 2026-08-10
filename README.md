@@ -247,9 +247,9 @@ BUGFIX (solved here and in PyPI skyalmanac 1.12.5):
 
 BUGFIX (solved here and in PyPI skyalmanac 1.13):  
 * the following error messages have been fixed:
-* &emsp"Event time sequence ERROR on dd-mm-yyyy in mp_eventtables_fmt_rise_set"
-* &emsp"Event time sequence ERROR on dd-mm-yyyy in mp_nautical_fmt_rise_set"
-* &emsp"Event time sequence ERROR on dd-mm-yyyy in alma_skyfield.next_rise_set"
+* &emsp; "Event time sequence ERROR on dd-mm-yyyy in mp_eventtables_fmt_rise_set"
+* &emsp; "Event time sequence ERROR on dd-mm-yyyy in mp_nautical_fmt_rise_set"
+* &emsp; "Event time sequence ERROR on dd-mm-yyyy in alma_skyfield.next_rise_set"
 * 23 Syntax Deprecation Warnings detected by Python 3.13.14 have been fixed
 ** Note that Skyfield version 1.55 is required as a minimum to avert other issues**
 
