@@ -282,20 +282,20 @@ BUGFIX (solved here and in PyPI skyalmanac 1.13):
 
 **It is unlikely that the performance improvement with multiprocessing requires specific virtualization settings enabled in the BIOS. (Intel Virtualization Technology or VMM support is not required.) Furthermore Windows 10 Home (without Hyper-V support) is sufficient - Windows 10 Pro/Enterprise/Education is not required. Also Windows 11 Home is sufficient.**
 
-&emsp;Tested on Windows 10 Pro, Version 21H2 with an AMD Ryzen 7 3700X 8-Core Processor  
-&emsp;A PDF reader is required, e.g. **Adobe Acrobat Reader DC**  
+&emsp;Tested on Windows 11 Pro, Version 25H2 with an AMD Ryzen 7 9700X 8-Core Processor  
+&emsp;A PDF reader is required, e.g. **Adobe Acrobat Reader**  
 
-&emsp;Install Python 3.11.3 It should be in the system environment variable PATH, e.g.  
-&emsp;&ensp;**C:\\Python311\Scripts;C:\\Python311;** .....  
-&emsp;Install MiKTeX 22.10 from https://miktex.org/  
-&emsp;&emsp;**Run** basic-miktex-22.10-x64.exe **as administrator**  
+&emsp;Install Python 3.13.14 It should be in the system environment variable PATH, e.g.  
+&emsp;&ensp;**C:\\Python313\Scripts;C:\\Python313;** .....  
+&emsp;Install MiKTeX 25.12 from https://miktex.org/  
+&emsp;&emsp;**Run** basic-miktex-25.12-x64.exe **as administrator**  
 &emsp;&emsp;I prefer to install MiKTeX **for all users** on a private laptop  
 &emsp;&emsp;**Reboot the computer** to avoid the message:  
 &emsp;&emsp;"- - - Neither TeX Live nor MiKTeX is installed - - -"  
 &emsp;When MiKTeX first runs confirm the installation of additional packages.  
 &emsp;Run Command Prompt as Administrator, go to your Python folder and execute, e.g.:
 
-&emsp;**cd C:\\Python311**  
+&emsp;**cd C:\\Python313**  
 &emsp;**python.exe -m pip install --upgrade pip**  
 &emsp;... for a first install (it's preferable to install *wheel* first):  
 &emsp;**pip3 install wheel**  
@@ -307,19 +307,9 @@ BUGFIX (solved here and in PyPI skyalmanac 1.13):
 &emsp;Put the required files for Skyalmanac in a new folder, run Command Prompt in that folder and start with:  
 &emsp;**py -3 skyalmanac.py**
 
-&emsp;If using MiKTeX 21 or higher, executing 'option 6' (Increments and Corrections) will probably fail with  
-&emsp;**! TeX capacity exceeded, sorry [main memory size=3000000].**  
-&emsp;To resolve this problem (assuming MiKTeX has been installed for all users),  
-&emsp;open a Command Prompt as Administrator and enter:  
-&emsp;**initexmf --admin --edit-config-file=pdflatex**  
-&emsp;This opens **pdflatex.ini** in Notepad. Add the following line:  
-&emsp;**extra_mem_top = 1000000**  
-&emsp;and save the file. Problem solved. For more details go [here](https://tex.stackexchange.com/questions/438902/how-to-increase-memory-size-for-xelatex-in-miktex/438911#438911)
-
-
 ### INSTALLATION GUIDELINES on Ubuntu Desktop 19.10 or 20.04, 22.04, 24.04 or 26.04:
 
-&emsp;Ubuntu 18.04 and higher come with Python 3 preinstalled,  
+&emsp;Ubuntu 18.04 and higher comes with Python 3 preinstalled,  
 &emsp;however pip may need to be installed:  
 &emsp;**sudo apt install python3-pip**
 
@@ -334,13 +324,11 @@ BUGFIX (solved here and in PyPI skyalmanac 1.13):
 &emsp;Put the Skyalmanac files in a folder and start with:  
 &emsp;**python3 skyalmanac.py**  
 
-
 ### INSTALLATION GUIDELINES on Ubuntu Desktop 24.04:
 
 &emsp;Ubuntu 24.04 comes with Python 3.12 preinstalled, which requires use of a virtual environment.  
 &emsp;Please download the file **How to install Skyalmanac on Linux.pdf** for instructions.  
 &emsp;Installation of the PyPI package is described, which is simpler - no other files from GitHub are required.
-
 
 ### INSTALLATION GUIDELINES on Mac OS (old; unverified):
 
